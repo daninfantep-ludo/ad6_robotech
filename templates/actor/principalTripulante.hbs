@@ -1,0 +1,162 @@
+{{!--
+    Pestaña "Tripulante" del actor PRINCIPAL.
+
+    Aparece SOLO si el personaje tiene un vehículo "instalado"
+    (system.nombreVehiculo). Representa que el principal está actuando también
+    como TRIPULANTE de ese vehículo.
+
+    Contenido:
+      a) Cabecera con el retrato + nombre + designación del vehículo y un botón X
+         para "bajarse" (quitarVehiculo).
+      b) Listado de los EQUIPOS (armas) del vehículo.
+      c) Listado de los SUITIES DE EQUIPO del vehículo.
+
+    IMPORTANTE: esta pestaña es de SOLO LECTURA en cuanto a creación/borrado (no
+    hay botón "+" ni acción de borrar). Pero SÍ se puede:
+      - marcar "siendoUsado" (suma el valor de los suities a los dados),
+      - editar los campos numéricos (dano, valor, usos, bancos...),
+      - usar/recargar (consumir usos) desde el menú contextual.
+    Todos estos cambios se aplican sobre los items REALES del vehículo (la
+    resolución de items de un principal tripulante mira en system.nombreVehiculo
+    vía Func.ObtenerItem), de modo que los usos se consumen en el vehículo.
+--}}
+<section id="TRIPULANTE" class="tab ad6-tab tripulante tx  {{tab.cssClass}} div-panel txt-fill" data-group="primary" data-tab="tripulante"  role="tabpanel">
+<div class="tab-content txt-fill flx fd-column">
+
+    {{#if vehiculoTripulante}}
+    {{!-- ===== (a) CABECERA: retrato + nombre + designación + X ===== --}}
+    <div class="flx cnt-horizontal vam gap-5" style="margin-bottom: 6px;">
+        <img class="piloto-imagen" src="{{vehiculoTripulante.img}}" title="{{vehiculoTripulante.name}}"
+             alt="{{vehiculoTripulante.name}}" width="64" height="64"
+             style="border: 1px solid var(--color-brillo);"/>
+        <div class="flx fd-column gap-5">
+            <label class="tx tx-negrita">{{vehiculoTripulante.name}}</label>
+            <label class="tx tx-pq">{{localize "Ad6.Etiquetas.designacion"}}: {{vehiculoTripulante.system.designacion}}</label>
+        </div>
+        <button title="{{localize "Ad6.Etiquetas.quitarVehiculo"}}" class="boton-ico mrg-la"
+                data-action="quitarVehiculo"><i class="fas fa-xmark"></i></button>
+    </div>
+
+    <div>
+        {{!-- ===== (b) EQUIPOS (ARMAS) DEL VEHÍCULO ===== --}}
+        <header class="chk-ct" style="height:20px;">
+            {{#if equiposVehiculo}}
+            <div class="w-200 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.arma"}}</div>
+            <div class="w-50 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.rango"}}</div>
+            <div class="w-50 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.dano"}}</div>
+            <div class="w-50 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.pen"}}</div>
+            <div class="w-50 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.areachica"}}</div>
+            <div class="w-40"></div>
+            <div class="w-100 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.descriptores"}}</div>
+            <div class="w-30 tx-pq tx-cnt" ></div>
+            <div class="w-45 tx-pq tx-cnt"></div>
+            {{#if equiposVehiculoHayBancos}}
+            <div class="w-45 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.bancos"}}</div>
+            {{/if}}
+            {{/if}}
+        </header>
+        <div class="fd-column" ID="EQUIPOS_VEHICULO">
+            {{#each equiposVehiculo as |eq|}}
+            <div class="chk-ct">
+                {{> parcialCuerpoEquipos  se=eq  eqSuit=false}}
+                <div class="w-30"></div>
+                <div class="w-45"></div>
+                {{#if eq.system.esBanco}}
+                    {{> parcialMaxValor
+                        valor=eq.system.bancos.restante
+                        maximo=eq.system.bancos.maximo
+                        dataId=eq.id
+                        it=true
+                        campo="bancos.restante"
+                        titulo=(localize "Ad6.Etiquetas.bancosRestantes")
+                        anchura="w-45"
+                    }}
+                {{else if eq.system.esHardware}}
+                    {{> parcialHardwares basico=@root.system.esBasico hardwares=eq.system.hardwares dataId=eq.id titulo=(localize "Ad6.Etiquetas.hardware")}}
+                {{else}}
+                    <div class="w-45"></div>
+                {{/if}}
+                {{!-- Menú contextual SIN borrar (pestaña de solo lectura para crear/borrar);
+                     conserva editar/chat/infinito. --}}
+                <div class="menu-context fila-ext mrg-la">
+                    <input type="checkbox" id="menu-{{eq.id}}" class="menu-toggle">
+                    <label for="menu-{{eq.id}}" title="{{localize "Ad6.Etiquetas.masOpciones"}}" class="boton-ico menu-pin"><i class="fas fa-ellipsis-vertical"></i></label>
+                    <div class="menu-panel">
+                        <button title="{{localize "Ad6.Etiquetas.verDetalleEditar"}}" data-id="{{eq.id}}" class="boton-ico" data-action="itemEditar" data-tipo="equipo"><i class="fas fa-pen-to-square"></i></button>
+                        <button title="{{localize "Ad6.Etiquetas.enviarAlChat"}}" data-id="{{eq.id}}" class="boton-ico" data-action="itemChat" data-tipo="equipo"><i class="fas fa-comment"></i></button>
+                    </div>
+                </div>
+            </div>
+            {{/each}}
+        </div>
+
+        {{!-- ===== (c) SUITIES DE EQUIPO DEL VEHÍCULO ===== --}}
+        <header class="chk-ct" style="height:20px;">
+            {{#if suitEquiposVehiculo}}
+            <div class="w-200 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.suitEquipo"}}</div>
+            <div class="w-50 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.rango"}}</div>
+            <div class="w-50 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.dano"}}</div>
+            <div class="w-50 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.pen"}}</div>
+            <div class="w-50 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.areachica"}}</div>
+            <div class="w-40"></div>
+            <div class="w-100 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.descriptores"}}</div>
+            <div class="w-30 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.valor"}}</div>
+            <div class="w-45 tx-pq tx-cnt">{{localize "Ad6.Etiquetas.usos"}}</div>
+            {{#if suitEquiposVehiculoHayBancos}}
+            <div class="w-45 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.bancos"}}</div>
+            {{/if}}
+            {{/if}}
+        </header>
+        <div class="fd-column" ID="SUITEQUIPOS_VEHICULO">
+            {{#each suitEquiposVehiculo as |se|}}
+            <div class="chk-ct">
+                {{> parcialCuerpoEquipos  se=se eqSuit=true}}
+                <div class="w-30">
+                    <input title="{{localize "Ad6.Etiquetas.habilidad"}}" type="text" data-id="{{se.id}}" data-campo="valor" value="{{se.system.valor}}" class="change tx mrg w-30 tx-cnt"/>
+                </div>
+                {{> parcialMaxValor
+                    valor=se.system.usos.restante
+                    maximo=se.system.usos.maximo
+                    dataId=se.id
+                    it=true
+                    campo="usos.restante"
+                    titulo=(localize "Ad6.Etiquetas.usosRestantes")
+                    anchura="w-45"
+                }}
+                {{#if se.system.esBanco}}
+                    {{> parcialMaxValor
+                        valor=se.system.bancos.restante
+                        maximo=se.system.bancos.maximo
+                        dataId=se.id
+                        it=true
+                        campo="bancos.restante"
+                        titulo=(localize "Ad6.Etiquetas.bancosRestantes")
+                        anchura="w-45"
+                    }}
+                {{else if se.system.esHardware}}
+                    {{> parcialHardwares basico=@root.system.esBasico hardwares=se.system.hardwares dataId=se.id titulo=(localize "Ad6.Etiquetas.hardware")}}
+                {{else}}
+                    <div class="w-45"></div>
+                {{/if}}
+                {{!-- Menú contextual SIN borrar; conserva editar/chat/infinito. --}}
+                <div class="menu-context fila-ext mrg-la">
+                    <input type="checkbox" id="menu-{{se.id}}" class="menu-toggle">
+                    <label for="menu-{{se.id}}" title="{{localize "Ad6.Etiquetas.masOpciones"}}" class="boton-ico menu-pin"><i class="fas fa-ellipsis-vertical"></i></label>
+                    <div class="menu-panel">
+                        <button title="{{localize "Ad6.Etiquetas.infinito"}}" class="boton-ico" data-id="{{se.id}}" type="button" data-action="infinitoItem" data-tipo="suitEquipo"><i class="fas fa-solid fa-infinity"></i></button>
+                        <button title="{{localize "Ad6.Etiquetas.verDetalleEditar"}}" data-id="{{se.id}}" class="boton-ico" data-action="itemEditar" data-tipo="suitEquipo"><i class="fas fa-pen-to-square"></i></button>
+                        <button title="{{localize "Ad6.Etiquetas.enviarAlChat"}}" data-id="{{se.id}}" class="boton-ico" data-action="itemChat" data-tipo="suitEquipo"><i class="fas fa-comment"></i></button>
+                    </div>
+                </div>
+            </div>
+            {{/each}}
+        </div>
+    </div>
+    {{else}}
+    <div class="piloto-vacio tx-cnt" style="margin-top: 20px;">
+        {{localize "Ad6.Etiquetas.arrastreAquiVehiculo"}}
+    </div>
+    {{/if}}
+
+</div>
+</section>

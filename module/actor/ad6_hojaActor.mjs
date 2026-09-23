@@ -770,14 +770,33 @@ await item.update({[campo]: valor});
     return false;
   }
 
-  // Devuelve un objeto {clase, item} con el arma en uso, con preferencia del
+    // Devuelve un objeto {clase, item} con el arma en uso, con preferencia del
   // equipo (arma) sobre la suit de equipo, entre los que tienen siendoUsado.
+  //
+  // Además de los items del propio actor, si el actor es un PRINCIPAL con
+  // vehículo instalado (system.nombreVehiculo), también se consideran los
+  // equipos/suities del VEHÍCULO (el personaje actúa como tripulante y puede
+  // fijar el ataque con un arma del vehículo). Se devuelve el ITEM REAL del
+  // vehículo, para que al fijar la tirada se copie su identidad correctamente.
   _armaEnUso()
   {
-    const armas = this.actor.items.filter(i => i.type === "equipo" && i.system.siendoUsado);
+    // Candidatos: items del propio actor + (si procede) los del vehículo.
+    const candidatos = [...this.actor.items];
+
+    if (this.actor.type === "principal")
+    {
+      const idVehiculo = this.actor.system?.nombreVehiculo;
+      if (idVehiculo && idVehiculo !== "undefined")
+      {
+        const vehiculo = game.actors?.get(idVehiculo);
+        if (vehiculo) candidatos.push(...vehiculo.items);
+      }
+    }
+
+    const armas = candidatos.filter(i => i.type === "equipo" && i.system.siendoUsado);
     if (armas.length > 0) return { clase: "equipo", item: armas[0] };
 
-    const suits = this.actor.items.filter(i => i.type === "suitEquipo" && i.system.siendoUsado);
+    const suits = candidatos.filter(i => i.type === "suitEquipo" && i.system.siendoUsado);
     if (suits.length > 0) return { clase: "suitEquipo", item: suits[0] };
 
     return null;
@@ -872,12 +891,23 @@ await item.update({[campo]: valor});
 
     if (esAtaque)
     {
+            // Candidatos: los items del actor y, si es un principal con vehículo
+      // instalado, también los del vehículo (el arma puede venir de ahí).
+      const candidatosValidacion = [...this.actor.items];
+      if (this.actor.type === "principal") {
+        const idv = this.actor.system?.nombreVehiculo;
+        if (idv && idv !== "undefined") {
+          const veh = game.actors?.get(idv);
+          if (veh) candidatosValidacion.push(...veh.items);
+        }
+      }
+
       // (a) Equipo en uso.
-      const tieneA = this.actor.items.some(
+      const tieneA = candidatosValidacion.some(
         i => i.type === "equipo" && i.system.siendoUsado === true);
 
       // (b) Suit de equipo en uso CON daño.
-      const tieneB = this.actor.items.some(
+      const tieneB = candidatosValidacion.some(
         i => i.type === "suitEquipo"
           && i.system.siendoUsado === true
           && Ad6_HojaActor._armaCuentaParaAtaque("suitEquipo", i.system?.dano));
@@ -1171,7 +1201,7 @@ await item.update({[campo]: valor});
     }
     
         // Set tab context if this is a tab part
-    if (["habilidades", "elementos", "talentos" ,"equipo","talentosElementos", "competencias", "localizaciones", "notas"].includes(partId)) {
+        if (["habilidades", "elementos", "talentos" ,"equipo","talentosElementos", "tripulante", "competencias", "localizaciones", "notas"].includes(partId)) {
         context.tab = context.tabs[partId];
     }
 

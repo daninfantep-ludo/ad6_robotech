@@ -203,8 +203,13 @@ export class Ad6_ActorPrincipal extends Ad6_ActorPersona{
         ...commonData
         ,naturaleza: new fields.SchemaField(Ad6_Personalidad())
         ,conducta: new fields.SchemaField(Ad6_Personalidad())
-        ,agotamiento: new fields.NumberField({initial:5})
+                ,agotamiento: new fields.NumberField({initial:5})
         ,hastaAgotamiento: new fields.BooleanField({initial:false})
+        ,nombreVehiculo: new fields.StringField({initial:""})
+        // id del actor "vehiculo" en el que este principal actúa como TRIPULANTE.
+        // Mismo patrón que system.nombrePiloto del vehículo (id sin "Actor.").
+        // Cuando está relleno, se muestra la pestaña "Tripulante" y los equipos/
+        // suities del vehículo se listan (en vivo) y se pueden usar desde aquí.
         ,rango: new fields.SchemaField(Ad6_Ranking())
         ,fama: new fields.SchemaField(Ad6_Ranking())
         ,fortuna: new fields.SchemaField(Ad6_Ranking())

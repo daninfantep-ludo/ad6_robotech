@@ -69,6 +69,19 @@ export async function ObtenerItem(actor,itemId)
         
         item = await foundry.utils.fromUuid(uuid);
     }
+    // Caso INVERSO: un PRINCIPAL puede ser TRIPULANTE de un vehículo. Los items
+    // que se listan en su pestaña "Tripulante" (equipos y suities de equipo del
+    // vehículo) NO son del personaje, así que hay que resolverlos contra el
+    // vehículo guardado en system.nombreVehiculo. Se devuelven los ITEMS REALES
+    // del vehículo para que (p.ej.) gastar un uso lo consuma allí.
+    if ((item===undefined)||(item===null))
+    {
+        const idVehiculo = actor.system?.nombreVehiculo;
+        if (idVehiculo && idVehiculo !== "undefined")
+        {
+            item = await foundry.utils.fromUuid("Actor." + idVehiculo + ".Item." + itemId);
+        }
+    }
     return item;
 }
 
@@ -115,6 +128,28 @@ export function suitsEquipoDe(actor)
 {
     if (!actor) return [];
     const propios = actor.items.filter(i => i.type === "suitEquipo");
+
+    // Caso INVERSO: un PRINCIPAL con vehículo instalado (system.nombreVehiculo)
+    // actúa como TRIPULANTE. Entonces también cuentan los suitEquipo del
+    // vehículo: al marcarlos ("siendoUsado") suman su valor a los dados del
+    // principal y, AL TIRAR, se cuentan y se CONSUMEN en el vehículo (items
+    // reales, no copias). Solo aplica a los suities; los equipos-arma del
+    // vehículo no entran aquí (se usan como arma, no como dados de equipo).
+    if (actor.type === "principal")
+    {
+        const idVehiculo = actor.system?.nombreVehiculo;
+        if (idVehiculo && idVehiculo !== "undefined")
+        {
+            const vehiculo = game.actors?.get(idVehiculo);
+            if (vehiculo)
+            {
+                const delVehiculo = vehiculo.items.filter(i => i.type === "suitEquipo");
+                return [...propios, ...delVehiculo];
+            }
+        }
+        return propios;
+    }
+
     if (!INCLUIR_SUITS_PERSONALES_PILOTO) return propios;
     if (actor.type !== "vehiculo") return propios;
 
