@@ -76,6 +76,11 @@
             <div class="chk-ct fila-ext mrg-xl">
                 <label class="label-item w-140">{{localize "Ad6.Etiquetas.nombre"}}</label>
                 <input class="w-200" name="name" type="text" value="{{document.name}}" placeholder="{{localize "Ad6.Etiquetas.nombre"}}"/>
+
+                 <label>{{localize "Ad6.Etiquetas.rnk"}}</label>
+                    <select name="system.rangoRequerido" class="tx mrg w-60">
+                        {{selectOptions config.Rangos selected = system.rangoRequerido  localize=true}}
+                    </select>    
             </div>
             {{!-- DESIGNACIÓN del vehículo: si NO está vacía, al EQUIPAR el upgrade
                  sustituye la designación del vehículo (system.designacion del

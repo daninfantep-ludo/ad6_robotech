@@ -2,7 +2,12 @@
   <label class="label-item w-120">{{localize "Ad6.Etiquetas.tipo"}}</label>
   <select name ="system.armadura.tipo" class="tx mrg w-105" data-campo ="armadura.tipo">
       {{selectOptions config.Escalas selected = system.armadura.tipo  localize=true}}
-  </select></div>
+  </select>
+   <label>{{localize "Ad6.Etiquetas.rnk"}}</label>
+                    <select name="system.rangoRequerido" class="tx mrg w-60">
+                        {{selectOptions config.Rangos selected = system.rangoRequerido  localize=true}}
+                    </select>    
+</div>
 <div class="form-group  mrg-xl">
   <label class="label-item w-120">{{localize "Ad6.Etiquetas.valor"}}</label>
   <input  class="text-item w-60 tx-cnt" type="text" name="system.armadura.valor" value="{{system.armadura.valor}}"/>

@@ -71,7 +71,8 @@
         }
          ,"Etiquetas":  
          {
-             "personal": "¿Personal?"
+             "rnk": "Rng"
+            ,"personal": "¿Personal?"
             ,"valor": "Valor"
             ,"resiste": "Resiste"
             ,"equipado": "Equipado"

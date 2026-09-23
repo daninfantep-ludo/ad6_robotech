@@ -27,6 +27,10 @@
                 <select data-blindaje="S" name ="armaduraPrincipal.system.armadura.tipo" class="change tx mrg w-105" data-id="{{armaduraPrincipal.id}}" data-campo ="armadura.tipo">
                     {{selectOptions config.Escalas selected = armaduraPrincipal.system.armadura.tipo  localize=true}}
                 </select>
+                <label>{{localize "Ad6.Etiquetas.rnk"}}</label>
+                    <select name="system.rangoRequerido" class="tx mrg w-60">
+                        {{selectOptions config.Rangos selected = system.rangoRequerido  localize=true}}
+                    </select>                
             </div>                   
             {{#if (neq velocidades.length 1)}}
             <div class="flx cnt-horizontal">

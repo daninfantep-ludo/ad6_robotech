@@ -340,6 +340,7 @@ export class Ad6_ActorVehiculo extends Ad6_Actor{
         ,redirigir: new fields.NumberField({initial:0})
         ,inhibir: new fields.NumberField({initial:0})
         ,interactuar: new fields.NumberField({initial:0})
+        ,rangoRequerido: new fields.StringField()
         }
 
         // deberé tener métodos externos, porque estas clases son una mierda, que me diga la velocidad de un vehículo (actual) tipo getter, pero no en la clase

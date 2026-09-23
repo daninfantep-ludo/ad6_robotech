@@ -62,6 +62,7 @@ export class Ad6_Armadura extends Ad6_Item{
         ...commonData
         ,armadura: new fields.SchemaField(Ad6_Proteccion())
         ,equipada: new fields.BooleanField({initial: true})
+        ,rangoRequerido: new fields.StringField()
         }
     }
 }
@@ -71,6 +72,7 @@ export class Ad6_Equipo extends Ad6_Item{
         const commonData = super.defineSchema();
         return {
         ...commonData
+        ,rangoRequerido: new fields.StringField()
         ,rango: new fields.StringField()
         ,extendido: new fields.BooleanField()
         ,dano: new fields.StringField()
@@ -211,6 +213,7 @@ export class Ad6_Upgrade extends Ad6_Item{
         const commonData = super.defineSchema();
         return {
         ...commonData
+        ,rangoRequerido: new fields.StringField()
         // --- ¿Está puesto el upgrade en el vehículo? ---
         ,equipado: new fields.BooleanField({initial: false})
 
