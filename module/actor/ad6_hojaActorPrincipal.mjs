@@ -54,14 +54,10 @@ export class Ad6_HojaActorPrincipal extends Ad6_HojaActorPersona
         template: "systems/ad6_robotech/templates/actor/tabHabilidades.hbs",
         scrollable: [".tab-content"]
     }
-    ,talentos: {
-        template: "systems/ad6_robotech/templates/actor/tabTalentos.hbs",
+    ,talentosElementos: {
+        template: "systems/ad6_robotech/templates/actor/principalTalentosElementos.hbs",
         scrollable: [".tab-content"]
     }
-    ,elementos: {
-        template: "systems/ad6_robotech/templates/actor/tabElementos.hbs",
-        scrollable: [".tab-content"]
-    }    
     ,equipo: {
         template: "systems/ad6_robotech/templates/actor/tabEquipo.hbs",
         scrollable: [".tab-content"]
@@ -77,12 +73,11 @@ export class Ad6_HojaActorPrincipal extends Ad6_HojaActorPersona
 
   };
 
-   static TABS = {
+      static TABS = {
         primary: {
             tabs: [
                 { id: "habilidades", label: "Habilidades" },
-                { id: "elementos", label: "Elementos" },
-                { id: "talentos", label: "Talentos" },
+                { id: "talentosElementos", label: "Especiales" },
                 { id: "equipo", label: "Equipo" },
                 { id: "competencias", label: "Competencias" },
                 { id: "notas", label: "Notas" }
