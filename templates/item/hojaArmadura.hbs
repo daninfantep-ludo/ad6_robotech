@@ -1,0 +1,55 @@
+<div class="form-group  mrg-xl">
+  <label class="label-item w-120">{{localize "Ad6.Etiquetas.tipo"}}</label>
+  <select name ="system.armadura.tipo" class="tx mrg w-105" data-campo ="armadura.tipo">
+      {{selectOptions config.Escalas selected = system.armadura.tipo  localize=true}}
+  </select></div>
+<div class="form-group  mrg-xl">
+  <label class="label-item w-120">{{localize "Ad6.Etiquetas.valor"}}</label>
+  <input  class="text-item w-60 tx-cnt" type="text" name="system.armadura.valor" value="{{system.armadura.valor}}"/>
+</div>
+<div class="form-group  mrg-xl">
+  <label class="label-item w-120">{{localize "Ad6.Etiquetas.restante"}}</label>
+  <input  class="text-item w-60 tx-cnt" type="text" name="system.armadura.restante" value="{{system.armadura.restante}}"/>
+</div>
+<div class="form-group  mrg-xl">
+  <label class="label-item w-120">{{localize "Ad6.Etiquetas.resiste"}}</label>
+  <input class="text-item w-60 tx-cnt" type = "number" name="system.armadura.resiste" value="{{system.armadura.resiste}}"/>
+</div>
+<div class="form-group  mrg-xl">
+  <label class="label-item w-120">{{localize "Ad6.Etiquetas.ablativaEscudo"}}</label>
+  <input class="text-item" type = "checkbox" name="system.armadura.ablativa" {{#if system.armadura.ablativa}}checked{{/if}}/>
+</div>
+<label>{{localize "Ad6.Etiquetas.resistenciasAdicionales"}}</label>
+<div class="flx cnt-horizontal">
+  {{#each system.armadura.resistencias as |res|}}
+  <div class="form-group flx fd-column">
+    <label class="label-item tx-red tx-cnt">
+      {{localize res.descriptor}}
+    </label>
+    <input
+      class="text-item w-60 tx-cnt"
+      type="number"
+      name="system.armadura.resistencias.{{@index}}.adicional"
+      value="{{res.adicional}}"
+    />
+     <input
+      type="hidden"
+      name="system.armadura.resistencias.{{@index}}.descriptor"
+      value="{{res.descriptor}}"
+    />
+  </div>
+  {{/each}}
+</div>
+<!--<div class="form-group  mrg-xl">
+  <label class="label-item w-120">{{localize "Ad6.Etiquetas.equipado"}}</label>
+  <input class="text-item" type = "checkbox" name="system.equipada" {{#if system.equipada}}checked{{/if}}/>
+</div>
+esto no debería ir acá, porque el hecho de que esté equipada o no es de la dinámica de la hoja
+-->
+<div class="form-group  mrg-xl">
+    <prose-mirror target="system.description" name="system.descripcion" value="{{system.descripcion}}" toggled="true">
+      {{{descripcionRica}}} {{!--the enriched text--}}
+    </prose-mirror>
+</div>  
+
+ 

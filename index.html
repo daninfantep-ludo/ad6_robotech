@@ -1,0 +1,143 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"/>
+
+        <style>
+        @import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@600;700;800;900&display=swap');
+        @import url('/css/ad6_robotech_generales.css');
+        @import url('/css/ad6_robotech_hex_heridas.css');
+        @import url('/css/ad6_tabs.css');
+
+        /* Contenedor principal que simula el fondodel panel */
+        .panel-container {
+            background-color:var(--color-borde); /* Color general de la hoja */
+            padding: 2px;
+            display: flex;
+            justify-content: center;
+            gap: 2px;
+            width: fit-content;
+            margin: 0px auto;
+            border-radius: 3px;
+            box-shadow: inset 0 0 3px rgba(0,0,0,0.5), 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        /* Simulación de la ranura oscura por donde se desliza el botón */
+        .ranura {
+            width: 24px;
+            height: 40px;
+            background-color: #1a1a1a; /* Fondo oscuro de la ranura */
+            border-radius: 3px;
+            position: relative;
+            box-shadow: inset 3px 3px 10px rgba(0,0,0,0.8), inset -3px -3px 10px rgba(255,255,255,0.1);
+            overflow: hidden;
+        }
+
+        /* Estilo base de la palanca-botón */
+        .palanca-btn {
+            width: 20px;
+            height: 20px;
+            background-color: #ffffff; /* Bloque blanco principal */
+            border: none;
+            border-radius: 2px;
+            position: absolute;
+            left: 2px;
+            cursor: pointer;
+            
+            /* Tipografía y diseño de la letra */
+            font-family: 'Arial Black', sans-serif;
+            font-size: 0.7rem;
+            color: #005691; /* Color azul de las letras del panel */
+            
+            /* Efecto 3D del botón tipo bloque */
+            box-shadow: 0 3px 0px #b3b3b3, 
+                        3px 8px 10px rgba(0,0,0,0.4);
+            
+            /* Animación suave al cambiar de posición */
+            transition: top 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* Posición por defecto: APAGADO / ABAJO */
+        .palanca-btn[aria-pressed="false"] {
+            top: 15px; /* Se queda en la parte inferior de la ranura */
+        }
+
+        /* Posición modificada: ACTIVO / ARRIBA */
+        .palanca-btn[aria-pressed="true"] {
+            top: 2px; /* Sube a la parte superior de la ranura */
+            color: #0088cc; /* Un azul un poco más brillante al activarse */
+            box-shadow: 0 5px 0px #b3b3b3, 
+                        0px 2px 5px rgba(0,0,0,0.2);
+        }
+
+        /* Pequeño indicador luminoso decorativo encima de cada ranura */
+       /* .indicador-luces {
+            width: 40px;
+            height: 8px;
+            background-color: #3a6073;
+            margin: 0 auto 15px auto;
+            border-radius: 2px;
+            box-shadow: inset 1px 1px 3px rgba(0,0,0,0.5);
+        }*/
+        
+        /* Contenedor individual para alinear la luz con su respectiva ranura */
+        .modulo-control {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+    </style>
+</head> 
+<body bgcolor="black">
+    
+    <!-- Panel de control general -->
+    <div class="panel-container">
+        <!-- Módulo del Modo B (Battloid) -->
+        <div class="modulo-control">
+            <div class="ranura">
+                <button class="palanca-btn" aria-pressed="false" id="btn-b">B</button>
+            </div>
+        </div>
+
+        <!-- Módulo del Modo G (Guardian) -->
+        <div class="modulo-control">
+            <div class="ranura">
+                <button class="palanca-btn" aria-pressed="false" id="btn-g">G</button>
+            </div>
+        </div>
+
+        <!-- Módulo del Modo F (Fighter) -->
+        <div class="modulo-control">
+            <div class="ranura">
+                <button class="palanca-btn" aria-pressed="false" id="btn-f">F</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Lógica JavaScript para cambiar los estados ARRIBA/ABAJO de forma interactiva -->
+    <script>
+        const botones = document.querySelectorAll('.palanca-btn');
+
+        botones.forEach(boton => {
+            boton.addEventListener('click', () => {
+                // Obtenemos el estado actual del botón presionado
+                const estaPresionado = boton.getAttribute('aria-pressed') === 'true';
+                
+                // OPCIONAL: Apaga todos los demás botones primero (Regla de la serie: Solo un modo activo a la vez)
+                botones.forEach(b => b.setAttribute('aria-pressed', 'false'));
+                
+                // Si estaba abajo (false), ahora sube (true). Si estaba arriba, baja.
+                boton.setAttribute('aria-pressed', !estaPresionado);
+            });
+        });
+    </script>
+</body>
+</html>

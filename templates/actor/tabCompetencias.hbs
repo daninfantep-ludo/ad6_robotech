@@ -1,0 +1,22 @@
+<section id="COMPETENCIAS" class="tab ad6-tab competencias tx  {{tab.cssClass}} div-panel txt-fill" data-group="primary" data-tab="competencias"  role="tabpanel">
+<div class="tab-content txt-fill flx">
+        <div>
+            <header class="chk-ct" style="height:20px;">
+                {{#if @root.competencias}}
+                <div class="w-375 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.nombreDeLaCompetencia"}}</div>
+                {{/if}}
+                <div class="fila-ext mrg-la">                
+                    <button title="{{localize "Ad6.Etiquetas.anadirCompetencia"}}" class="boton-ico" data-action="itemAnadir" data-tipo="competencia"><i class="fas fa-solid fa-plus"></i> </button>
+                </div>
+            </header>
+            <div class="fd-column" ID="COMPETENCIAS">
+                {{#each competencias as |com|}}
+                <div class="chk-ct">
+                <input type="text" data-id="{{com.id}}" data-campo="name" value="{{com.name}}" class="change tx mrg w-375"/>
+                {{> parcialContextoGeneral id=com.id infinito=false tipoDato="competencia"}}
+                </div>
+                {{/each}}
+
+            </div>
+        </div>
+</section>

@@ -1,0 +1,19 @@
+<section id="HABILIDADESTENIENTE" class="tab ad6-tab habilidades tx  {{tab.cssClass}} div-panel txt-fill" data-group="primary" data-tab="habilidades"  role="tabpanel">
+    <div class="flx fd-column gap-5">
+
+        <div class="flx cnt-horizontal gap5">
+            {{> parcialTenienteHabilidades}}
+            <div id="DERECHA">
+                <div>
+                    <div>
+                        <label class="w-80">{{localize "Ad6.Etiquetas.elemento"}}</label>
+                        <input  name="system.elemento" value="{{system.elemento}}" readonly class="tx tx-cnt mrg w-200" type="text"></input>
+
+                    </div>
+
+                </div>
+                {{> tabTalentos  talentos = talentos teniente=true}}
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,31 @@
+<section id="FORMACION" class="tab ad6-tab formacion tx  {{tab.cssClass}} div-panel txt-fill" data-group="primary" data-tab="formacion"  role="tabpanel">
+<div class="tab-content txt-fill flx fd-column">
+        {{#if system.formacion }}
+        {{#each system.formacion as |f|}}
+        <div class="flx cnt-horizontal vam gap-5 mrg-xl ad6-miembro-formacion{{#if (lte f.cantidad 0)}} ad6-miembro-muerto{{/if}}">
+            <div class="hex-input hex-boton-normal">
+                <input type="number" data-campo="cantidad" data-miembro="S" data-id="{{@index}}" value="{{f.cantidad}}" class="hex-input-numero change" step="1" min="0"/>
+            </div>
+            <img class="piloto-imagen" src="{{f.img}}" title="{{f.nombre}}" alt="{{piloto.nombre}}" width="64" height="64"/>
+            <div class="flx fd-column gap-5">
+                <label class="piloto-nombre">{{f.nombre}}</label>
+                <button title="{{localize "Ad6.Etiquetas.quitarElemento"}}" class="boton-ico" data-action="borrarMiembro" data-identificador="{{f.identificador}}"><i class="fas fa-xmark"></i></button>
+            </div>      
+            <div class="flx fd-column gap-5 mrg-l10">
+                <div class="flx cnt-horizontal jcc"><label class="w-100">{{localize "Ad6.Etiquetas.armadura"}}</label><label>{{f.armaduraPrincipal.restante}} {{f.armaduraPrincipal.tipo}} </label>{{> parcialResistencias proteccion=f.armaduraPrincipal }}</div>
+                <div class="flx cnt-horizontal"><label class="w-100">{{localize "Ad6.Etiquetas.estructura"}}</label><label>{{f.estructura}} {{f.tipo}} {{#if (neq f.armaduraSecundaria.restante 0)}}+{{f.armaduraSecundaria.restante}} {{f.armaduraSecundaria.tipo}}{{/if}}</label></div>
+            </div>
+            {{!-- Indicador de miembro ANIQUILADO (0 unidades). Es SOLO visual:
+                 en cuanto se escriba una cantidad > 0, desaparece en tiempo real. --}}
+            {{#if (lte f.cantidad 0)}}
+            <i class="fas fa-skull ad6-icono-muerto" title="{{localize "Ad6.Etiquetas.miembroAniquilado"}}"></i>
+            {{/if}}
+        </div>
+        {{/each}}
+    {{else}}
+        <div class="piloto-vacio tx-red tx-cnt">
+            {{localize "Ad6.Etiquetas.arrastreAquiActor"}}<br/>{{localize "Ad6.Etiquetas.tenienteOVehiculo"}}
+        </div>
+    {{/if}}
+</div>
+</section>

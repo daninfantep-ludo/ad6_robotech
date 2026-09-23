@@ -1,0 +1,12 @@
+            {{!--
+              Resistencias de una protección (armadura/blindaje) como ICONOS.
+              Se itera POR DESCRIPTOR (no por índice fijo) para ser robusto ante cualquier
+              reordenación del array (p.ej. combinarArmaduras lo reconstruye desde un Map).
+              El icono y la etiqueta del title se resuelven con los helpers
+              iconoResistencia / etiquetaResistencia según el descriptor.
+            --}}
+            {{#each proteccion.resistencias as |res|}}
+            {{#if (neq res.adicional 0)}}<div><i class="{{iconoResistencia res.descriptor}}" title="{{etiquetaResistencia res.descriptor}} {{res.adicional}}"></i></div>{{/if}}
+            {{/each}}
+            {{#if (neq proteccion.resiste 0)}}<div ><i class="fa-solid fa-crosshairs" title="{{localize "Ad6.Etiquetas.resiste"}} {{proteccion.resiste}}"></i></div>{{/if}}
+

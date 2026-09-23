@@ -1,0 +1,29 @@
+<section id="LOCALIZACIONES" class="tab ad6-tab localizaciones tx {{tab.cssClass}} div-panel txt-fill" data-group="primary" data-tab="localizaciones" role="tabpanel">
+  <div class="tab-content txt-fill flx h-full">
+    <div>
+      <div class="chk-ct" style="height:20px;">
+        {{#if @root.localizaciones}}
+        <div class="w-200 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.nombreDeLaLocalizacion"}}</div>
+        {{/if}}
+        <div class="fila-ext mrg-la">
+          <button title="{{localize "Ad6.Etiquetas.anadirLocalizacion"}}" class="boton-ico" data-action="itemAnadir" data-tipo="localizacion"><i class="fas fa-solid fa-plus"></i> </button>
+        </div>
+      </div>
+      <div class="fd-column" ID="LOCALIZACIONES">
+        {{#each localizaciones as |loc|}}
+        <div class="chk-ct">
+          <input type="text" data-id="{{loc.id}}" data-campo="name" value="{{loc.name}}" class="change tx mrg w-200"/>
+          <button type="button"
+                  class="boton-hardware {{#if loc.system.marcado}}hardware-verde{{else}}hardware-rojo{{/if}}"
+                  data-action="clickLocalizacion"
+                  data-id="{{loc.id}}"
+                  title="{{#if loc.system.marcado}}{{localize "Ad6.Etiquetas.operativa"}}{{else}}{{localize "Ad6.Etiquetas.destruida"}}{{/if}}">
+            <i class="fas fa-location-dot"></i>
+          </button>
+          {{> parcialContextoGeneral id=loc.id infinito=false tipoDato="localizacion"}}
+        </div>
+        {{/each}}
+      </div>
+    </div>
+  </div>
+</section>  

@@ -1,0 +1,15 @@
+<section  id="HEROICOS" class="div-panel tx flex-0-1-auto mw-171" >
+    <header class="div-panel-titulo cnt-horizontal">
+        <div >{{localize "Ad6.Etiquetas.movHeroicosTitulo"}}</div>
+    </header>
+        <div class="mrg-xl flx gap-5 hex-center-heroico">
+            {{#each system.movimientosHeroicos}}
+                {{#if (eq visible true)}}
+                    <button data-action="clickHexHeroico" data-indice="{{@index}}" 
+                    class="hex-boton hex-boton-heroico{{#if (neq letra "")}} agotado{{/if}}" type="button" aria-pressed="{{#if (neq letra "")}}true{{else}}false{{/if}}">
+                        <span class="hex-letra">{{#if (eq letra "")}}&nbsp;{{else}}{{letra}}{{/if}}</span>
+                    </button>
+                {{/if}}
+            {{/each}}
+        </div>
+</section>

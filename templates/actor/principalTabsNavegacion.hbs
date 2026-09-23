@@ -1,0 +1,13 @@
+    <nav class="navigable-tabs cnt-horizontal pl-4 mrg-xl" role="tablist" data-group="primary">
+  {{#each tabs as |tab id|}}
+    <button role="tab" 
+            aria-selected="{{#if tab.active}}true{{else}}false{{/if}}" 
+            aria-controls="{{tab.id}}-panel"
+            class="tab-button tx w-120 {{tab.cssClass}}"
+            data-tab="{{tab.id}}"
+            data-group="primary">
+            {{#if tab.icon}}<i class="{{tab.icon}}"></i>{{/if}}
+      {{#if tab.labelTraducido}}{{tab.labelTraducido}}{{else}}{{tab.label}}{{/if}}
+    </button>
+  {{/each}}
+</nav>

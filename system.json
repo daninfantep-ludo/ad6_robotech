@@ -1,0 +1,61 @@
+{
+    "id": "ad6_robotech",
+    "title": "Robotech Advantage6",
+    "description": "The Robotech Advantage6 for FoundryVTT! Release v1.1.0 - ApplicationV2",
+    "authors": [
+      {
+        "name": "Daniel Infante",
+        "discord": "daxos_ludocronicas",
+        "email": "daniel@ludocronicas.org",
+        "url": "https://ludocronicas.org",
+        "flags": {}
+      }
+    ],
+    "url": "https://github.com/daniel-infante-perez/ad6_robotech",
+    "version": "1.1.0",
+    "compatibility": {
+      "minimum": 14,
+      "verified": "14.367"
+    },
+    "esmodules": ["module/ad6_robotech.mjs"],
+    "styles": ["css/ad6_robotech_generales.css","css/ad6_robotech_hex_heridas.css","css/ad6_chat.css","css/ad6_tabs.css","css/ad6_cabina.css"],
+    "languages": [
+      {
+        "lang": "en",  
+        "name": "English",
+        "path": "lang/en.json"
+      }
+      ,{            
+        "lang": "es",
+        "name": "Spanish",
+        "path": "lang/es.json"
+      }
+    ],
+    "documentTypes": {
+        "Actor": {
+           "enjambre": {}
+          ,"teniente": {}
+          ,"principal": {}
+          ,"conflicto":{}
+          ,"vehiculo": {}
+        },
+        "Item": {
+          "talento": {},
+          "armadura": {},
+          "equipo": {},
+          "suitEquipo": {},
+          "habilidad":{},
+          "elemento":{},
+          "competencia":{},
+                    "perfilVelocidad":{},
+          "localizacion":{},
+          "hardware":{},
+          "upgrade":{}
+        }
+    },
+    "packs": [],
+    "packFolders": []
+    ,"manifest": "https://github.com/daniel-infante-perez/ad6_robotech/releases/latest/download/system.json"
+    ,"download": "https://github.com/daniel-infante-perez/ad6_robotech/archive/refs/tags/v1.1.0.zip"
+  }
+  

@@ -1,0 +1,104 @@
+/* Estilos para la ventana de chat */
+/***********************************/
+
+/* en esta versión se añade el estilo a la ventana flotante */
+
+:is(
+    .ad6-chat-log,
+    #notifications,
+    #chat-notifications,
+    .chat-notifications
+) .chat-message {
+    margin: 4px 0;
+    color: var(--color-letras);
+
+    position: relative;
+    isolation: isolate;
+    padding: 0.5rem;
+
+    background: var(--color-fondo-caja);
+
+    border-top-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+    border-top-right-radius: 10px;
+
+    border: 1px solid var(--color-borde);
+    box-shadow: 0 0 2px var(--color-brillo);
+}
+
+:is(
+    .ad6-chat-log,
+    #notifications,
+    #chat-notifications,
+    .chat-notifications
+) .message-header .message-sender {
+    color: var(--color-brillo);
+    font-family: "Exo 2", sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+:is(
+    .ad6-chat-log,
+    #notifications,
+    #chat-notifications,
+    .chat-notifications
+) .message-header .message-metadata {
+    color: var(--color-brillo);
+    font-family: "Exo 2", sans-serif;
+    font-size: 11px;
+    font-style: italic;
+}
+
+/**************************************************************/
+/* DADOS */
+
+
+  .dado-1{
+    background-image: url("../img/dado-1.png");
+    background-position: left top;
+    background-repeat: no-repeat;
+    background-size: 30px 30px; 
+    display: inline-block;
+  } 
+  
+  .dado-2{
+    background-image: url("../img/dado-2.png");
+    background-position: left top;
+    background-repeat: no-repeat;
+    background-size: 30px 30px; 
+    display: inline-block;
+  }  
+
+  .dado-3{
+    background-image: url("../img/dado-3.png");
+    background-position: left top;
+    background-repeat: no-repeat;
+    background-size: 30px 30px; 
+    display: inline-block;
+  }  
+
+  .dado-4{
+    background-image: url("../img/dado-4.png");
+    background-position: left top;
+    background-repeat: no-repeat;
+    background-size: 30px 30px; 
+    display: inline-block;
+  }  
+
+  .dado-5{
+    background-image: url("../img/dado-5.png");
+    background-position: left top;
+    background-repeat: no-repeat;
+    background-size: 30px 30px; 
+    display: inline-block;
+  }  
+
+  .dado-6{
+    background-image: url("../img/dado-6.png");
+    background-position: left top;
+    background-repeat: no-repeat;
+    background-size: 30px 30px; 
+    display: inline-block;
+  }  

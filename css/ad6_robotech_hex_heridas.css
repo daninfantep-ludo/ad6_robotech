@@ -1,0 +1,347 @@
+/* Clases generales para los botones hexagonales */
+.hex-boton{
+    position: relative;
+    width: 46px;
+    height: 40px;
+    padding: 0;
+    border: 0;
+    cursor: pointer;
+    appearance: none;
+    clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50% );
+    transition: background-color 0.2s ease,  transform 0.1s ease;
+    --fondo: #111111;
+    background: var(--color-externo);
+}
+.hex-boton::before{
+    content: "";
+    position: absolute;
+    inset: 1px;
+    clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50% );
+    background: var(--fondo);
+}
+.hex-letra{
+    position: relative;
+    z-index: 1;
+    font-family: "Exo 2";
+    font-size: 20px;
+    font-weight: 800;
+    line-height: 1;
+    user-select: none;
+    color: var(--color-externo);
+}
+.hex-boton:active {
+    transform: scale(0.96);
+}
+
+/* Definición de colores para el botón AMBAR */
+.hex-boton-ambar{
+    --color-externo: var(--color-ambar);
+}
+
+/* Estado al pasar el cursor */
+.hex-boton-ambar:hover {
+    --color-externo: var(--color-ambar-hover);
+}
+
+.hex-boton-ambar.agotado {
+    --color-externo: var(--color-ambar-agotado);
+    --fondo: var(--color-fondo-agotado);
+}
+
+/* Definición de colores para el botón VERDE */
+.hex-boton-verde{
+    --color-externo: var(--color-verde);
+}
+
+/* Estado al pasar el cursor */
+.hex-boton-verde:hover {
+    --color-externo: var(--color-verde-hover);
+}
+
+.hex-boton-verde.agotado {
+    --color-externo: var(--color-verde-agotado);
+    --fondo: var(--color-fondo-agotado);
+}
+
+/* Definición de colores para el botón ROJO */
+.hex-boton-rojo{
+    --color-externo: var(--color-rojo)
+}
+
+/* Estado al pasar el cursor */
+.hex-boton-rojo:hover {
+    --color-externo: var(--color-rojo-hover);
+}
+
+.hex-boton-rojo.agotado {
+    --color-externo: var(--color-rojo-agotado);
+    --fondo: var(--color-fondo-agotado);
+}
+
+/* Definición de colores para el botón ESTRÉS */
+/* el botón estrés no tiene color-interno ni agotado porque no comparte
+   la lógica con los botones de heridas, pero sí el tema de ser hexagonal
+   de la transición y del hover */
+
+.hex-boton-estres{
+    --color-externo: var(--color-estres);
+}
+
+/* Estado al pasar el cursor */
+.hex-boton-estres:hover {
+    --color-externo: var(--color-estres-hover);
+}
+.hex-boton-estres.agotado {
+    --color-externo: var(--color-estres-agotado);
+    --fondo: var(--color-fondo-agotado);
+}
+
+
+.hex-boton-heroico{
+    --color-externo: var(--color-heroico);
+}
+
+/* Estado al pasar el cursor */
+.hex-boton-heroico:hover {
+    --color-externo: var(--color-heroico-hover);
+}
+.hex-boton-heroico.agotado {
+    --color-externo: var(--color-heroico-agotado);
+    --fondo: var(--color-fondo-agotado);
+}
+
+.hex-boton-normal{
+    --color-externo: var(--color-brillo);
+}
+.hex-boton-normal:hover {
+    --color-externo: var(--color-letras);
+}
+.hex-boton-normal.agotado {
+    --color-externo: var(--color-borde);
+    --fondo: var(--color-fondo-agotado);
+}
+
+
+/* ------------------------------------------------------------------
+   Botones microchip de Hardware (parcialHardwares)
+   Reutiliza los colores de las heridas:
+     - verde  -> hardware operativo (true)
+     - rojo   -> hardware estropeado (false)
+------------------------------------------------------------------- */
+.boton-hardware-desactivado {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    margin: 0;
+
+    border: 0px;
+    border-radius: 0px;
+    background: var(--color-fondo-caja);
+    font-size: 0.8rem;
+
+
+}
+
+.boton-hardware {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+   /* border: 1px solid currentColor;
+    border-radius: 3px;*/
+    border: 0px;
+    border-radius: 0px;
+    background: var(--color-fondo-caja);
+    font-size: 0.8rem;
+    /*line-height: 1;*/
+    transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.boton-hardware:hover {
+    box-shadow: 0 0 4px currentColor;
+    transform: translateY(-1px);
+}
+
+.boton-hardware.hardware-verde {
+    color: var(--color-verde);
+}
+
+.boton-hardware.hardware-verde:hover {
+    background: var(--color-verde);
+    color: var(--color-fondo-caja);
+}
+
+.boton-hardware.hardware-rojo {
+    color: var(--color-rojo);
+}
+
+.boton-hardware.hardware-rojo:hover {
+    background: var(--color-rojo);
+    color: var(--color-fondo-caja);
+}
+
+/* Encabezado o agrupación opcional de hardwares */
+.hardwares-grupo {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+}
+
+
+/* para definir el interior cuando cada herida vale más de 1L */
+.hex-interior-l {
+    --interior-inset: 4px;
+}
+
+.hex-interior-l::after {
+    content: "";
+
+    position: absolute;
+    inset: var(--interior-inset);
+
+    z-index: 1;
+    pointer-events: none;
+
+    background: var(--color-externo);
+
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 46 40' preserveAspectRatio='none'%3E%3Cpolygon points='11.5,1 34.5,1 45,20 34.5,39 11.5,39 1,20' fill='none' stroke='white' stroke-width='1.5' stroke-dasharray='3 3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+        center / 100% 100%
+        no-repeat;
+
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 46 40' preserveAspectRatio='none'%3E%3Cpolygon points='11.5,1 34.5,1 45,20 34.5,39 11.5,39 1,20' fill='none' stroke='white' stroke-width='1.5' stroke-dasharray='3 3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+        center / 100% 100%
+        no-repeat;
+}
+
+.hex-interior-m {
+    --interior-inset: 4px;
+}
+
+.hex-interior-m::after {
+    content: "";
+
+    /*position: absolute;*/
+    inset: var(--interior-inset);
+    clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50% );
+    width: 38px;
+    height: 32px;
+    padding: -1px;
+    border: 0;
+    position:absolute;
+
+    z-index: 1;
+    pointer-events: none;
+
+    background: var(--color-externo);
+
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 46 40' preserveAspectRatio='none'%3E%3Cpolygon points='11.5,1 34.5,1 45,20 34.5,39 11.5,39 1,20' fill='none' stroke='white' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+        center / 100% 100%
+        no-repeat;
+
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 46 40' preserveAspectRatio='none'%3E%3Cpolygon points='11.5,1 34.5,1 45,20 34.5,39 11.5,39 1,20' fill='none' stroke='white' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+        center / 100% 100%
+        no-repeat;
+}
+
+
+/* clases para poner de colores dinámicamente los clones cuando eres Tiresio */
+
+.clon-blanco
+{
+    color: var(--color-blanco);
+}
+.clon-verde
+{
+    color: var(--color-verde);
+}
+
+.clon-ambar
+{
+    color: var(--color-ambar);
+
+}
+
+.clon-rojo
+{
+    color: var(--color-rojo);
+}
+
+
+/* ------------------------------------------------------------------
+   Hexágono con INPUT editable dentro (p. ej. el de agotamiento).
+   Mismas dimensiones y clip-path que .hex-boton, pero en vez de un
+   botón usa un contenedor <div> con un <input> insertado.
+   El hexágono es meramente cosmético.
+   Para usarlo:
+     <div class="hex-input hex-input-agotamiento">
+        <input type="number" name="..." value="{{...}}" class="hex-input-numero"/>
+     </div>
+   La clase de color (-agotamiento, etc.) se reutiliza igual que las
+   de los botones, seteando --color-externo.
+------------------------------------------------------------------ */
+.hex-input{
+    position: relative;
+    width: 46px;                 /* mismas medidas que .hex-boton */
+    height: 40px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+    --fondo: #111111;
+    background: var(--color-externo);
+}
+.hex-input::before{
+    content: "";
+    position: absolute;
+    inset: 1px;
+    clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+    background: var(--fondo);
+}
+.hex-input .hex-input-numero{
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    background: transparent;
+    border: 0;
+    outline: none;
+    box-shadow: none;
+    color: var(--color-externo);
+    font-family: "Exo 2";
+    font-size: 20px;
+    font-weight: 800;
+    line-height: 1;
+    /*-moz-appearance: textfield;   lo quité porque no sé bien qué hace y da un error */
+}
+.hex-input .hex-input-numero::-webkit-inner-spin-button,
+.hex-input .hex-input-numero::-webkit-outer-spin-button{
+    -webkit-appearance: none;
+    margin: 0;
+}
+.hex-input .hex-input-numero:focus{
+    color: #fff;
+}
+
+/* color fucsia estándar del "agotamiento" */
+.hex-input-agotamiento{
+    --color-externo: var(--color-agotamiento);
+}
+
+
+
+/* para centrar los movimientos heróicos*/
+.hex-center-heroico
+{
+height:50px; align-items: center; justify-content: center;
+}

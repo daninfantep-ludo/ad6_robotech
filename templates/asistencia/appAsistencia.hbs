@@ -1,0 +1,63 @@
+{{!--
+  Ventana compartida de Asistencia.
+  Muestra los pools de asistencia activos (normalmente uno) y los tres botones.
+  El selector "Actor que recibe" aparece solo cuando el usuario puede
+  representar más de un actor (GM con muchas fichas, jugador con varios).
+--}}
+<div class="ad6-asistencia-cuerpo">
+
+  {{#if mostrarSelector}}
+  <div class="ad6-asistencia-selector">
+    <label>{{localize "Ad6.Asistencia.actorQueRecibe"}}</label>
+    <select data-selector-actor>
+      {{#each candidatos as |c|}}
+      <option value="{{c.id}}" {{#if c.seleccionado}}selected{{/if}}>{{c.nombre}}</option>
+      {{/each}}
+    </select>
+  </div>
+  {{else}}
+    {{#if actor}}
+    <div class="ad6-asistencia-actor-fijo tx-pq">
+      {{localize "Ad6.Asistencia.recibe"}}: <b>{{actor.nombre}}</b>
+    </div>
+    {{/if}}
+  {{/if}}
+
+  {{#if pools.length}}
+    {{#each pools as |p|}}
+    <div class="ad6-asistencia-pool">
+      <div class="ad6-asistencia-cabecera">
+        <img class="ad6-asistencia-retrato" src="{{p.img}}" alt="{{p.nombre}}"/>
+        <div class="ad6-asistencia-datos">
+          <div class="ad6-asistencia-nombre">{{p.nombre}}</div>
+          <div class="ad6-asistencia-exitos">
+            <span class="tx-red">{{localize "Ad6.Asistencia.exitos"}}:</span>
+            <b>{{p.restantes}}</b> / <span>{{p.inicial}}</span>
+          </div>
+        </div>
+      </div>
+      <div class="ad6-asistencia-botones">
+        <button type="button" class="boton-ico" title="{{localize "Ad6.Asistencia.tomarUno"}}"
+                data-action="tomarUno" data-uuid="{{p.actorUuid}}">
+          <i class="fas fa-plus"></i> {{localize "Ad6.Asistencia.tomarUno"}}
+        </button>
+        <button type="button" class="boton-ico" title="{{localize "Ad6.Asistencia.tomarTodos"}}"
+                data-action="tomarTodos" data-uuid="{{p.actorUuid}}">
+          <i class="fas fa-layer-group"></i> {{localize "Ad6.Asistencia.tomarTodos"}}
+        </button>
+        {{#if @root.esGM}}
+        <button type="button" class="boton-ico" title="{{localize "Ad6.Asistencia.eliminar"}}"
+                data-action="eliminar" data-uuid="{{p.actorUuid}}">
+          <i class="fas fa-trash"></i>
+        </button>
+        {{/if}}
+      </div>
+    </div>
+    {{/each}}
+  {{else}}
+    <div class="ad6-asistencia-vacio tx-pq">
+      {{localize "Ad6.Asistencia.sinPools"}}
+    </div>
+  {{/if}}
+
+</div>

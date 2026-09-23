@@ -1,0 +1,16 @@
+ <div class="cnt-horizontal compensa-vert">
+                    <div class="mrg-xl flx gap-5" >
+                        {{#each hexagonos}}
+                            <button data-action="clickEstres" data-indice="{{@index}}" 
+                            class="hex-boton hex-boton-estres{{#if (neq this "")}} agotado{{/if}}" type="button" aria-pressed="{{#if (neq this "")}}true{{else}}false{{/if}}">
+                                <span class="hex-letra">{{#if (eq this "")}}&nbsp;{{else}}{{this}}{{/if}}</span>
+                            </button>
+                        {{/each}}
+                    </div>                
+                    <div class="flx mrg-xl gap-5 mrg-la vam">
+                        <i class="fas fa-fire" style="color: var(--color-agotamiento);" title="{{localize "Ad6.Etiquetas.agotamiento"}}"></i>
+                        <div class="hex-input hex-input-agotamiento">
+                            <input type="number" name="system.agotamiento" value="{{agotamiento}}" class="hex-input-numero" step="1" min="0"/>
+                        </div>
+                    </div>
+                </div>

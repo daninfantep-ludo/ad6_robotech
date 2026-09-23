@@ -1,0 +1,244 @@
+{{!--
+    Plantilla de la ventana de Combate (Ad6_AppCombate).
+    Sirve tanto para la pantalla del Atacante como la del Defensor:
+    las secciones se muestran/ocultan según "esAtacante".
+
+    Parciales usados:
+      * parcialMaxValor -> input "valor/máximo" reutilizable del sistema.
+--}}
+<div class="ad6-combate-cuerpo tx">
+
+    {{#if vacio}}
+    <div class="ad6-combate-caja">
+        <span class="tx-pq">{{localize "Ad6.Combate.sinEncuentro"}}</span>
+    </div>
+    {{else}}
+
+    <!-- ============ cabecera: identificación del actor ============ -->
+    {{#if (neq esAtacante true)}}
+    <div class="ad6-combate-caja">
+        <div class="ad6-combate-objetivo-fila">
+            {{localize "Ad6.Combate.atacante"}}: <img class="ad6-combate-objetivo-img" src="{{cabecera.img}}" alt="{{cabecera.nombre}}"/>
+            <span class="ad6-combate-objetivo-nombre">{{cabecera.nombre}}</span>
+        </div>
+    </div>
+    {{/if}}
+
+    <!-- ============ SECCIÓN OBJETIVOS (solo atacante) ============ -->
+    {{#if esAtacante}}
+    {{!-- Cuando el ataque YA está confirmado, esta sección no aporta nada
+         (los objetivos y su defensa ya se ven abajo). Se COLAPSA por defecto,
+         dejando el título con una flecha para volver a mostrarla.
+         Mientras el ataque NO está confirmado, se muestra siempre expandida. --}}
+    <div class="ad6-combate-caja ad6-caja-objetivos{{#if ataqueConfirmado}} ad6-colapsado{{/if}}"
+         data-caja-objetivos>
+        <div class="ad6-combate-titulo ad6-titulo-colapsable" data-action="toggleObjetivos">
+            <span>{{localize "Ad6.Combate.objetivos"}}</span>
+            <i class="fas fa-caret-down ad6-flecha-colapsable"></i>
+        </div>
+
+        <div class="ad6-caja-objetivos-cuerpo">
+            <div class="ad6-combate-buscador">
+                <input type="text" data-buscador-objetivos autocomplete="off"
+                       placeholder="{{localize "Ad6.Combate.buscarObjetivo"}}" class="tx"/>
+                <button type="button" class="boton-ico" data-action="anadirObjetivo"
+                        title="{{localize "Ad6.Combate.anadirObjetivoBuscador"}}">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+            {{!-- Resultados del buscador: se filtran por JS (ver _onRender de la app).
+                 Se muestra SOLO el nombre; el uuid viaja en data-uuid (no visible).
+                 Cada fila es pulsable (data-action) y añade ese objetivo. --}}
+            <ul class="ad6-combate-resultados" data-resultados-objetivos>
+                {{#each catalogo}}
+                <li class="ad6-combate-resultado" data-action="anadirObjetivo"
+                    data-uuid="{{this.uuid}}" data-nombre="{{this.nombre}}">{{this.nombre}}</li>
+                {{/each}}
+            </ul>
+
+            <div class="ad6-combate-objetivos">
+                {{#each objetivos}}
+                <div class="ad6-combate-objetivo-fila">
+                    <img class="ad6-combate-objetivo-img" src="{{this.img}}" alt="{{this.nombre}}"/>
+                    <span class="ad6-combate-objetivo-nombre">{{this.nombre}}</span>
+                    <button type="button" class="boton-ico" data-action="quitarObjetivo"
+                            data-uuid="{{this.actorUuid}}" title="{{localize "Ad6.Combate.quitarObjetivo"}}">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+                {{else}}
+                <span class="tx-pq">{{localize "Ad6.Combate.sinObjetivos"}}</span>
+                {{/each}}
+            </div>
+        </div>
+    </div>
+    {{/if}}
+
+    <!-- ============ SECCIÓN ATAQUE ============ -->
+    <div class="ad6-combate-caja">
+        <div class="ad6-combate-titulo">{{localize "Ad6.Combate.ataque"}}</div>
+
+        {{!-- Una LÍNEA por cada arma del encuentro: la propia del atacante más
+             las que otros actores le hayan prestado para el fuego concentrado.
+             Cada arma tiene SU propio reparto de éxitos. --}}
+        {{#each armas}}
+        <div class="ad6-combate-arma">
+            {{> parcialArmaAtaque arma=this editableAtaque=../editableAtaque}}
+            {{#if ../editableAtaque}}
+            {{> parcialMaxValor
+                valor=this.exitosAtaque
+                maximo=this.maximoAtaque
+                campo=this.campo
+                titulo=(localize "Ad6.Combate.exitosAsignadosArma")
+                extraClass="exitos-ataque"
+            }}
+            {{else}}
+            {{> parcialMaxValor
+                valor=this.exitosAtaque
+                maximo=this.maximoAtaque
+                rl=true
+                titulo=(localize "Ad6.Combate.exitosAtaqueLectura")
+            }}
+            {{/if}}
+        </div>
+        {{/each}}
+
+        {{#if esAtacante}}
+            {{#unless ataqueConfirmado}}
+            <button type="button" class="boton-ico ad6-boton-central" data-action="confirmarAtaque" title="{{localize "Ad6.Combate.confirmarAtaqueTitulo"}}">
+                <i class="fa-solid fa-burst fa-fade ad6-ico-ataque"></i> {{localize "Ad6.Combate.confirmarAtaque"}}
+            </button>
+            {{else}}
+            <span class="tx-pq">{{localize "Ad6.Combate.ataqueConfirmado"}} ({{totalAtaque}} {{localize "Ad6.Etiquetas.exito-s"}}).</span>
+            {{/unless}}
+        {{/if}}
+    </div>
+    <!-- ============ SECCIÓN DEFENSA (solo defensor) ============ -->
+    {{#if (neq esAtacante true)}}
+    <div class="ad6-combate-caja">
+        <div class="ad6-combate-titulo">{{localize "Ad6.Combate.defensa"}}</div>
+
+        {{#if esperandoAtaque}}
+            {{!-- El atacante aún no ha confirmado: no hay nada que repartir
+                 (ni que confirmar todavía). --}}
+            <span class="tx-pq">{{localize "Ad6.Combate.esperandoAtaque"}}</span>
+        {{else}}
+            {{!-- Ya confirmó el atacante: el defensor SIEMPRE puede confirmar,
+                 aunque no tenga fuentes (defensa en blanco = 0 éxitos). Así la
+                 acción nunca se traba. --}}
+            {{#if defensa}}
+                {{#if defensa.fuentes.length}}
+                <div class="ad6-combate-arma-datos">
+                    {{localize "Ad6.Combate.totalDisponible"}}: <b>{{defensa.totalDisponible}}</b> — {{localize "Ad6.Combate.tomado"}}: <b>{{defensa.totalTomado}}</b>
+                </div>
+
+                {{#each defensa.fuentes}}
+                <div class="ad6-combate-arma">
+                    <div class="ad6-combate-arma-datos">
+                        {{this.actorNombre}}
+                        {{#unless this.propia}}<span class="tx-pq">{{localize "Ad6.Combate.defensaPrestada"}}</span>{{/unless}}
+                        — {{localize "Ad6.Combate.disponibles"}}: <b>{{this.disponible}}</b>
+                    </div>
+                    {{#if this.editable}}
+                    {{> parcialMaxValor
+                        valor=this.exitos
+                        maximo=this.disponible
+                        campo=this.campo
+                        titulo=(localize "Ad6.Combate.exitosDeTuFuente")
+                        extraClass="exitos-defensa"
+                    }}
+                    {{else}}
+                    {{> parcialMaxValor
+                        valor=this.exitos
+                        maximo=this.disponible
+                        rl=true
+                        titulo=(localize "Ad6.Combate.exitosDefensaLectura")
+                    }}
+                    {{/if}}
+                </div>
+                {{/each}}
+                {{else}}
+                <span class="tx-pq">{{localize "Ad6.Combate.sinExitosDefensaBlanco"}}</span>
+                {{/if}}
+
+                {{#unless defensa.confirmado}}
+                <button type="button" class="boton-ico ad6-boton-central" data-action="confirmarDefensa" title="{{localize "Ad6.Combate.confirmarDefensaTitulo"}}">
+                    <i class="fa-solid fa-shield fa-fade ad6-ico-defensa"></i> {{localize "Ad6.Combate.confirmarAtaque"}}
+                </button>
+                {{else}}
+                <span class="tx-pq">{{localize "Ad6.Combate.defensaConfirmada"}} ({{defensa.totalTomado}} {{localize "Ad6.Etiquetas.exito-s"}}).</span>
+                {{/unless}}
+            {{else}}
+                {{!-- No hay entrada de defensa (no debería pasar): permitimos
+                     confirmar igualmente para no trabar la acción. --}}
+                <span class="tx-pq">{{localize "Ad6.Combate.sinAccionesDefensa"}}</span>
+                {{#unless defensaConfirmada}}
+                <button type="button" class="boton-ico ad6-boton-central" data-action="confirmarDefensa" title="{{localize "Ad6.Combate.confirmarDefensaTitulo"}}">
+                    <i class="fa-solid fa-shield fa-fade ad6-ico-defensa"></i> {{localize "Ad6.Combate.confirmarAtaque"}}
+                </button>
+                {{/unless}}
+            {{/if}}
+        {{/if}}
+    </div>
+    {{/if}}
+
+    <!-- ============ SECCIÓN DEFENSA (solo atacante, solo lectura) ============ -->
+    {{#if esAtacante}}
+    <div class="ad6-combate-caja ad6-combate-caja-defensas">
+        <div class="ad6-combate-titulo">{{localize "Ad6.Combate.defensaDeLosObjetivos"}}</div>
+        {{#each defensasAtacante}}
+        {{!-- Dos filas por defensor para COMPACTAR:
+             1) imagen + nombre del piloto (+ marca de confirmado).
+             2) total tomado + fuentes de defensa (propia / prestadas). --}}
+        <div class="ad6-defensa-objetivo">
+            <!-- Fila 1: identidad -->
+            <div class="ad6-defensa-objetivo-cab">
+                <img class="ad6-combate-objetivo-img" src="{{this.img}}" alt="{{this.nombre}}"/>
+                <b>{{this.nombre}}</b>
+                {{#if this.confirmado}}<span class="tx-pq">{{localize "Ad6.Combate.confirmada"}}</span>{{/if}}
+            </div>
+            <!-- Fila 2: detalle de la defensa -->
+            <div class="ad6-defensa-objetivo-detalle">
+                {{localize "Ad6.Combate.tomado"}}: <b>{{this.total}}</b>
+                {{#if this.fuentes.length}}
+                    — {{localize "Ad6.Combate.fuentes"}}:
+                    {{#each this.fuentes}}{{#unless @first}}, {{/unless}}{{this.actorNombre}} <b>{{this.exitos}}</b>/{{this.disponible}}{{#unless this.propia}} {{localize "Ad6.Combate.prestada"}}{{/unless}}{{/each}}
+                {{else}}
+                    — {{localize "Ad6.Combate.sinFuentesDefensa"}}
+                {{/if}}
+            </div>
+        </div>
+        {{else}}
+        <span class="tx-pq">{{localize "Ad6.Combate.sinObjetivosPunto"}}</span>
+        {{/each}}
+    </div>
+    {{/if}}
+
+    <!-- ============ LOG ============ -->
+    {{!-- El log se pinta como HTML (no textarea) para poder darle COLOR:
+         destruido=rojo+negrita, aplicar=ámbar+negrita, sinDano=verde+negrita.
+         Cada entrada es { texto, nivel }. --}}
+    <div class="ad6-combate-caja ad6-combate-caja-log">
+        <div class="ad6-combate-titulo ad6-log-titulo-caja">
+            <span>{{localize "Ad6.Combate.log"}}</span>
+            <button type="button" class="boton-ico ad6-boton-copiar-log" data-action="copiarLog"
+                    title="{{localize "Ad6.Combate.copiarLog"}}">
+                <i class="fa-regular fa-copy"></i>
+            </button>
+        </div>
+        <div class="ad6-combate-log">
+            {{#each logLineas}}
+            <div class="ad6-log-linea ad6-log-{{this.nivel}}"{{#if this.sangria}} style="padding-left: {{this.sangria}}px"{{/if}}>{{this.texto}}</div>
+            {{/each}}
+        </div>
+    </div>
+
+    <!-- ============ PIE ============ -->
+    <div class="ad6-combate-pie">
+        <button type="button" class="ad6-boton-cerrar" data-action="cerrar" title="{{localize "Ad6.Combate.cerrar"}}">
+            <i class="fas fa-xmark"></i> {{localize "Ad6.Combate.cerrar"}}
+        </button>
+    </div>
+
+    {{/if}}
+</div>

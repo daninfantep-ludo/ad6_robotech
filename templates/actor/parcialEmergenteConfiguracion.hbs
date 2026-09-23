@@ -1,0 +1,22 @@
+{{!-- id único por actor: dos hojas abiertas a la vez no deben compartir el
+     mismo id (el <label for> resolvería siempre al primero del documento). --}}
+<input type="checkbox" id="menu-config-principal-{{actor.id}}" class="menu-toggle">
+<label for="menu-config-principal-{{actor.id}}" title="{{localize "Ad6.Etiquetas.configuracion"}}" class="tx-red boton-ico menu-pin"><i class="fas fa-gear"></i></label>
+<div class="menu-panel  tx-red">   
+    {{#if principal}}  
+    <div class="menu-fila">
+        <label title="{{localize "Ad6.Mensajes.Heroicos.Ayuda.adicional"}}" class="check-control">{{localize "Ad6.Etiquetas.talentoRugidoDeLeon"}}<input type="checkbox" name="system.heroicoExtra"  data-action="clickHeroico" data-valor="{{system.heroicoExtra}}" {{#if system.heroicoExtra}}checked{{/if}}/></label>
+    </div>
+    {{/if}}
+        <div class="flx fd-column">
+                <div class="menu-fila">
+            <label>{{localize "Ad6.Etiquetas.endurecido"}}</label>
+            <label title ="{{localize "Ad6.Mensajes.Endurecido1.ayuda"}}" class="check-control"><input name = "system.heridasParams.endurecido.nivel1" data-action="clickEndurecido1" data-valor="{{system.heridasParams.endurecido.nivel1}}" type="checkbox" {{#if system.heridasParams.endurecido.nivel1}}checked{{/if}} /></label>
+            <label title ="{{localize "Ad6.Mensajes.Endurecido2.ayuda"}}"  class="check-control"><input name = "system.heridasParams.endurecido.nivel2" data-action="clickEndurecido2" data-valor="{{system.heridasParams.endurecido.nivel2}}" type="checkbox" {{#if system.heridasParams.endurecido.nivel2}}checked{{/if}} /></label>
+        </div>
+        {{#if principal}}<div class="menu-fila">
+            <label>{{localize "Ad6.Etiquetas.mejorado"}}</label>
+            <label title ="{{localize "Ad6.Mensajes.Mejorado.ayuda"}}" class="check-control"><input name = "system.heridasParams.mejorado" data-action="clickMejorado" data-valor="{{system.heridasParams.mejorado}}" type="checkbox" {{#if system.heridasParams.mejorado}}checked{{/if}} /></label>
+        </div>{{/if}}
+    </div>                                
+</div>

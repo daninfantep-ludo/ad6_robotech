@@ -1,0 +1,80 @@
+{{!--
+    Parcial: UN botón de "tirada fijada" (un dadito que abre su popup).
+
+    Sustituye los dos bloques que estaban repetidos a mano en parcialTirada.hbs
+    (tirada1/tirada2) y añade el tercero. Se invoca desde parcialTirada.hbs con
+    {{#each tiradasFijadas}} ... {{> parcialTiradaBoton ...}}.
+
+    Parámetros (todos explícitos, no se hereda contexto):
+      n        -> sufijo del slot ("1" | "2" | "3"). Se usa para el id del toggle,
+                  los data-tirada y las claves de idioma (accionN / accionFijaN).
+      icono    -> clase Font Awesome del dado (fa-dice-one/two/three).
+      tirada   -> el objeto system.tiradaN (fase, exitos, arma, sinergia...).
+      actorId  -> id del actor, para que el id del checkbox sea único por hoja.
+--}}
+<div class="menu-context menu-contenido">
+    {{!-- El id del toggle lleva el id del actor para que dos hojas abiertas a la
+         vez NO compartan el mismo id (los ids son únicos por documento y el
+         <label for> apuntaría siempre al primero). --}}
+    <input type="checkbox" id="menu-tirada{{n}}-{{actorId}}" class="menu-toggle"/>
+    <label for="menu-tirada{{n}}-{{actorId}}" title="{{localize (concat "Ad6.Etiquetas.accionFija" n)}}" class="boton-ico menu-pin tx-red"><i class="fas {{icono}}"></i></label>
+    <div class="menu-panel">
+        <div class="menu-fila tirada-guardada-cabecera">
+            <b>{{localize (concat "Ad6.Etiquetas.accion" n)}}</b>
+            {{#if tirada.fase}}
+            <button title="{{localize "Ad6.Etiquetas.resetearEstaTirada"}}" type="button" class="boton-ico" data-action="restablecerTirada"
+                    data-tirada="{{n}}"><i class="fas fa-rotate-left"></i></button>
+            {{/if}}
+        </div>
+        {{#if tirada.fase}}
+        <div class="menu-fila">
+            <label class="w-60 tx-red">{{localize "Ad6.Etiquetas.fase"}}</label>
+            <span>{{#if tirada.sinergia}}{{localize (concat "Ad6.SuperFase." tirada.superFase)}}{{ else }} {{{localize (concat "Ad6.FaseAccion." tirada.fase)}}}{{/if}}</span>
+        </div>
+        <div class="menu-fila">
+            <label class="w-60 tx-red">{{localize "Ad6.Etiquetas.exitos"}}</label>
+            <div><span>{{tirada.exitos}}</span>{{#if tirada.sinergia}}<span class="mrg-l10" title="{{localize "Ad6.Etiquetas.tiradaConSinergia"}}"><i class="fa-brands fa-superpowers ad6-ico-sinergia"></i></span>{{/if}}</div>
+        </div>
+        <div class="menu-fila">
+            <label class="w-60 tx-red">{{localize "Ad6.Etiquetas.arma"}}</label>
+            <span>{{#if (mostrarNombreArma tirada)}}{{tirada.arma.nombre}}{{else}}-{{/if}}</span>
+            {{#if (botonAtaque tirada)}}
+            <div>
+                <button title="{{localize "Ad6.Etiquetas.atacar"}}" type="button" class="boton-ico" data-action="abrirAtaque" data-tirada="{{n}}">
+                    <i class="fa-solid fa-burst fa-fade ad6-ico-ataque"></i>
+                </button>
+            </div>
+            {{!-- Fuego concentrado: solo si esta tirada tiene un arma con datos
+                 (nombre + clase). Presta esa arma a otro atacante en conflicto. --}}
+            {{#if (and tirada.arma.nombre tirada.arma.clase)}}
+            <div>
+                <button title="{{localize "Ad6.Etiquetas.fuegoConcentrado"}}" type="button" class="boton-ico" data-action="fuegoConcentrado" data-tirada="{{n}}">
+                    <i class="fa-solid fa-arrows-to-circle"></i>
+                </button>
+            </div>
+            {{/if}}
+            {{/if}}
+            {{!-- Prestar defensa: solo si esta tirada tiene éxitos de defensa
+                 disponibles (operacionesDefender o operaciones con sinergia).
+                 Presta defensa a un defensor de un encuentro activo. --}}
+            {{#if (botonDefensa tirada)}}
+            <div>
+                <button title="{{localize "Ad6.Etiquetas.prestarDefensa"}}" type="button" class="boton-ico" data-action="prestarDefensa" data-tirada="{{n}}">
+                    <i class="fa-solid fa-shield-heart"></i>
+                </button>
+            </div>
+            {{/if}}
+        </div>
+        {{else}}
+        <div class="menu-fila">
+            <span class="tx-pq">{{localize "Ad6.Etiquetas.aunNoHayTirada"}}</span>
+        </div>
+        {{/if}}
+        <div class="menu-fila mrg-t-pq">
+            <button title="{{localize "Ad6.Etiquetas.guardarUltimaTirada"}}" type="button"
+                    class="boton-ico" data-action="guardarTirada" data-tirada="{{n}}">
+                <i class="fas fa-floppy-disk"></i>
+            </button>
+        </div>
+    </div>
+</div>

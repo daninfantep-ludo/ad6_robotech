@@ -1,0 +1,37 @@
+        <div style="width: 476px">
+            <div class="chk-ct h-20">
+                {{#if @root.talentos}}
+                <div class="w-200 tx-pq tx-cnt"  >{{localize "Ad6.Etiquetas.nombreDelTalento"}}</div>
+                                {{#if (neq teniente true)}}<div class="w-150 tx-pq tx-cnt"  >{{localize "Ad6.Etiquetas.tipo"}}</div>{{/if}}
+                                <div class="w-45 tx-pq tx-cnt"  >{{localize "Ad6.Etiquetas.usos"}}</div>
+                {{/if}}
+                <div class="w-60">  
+                </div>
+                <div>
+                          
+                    <button title="{{localize "Ad6.Etiquetas.anadirTalento"}}" class="boton-ico" data-action="itemAnadir" data-tipo="talento"><i class="fas fa-solid fa-plus"></i> </button>
+                </div>
+            </div>
+            <div class="fd-column" ID="TALENTOS">
+                {{#each talentos as |tal|}}
+                <div class="chk-ct">
+                    <input type="text" data-id="{{tal.id}}" data-campo="name" value="{{tal.name}}" class="change tx mrg w-200"/>
+                    {{#if (neq ../teniente true)}}<input type="text" data-id="{{tal.id}}" data-campo="tipo" value="{{tal.system.tipo}}" class="change tx mrg w-150"/>{{/if}}
+                    
+                    {{> parcialMaxValor
+                        valor=tal.system.usos.restante
+                        maximo=tal.system.usos.maximo
+                        dataId=tal.id
+                        it=true
+                        campo="usos.restante"
+                        titulo=(localize "Ad6.Etiquetas.restantes")
+                        anchura="w-45"
+                    }}
+           
+                    <button title="{{localize "Ad6.Etiquetas.usarTalento"}}" class="boton-ico" data-id="{{tal.id}}"  data-action="gastarItem" ><i class="fas fa-solid fa-play"></i> </button>
+                    <button title ="{{localize "Ad6.Etiquetas.recargarTalento"}}" class="boton-ico" data-id="{{tal.id}}"  data-action="recargarItem" data-valor="{{tal.system.usos.maximo}}"><i class="fas fa-solid fa-rotate"></i> </button>
+                    {{> parcialContextoGeneral id=tal.id infinito=true tipoDato="talento"}}
+                </div>
+                {{/each}}
+            </div>
+        </div>

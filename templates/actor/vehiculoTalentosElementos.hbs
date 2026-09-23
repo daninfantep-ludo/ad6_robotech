@@ -1,0 +1,10 @@
+<section id="TALENTOSELEMENTOS" class="tab ad6-tab talentosElementos tx  {{tab.cssClass}} div-panel txt-fill" data-group="primary" data-tab="talentosElementos"  role="tabpanel">
+<div class="flx fd-column tab-content" >
+{{> parcialContenidoTalentos }}
+{{> parcialContenidoElementos }}
+{{!-- Suities de equipo PERSONALES del piloto (system.personal === true).
+     Se listan EN VIVO desde el piloto, igual que talentos/elementos, y por
+     tanto desaparecen solos al quitar el piloto. --}}
+{{> parcialContenidoSuitEquiposPersonales }}
+</div>
+</section>

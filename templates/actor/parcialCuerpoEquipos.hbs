@@ -1,0 +1,13 @@
+                    <input type="text" data-id="{{se.id}}"  data-campo="name" value="{{se.name}}" class="change tx mrg w-200"/>
+                    <select data-id="{{se.id}}" data-campo="rango" class="change mrg w-50 tx-cnt" name="eq.system.rango">
+                    {{selectOptions @root.config.Rango selected=se.system.rango  localize=true}}
+                    </select> 
+                    <input title ="{{localize "Ad6.Etiquetas.dano"}}" type="text" data-id="{{se.id}}" data-campo="dano" value="{{se.system.dano}}" class="change tx mrg w-50 tx-cnt"/>
+                                        <input title ="{{localize "Ad6.Etiquetas.pen"}}" type="text" data-id="{{se.id}}" data-campo="penetracion" value="{{se.system.penetracion}}" class="change tx mrg w-50 tx-cnt"/>
+                                        <input title ="{{localize "Ad6.Etiquetas.areachica"}}" type="text" data-id="{{se.id}}" data-campo="area" value="{{se.system.area}}" class="change tx mrg w-50 tx-cnt"/>
+                                        <label title="{{localize "Ad6.Etiquetas.usando"}}" class="w-40 check-control">
+                        <input type="checkbox" class="chk-change" data-suit="{{#if eqSuit}}suit{{/if}}" data-campo="siendoUsado" data-id="{{se.id}}" 
+                            data-valor="{{se.system.siendoUsado}}" {{checked se.system.siendoUsado}}>
+                    </label>                
+                    <label title="{{localize "Ad6.Etiquetas.descriptores"}}" class="w-100">{{se.system.descriptores}}</label>
+               

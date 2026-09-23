@@ -1,0 +1,6 @@
+<div class="flx cnt-horizontal vam w-{{#if sp}}95{{else}}60{{/if}} jcc" >
+    <button data-action="clickHabilidadTeniente" data-accion="{{fase}}" data-valor="{{valor}}"
+    class="hex-boton hex-boton-normal{{#if (eq system.fase fase)}} agotado{{/if}}" type="button" aria-pressed="{{#if (eq system.fase fase)}}true{{else}}false{{/if}}">
+        <span class="hex-letra">{{valor}}</span>
+    </button>
+</div>

@@ -1,0 +1,42 @@
+{{!--
+    Fila de ARMADURA en SOLO LECTURA para la hoja de un UPGRADE.
+    Replica los mismos campos y aspecto que la fila de armadura de tabEquipo.hbs,
+    pero SIN edición (no hay inputs/selects/checkboxes con data-id). Sólo muestra
+    lo que el upgrade llevaría inyectado, más el botón de quitar de la lista.
+
+    Se invoca dentro de un {{#each system.armaduras as |ar idx|}} (hojaUpgrade).
+    'ar' es una COPIA de un item de armadura (objeto plano): ar.name, ar.system.armadura...
+    Parámetros:
+      * ar   -> la copia.
+      * idx  -> índice en system.armaduras (para el botón quitar).
+--}}
+<div class="chk-ct">
+    {{!-- Nombre --}}
+    <div class="w-200 mrg mrg-r10">{{ar.name}}</div>
+
+    {{!-- Tipo (escala) --}}
+    <div class="w-40 tx-cnt mrg">{{escalaLetra ar.system.armadura.tipo}}</div>
+
+    {{!-- Ablativa / Escudo: icono de escudo si es escudo (ablativa). El tooltip
+         AFIRMA que es un escudo. --}}
+    <div class="w-20 tx-cnt mrg">
+        {{#if ar.system.armadura.ablativa}}<i class="fas fa-shield" title="{{localize "Ad6.Etiquetas.esEscudoAfirma"}}"></i>{{/if}}
+    </div>
+
+    {{!-- Valor / Restante (solo lectura; mostramos valor como "restante/máximo") --}}
+    <div class="w-60 tx-cnt mrg">{{ar.system.armadura.restante}}<!-- / {{ar.system.armadura.valor}}--></div>
+
+    {{!-- Resiste --}}
+   <!-- <div class="w-60 tx-cnt mrg">{{ar.system.armadura.resiste}}</div>-->
+
+    {{!-- Resistencias (iconos) --}}
+    <div class="w-100 flx cnt-horizontal tx-cnt jcc">
+        {{> parcialResistencias proteccion=ar.system.armadura }}
+    </div>
+
+    {{!-- Botón quitar de la lista del upgrade --}}
+    <div class="fila-ext mrg-la">
+        <button type="button" class="boton-ico" data-action="upgradeBorrarArmadura" data-index="{{idx}}" title="{{localize "Ad6.Upgrade.quitar"}}"><i class="fas fa-trash"></i></button>
+    </div>
+</div>
+

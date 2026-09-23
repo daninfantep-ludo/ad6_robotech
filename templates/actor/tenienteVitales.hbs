@@ -1,0 +1,60 @@
+<section id="VITALES" class ="div-panel tx"> 
+    <header class="div-panel-titulo cnt-horizontal">
+                <span class="flex-0-1-auto">{{localize "Ad6.Etiquetas.vitales"}}</span>
+        {{!-- Menús contextuales agrupados: Mejoras (upgrades) + configuración. --}}
+        <div class="cnt-horizontal mrg-la">
+            <div class="menu-context menu-contenido">
+                {{> parcialEmergenteUpgrades upgrades = upgrades}}
+            </div>
+            <div class="menu-context menu-contenido">
+                {{> parcialEmergenteConfiguracion principal=false}}
+            </div>
+        </div>
+
+    </header>
+    <div class="cnt-horizontal">
+                {{> parcialRetrato}}
+
+        <div id="columna-izquierda-vitales">
+            <div>
+                <label class="w-80">{{localize "Ad6.Etiquetas.nombre"}}</label>
+                <input type="text" name="name" value="{{actor.name}}" class="tx mrg w-200" ></input>
+                {{#if (eq system.especie "tiresio")}}
+                <button type="button" class="boton-ico" data-action="editarClones" title="{{localize "Ad6.Mensajes.Clon.editar"}}"><i class="fa-solid fa-person"></i></button>
+                {{/if}}
+            </div>
+            <div>
+                <label class="w-80">{{localize "Ad6.Etiquetas.carrera"}}</label>
+                <select name ="system.carrera" class="tx mrg w-105" data-carreraTeniente-select>
+                    {{selectOptions config.Carreras selected = system.carrera  localize=true}}
+                </select>
+            </div>        
+            <div>
+                <label class="w-80">{{localize "Ad6.Etiquetas.especie"}}</label>
+                <select name ="system.especie" class="tx mrg w-120" data-especie-select>
+                    <options value=""></options>
+                    {{selectOptions config.Especies selected = system.especie  localize=true}}
+                </select>
+            </div>        
+
+        </div>
+        <div id="columna-derecha-vitales" >
+            <div>
+                <label class="w-80">{{localize "Ad6.Etiquetas.velocidad"}}</label>
+                <input  name="system.velocidad" value="{{system.velocidad}}" class="tx tx-cnt mrg w-60" type="text"></input>
+            </div>
+           <!-- <div>
+                                <label class="w-80">{{localize "Ad6.Etiquetas.elemento"}}</label>
+                <input  name="system.elemento" value="{{system.elemento}}" readonly class="tx tx-cnt mrg w-200" type="text"></input>
+
+            </div>-->
+            <div>
+                <label class="w-80">{{localize "Ad6.Etiquetas.tipo"}}</label>
+                <select name ="system.tipoTeniente" class="tx mrg w-120" data-tipoTeniente-select>
+                    <options value=""></options>
+                    {{selectOptions config.TipoTeniente selected = system.tipoTeniente  localize=true}}
+                </select>
+            </div>    
+        </div>
+    </div> 
+</section>   

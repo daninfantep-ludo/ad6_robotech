@@ -1,0 +1,33 @@
+<section id="PILOTO" class ="div-panel tx "> 
+    <header class="div-panel-titulo cnt-horizontal">
+        <div class="cnt-horizontal  check-control" >
+            {{localize "Ad6.Etiquetas.piloto"}}
+        </div>
+        <div class="menu-context menu-contenido mrg-la">
+        {{> parcialEmergenteEstres}}
+        </div>
+    </header>
+    <div class="flx cnt-horizontal vam">
+        {{#if piloto}}
+        <div class="flx cnt-horizontal vam gap-5">
+            <img class="piloto-imagen" src="{{piloto.img}}" title="{{piloto.name}}" alt="{{piloto.name}}" width="64" height="64"/>
+            <div class="flx fd-column gap-5">
+                <!--<label class="piloto-nombre">{{piloto.name}}</label>-->
+                <button title="{{localize "Ad6.Etiquetas.quitarPiloto"}}" class="boton-ico" data-action="borrarPiloto"><i class="fas fa-xmark"></i></button>
+                {{#if (eq tipoPiloto "principal")}}                                
+                <button title="{{localize "Ad6.Etiquetas.recargarPiloto"}}" class="boton-ico" data-action="recargarPiloto"><i class="fas fa-rotate"></i></button>
+                {{/if}}
+            </div>
+            {{#if pilotoSinCompetencia}}
+            <div class="piloto-sin-comp" >
+                <i class="fas fa-triangle-exclamation" title="{{localize "Ad6.Etiquetas.pilotoSinCompetencia"}}"></i>
+            </div>
+            {{/if}}
+        </div>
+        {{else}}
+        <div class="piloto-vacio tx-red tx-cnt">
+            {{localize "Ad6.Etiquetas.arrastreAquiActor"}}<br/>{{localize "Ad6.Etiquetas.tenienteOPrincipal"}}
+        </div>
+        {{/if}}
+    </div>
+</section>  

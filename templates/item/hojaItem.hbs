@@ -1,0 +1,12 @@
+<div class="item-sheet-container tx div-panel txt-fill">
+    {{!-- El header con el nombre NO se muestra en la hoja de "upgrade": ahí el
+       nombre va dentro de la columna derecha, junto a los bonos (ver hojaUpgrade.hbs). --}}
+  {{#if (neq itemType "upgrade")}}
+  <div class="item-header mrg-xl">
+        <label class="label-item w-120">{{localize "Ad6.Etiquetas.nombre"}}: </label>
+    <input class="w-300" name="name" type="text" value="{{document.name}}" placeholder="{{localize "Ad6.Etiquetas.nombre"}}"/>
+  </div>
+  {{/if}}
+  <!-- antes tenía acá un form, que impedía que se guardaran las cosas en el onsubmit. el form viene "de arriba"-->
+  {{> (lookup . "typeTemplate")}}
+</div>

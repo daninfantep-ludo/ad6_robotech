@@ -1,0 +1,33 @@
+{{!--
+    Menú emergente de MEJORAS (upgrades).
+    Se abre desde el botón con el icono fa-circle-up de la cabecera de Vitales.
+    Sirve para vehículo, principal y teniente.
+    - Lista los items de tipo "upgrade" del actor (instalados o no).
+    - Cada fila permite quitarla (data-action="borrarUpgrade", que revierte sus
+      efectos y la borra).
+    - Para AÑADIR una mejora se ARRASTRA un item "upgrade" sobre la hoja.
+    Id único por actor para que dos hojas abiertas no compartan id.
+--}}
+<input type="checkbox" id="menu-upgrades-vehiculo-{{actor.id}}" class="menu-toggle">
+<label for="menu-upgrades-vehiculo-{{actor.id}}" title="{{localize "Ad6.Upgrade.upgrades"}}" class="tx-red boton-ico menu-pin"><i class="fas fa-regular fa-circle-up"></i></label>
+<div class="menu-panel tx-red">
+    <header class="flx cnt-horizontal vam">
+        <div class="vam">{{localize "Ad6.Upgrade.upgrades"}}</div>
+    </header>
+    {{#if upgrades.length}}
+        {{#each upgrades as |up|}}
+        <div class="flx cnt-horizontal vam">
+            <!--<i class="fas fa-circle{{#unless up.system.equipado}}-notch{{/unless}} vam mrg-r5" title="{{#if up.system.equipado}}{{localize "Ad6.Upgrade.equipada"}}{{/if}}"></i>-->
+            <!-- no es necesario porque si está equipada está en el mecha no puede estar y no estar equipada -->
+            <label class="w-120 vam mrg-l5" title="{{up.name}}">{{up.name}}</label>
+            <!--<button title="{{localize "Ad6.Upgrade.editarUpgrade"}}" data-id="{{up.id}}" class="boton-ico" data-action="itemEditar"><i class="fas fa-pen-to-square"></i></button>-->
+            <!-- no quiero editar -->
+            <button title="{{localize "Ad6.Upgrade.quitarUpgrade"}}" data-id="{{up.id}}" class="boton-ico" data-action="borrarUpgrade"><i class="fas fa-trash"></i></button>
+        </div>
+        {{/each}}
+    {{else}}
+        <div class="mrg-l5">{{localize "Ad6.Upgrade.sinUpgrades"}}</div>
+    {{/if}}
+    <!--<div class="mrg-l5 tx-pq">{{localize "Ad6.Upgrade.anadirUpgrade"}}</div>-->
+    <!-- no es necesario realmente-->
+</div>

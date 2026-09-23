@@ -1,0 +1,66 @@
+{{!--
+    Fila de EQUIPO (arma) o SUIT DE EQUIPO en SOLO LECTURA para la hoja de un
+    UPGRADE. Replica los mismos campos/aspecto que parcialCuerpoEquipos.hbs +
+    las columnas extra de tabEquipo.hbs (valor/usos/bancos/hardwares), pero SIN
+    edición. Sólo conserva el botón de quitar de la lista.
+
+    Parámetros:
+      * se      -> la COPIA del item (objeto plano): se.name, se.system...
+      * eqSuit  -> true => suit de equipo (muestra valor y usos); false => arma.
+      * idx     -> índice en la lista (para el botón quitar).
+      * borrar  -> data-action del botón quitar (upgradeBorrarEquipo o
+                   upgradeBorrarSuitEquipo, según la lista).
+
+    Se invoca dentro de un {{#each system.equipos ...}} o {{#each system.suitEquipos ...}}.
+--}}
+<div class="chk-ct">
+    {{!-- Nombre --}}
+    <div class="w-200 mrg mrg-r10">{{se.name}}</div>
+
+    {{!-- Rango: se guarda la CLAVE (melee/corto/...); mostramos su texto
+         localizado igual que el <select> de tabEquipo (Me, S, M, L, Ex...). --}}
+    <div class="w-50 tx-cnt mrg">{{localize (concat "Ad6.Rango." se.system.rango)}}</div>
+
+    {{!-- Daño --}}
+    <div class="w-50 tx-cnt mrg">{{se.system.dano}}</div>
+
+    {{!-- Penetración --}}
+    <div class="w-50 tx-cnt mrg">{{se.system.penetracion}}</div>
+
+    {{!-- Área --}}
+    <div class="w-50 tx-cnt mrg">{{se.system.area}}</div>
+
+    {{!-- Siendo usado --}}
+    <div class="w-40 tx-cnt mrg">
+        {{#if se.system.siendoUsado}}<i class="fas fa-check"></i>{{/if}}
+    </div>
+
+    {{!-- Descriptores (reconstruidos desde los flags: en la copia plana el
+         getter "descriptores" del DataModel NO existe, por eso uso el helper). --}}
+    <div class="w-100 mrg">{{descriptoresArma se.system}}</div>
+
+    {{!-- VALOR (sólo suities de equipo) --}}
+    <div class="w-30 tx-cnt mrg">
+        {{#if eqSuit}}{{se.system.valor}}{{/if}}
+    </div>
+
+    {{!-- USOS (sólo suities) / hueco para armas --}}
+    <div class="w-45 tx-cnt mrg">
+        {{#if eqSuit}}{{se.system.usos.restante}} / {{se.system.usos.maximo}}{{/if}}
+    </div>
+
+    {{!-- BANCOS / HARDWARES --}}
+    {{#if se.system.esBanco}}
+        <div class="w-45 tx-cnt mrg">{{se.system.bancos.restante}} / {{se.system.bancos.maximo}}</div>
+    {{else if se.system.esHardware}}
+        {{> parcialUpgradeLecturaHardwares hardwares=se.system.hardwares titulo=(localize "Ad6.Etiquetas.hardware")}}
+    {{else}}
+        <div class="w-45"></div>
+    {{/if}}
+
+    {{!-- Botón quitar de la lista del upgrade --}}
+    <div class="fila-ext mrg-la">
+        <button type="button" class="boton-ico" data-action="{{borrar}}" data-index="{{idx}}" title="{{localize "Ad6.Upgrade.quitar"}}"><i class="fas fa-trash"></i></button>
+    </div>
+</div>
+

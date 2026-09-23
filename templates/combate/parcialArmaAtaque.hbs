@@ -1,0 +1,58 @@
+{{!--
+    Parcial: datos del arma usada en un ataque.
+    Muestra SOLO lo básico: nombre, daño, penetración, área y descriptores.
+    Parámetros:
+      * arma -> { nombre, dano, penetracion, tienePenetracion, area, descriptores,
+                  penetracionFinal, penetracionOpciones, penetracionElegible,
+                  campoPenetracion,
+                  danoFinal, danoOpciones, danoElegible, campoDano }
+      * editableAtaque -> true si el atacante puede elegir el daño y la
+                          penetración finales (armas con formato "x|y").
+
+    PRESENTACIÓN (acordada):
+      DAÑO:
+        - sin opciones -> "Daño 2xL" (el valor crudo; si vacío, "—").
+        - con opciones -> "Daño" + <select> (NO se muestra el crudo "L|2xL").
+      PENETRACIÓN:
+        - sin valor    -> NO se muestra nada (ni el badge "Pen").
+        - sin opciones -> "Pen 1".
+        - con opciones -> "Pen" + <select> (NO se muestra el crudo "0|1").
+--}}
+<div class="ad6-combate-arma-datos">
+    <b>{{arma.nombre}}</b> —
+    {{!-- ================= DAÑO ================= --}}
+    {{!--localize "Ad6.Etiquetas.dano"--}}
+    {{#if arma.danoElegible}}
+        {{!-- Con opciones: SOLO el select (las opciones ya se ven dentro). --}}
+        <span class="ad6-dano-final">[
+            {{#if editableAtaque}}
+                <select class="ad6-dano-final-select" name="{{arma.campoDano}}"
+                title="{{localize "Ad6.Combate.danoFinalElegir"}}">
+                {{#each arma.danoOpciones}}<option value="{{this}}" {{#if (eq this ../arma.danoFinal)}}selected{{/if}}>{{this}}</option>{{/each}}</select>
+            {{else}}
+                <span class="ad6-dano-final-valor" title="{{localize "Ad6.Combate.danoFinalAplicada"}}">{{arma.danoFinal}}</span>
+            {{/if}}
+        ]</span>
+    {{else}}
+    {{!-- Sin opciones: el valor crudo directamente tras "Daño". --}}
+        <span class="ad6-dano-final-valor" title="{{localize "Ad6.Combate.danoFinalAplicada"}}">[ {{arma.dano}} ]</span>
+    {{/if}}
+
+    {{!-- ================= PENETRACIÓN ================= --}}
+    {{#if arma.tienePenetracion}}
+    · {{!--localize "Ad6.Etiquetas.pen"--}}
+    {{#if arma.penetracionElegible}}
+    {{!-- Con opciones: SOLO el select (las opciones ya se ven dentro). --}}
+    <span class="ad6-pen-final">[ P {{#if editableAtaque}}<select class="ad6-pen-final-select" name="{{arma.campoPenetracion}}"
+            title="{{localize "Ad6.Combate.penetracionFinalElegir"}}">{{#each arma.penetracionOpciones}}<option value="{{this}}" {{#if (eq this ../arma.penetracionFinal)}}selected{{/if}}>{{this}}</option>{{/each}}</select>{{else}}<span class="ad6-pen-final-valor" title="{{localize "Ad6.Combate.penetracionFinalAplicada"}}">{{arma.penetracionFinal}}</span>{{/if}} ]</span>
+    {{else}}
+    {{!-- Sin opciones: el valor crudo directamente tras "Pen". --}}
+    <span class="ad6-pen-final-valor" title="{{localize "Ad6.Combate.penetracionFinalAplicada"}}">[ P{{arma.penetracion}} ]</span>
+    {{/if}}
+    {{/if}}
+
+    {{!-- ================= ÁREA / DESCRIPTORES ================= --}}
+    {{#if (neq arma.area "")}} · [{{!-- localize "Ad6.Etiquetas.areachica"--}} {{arma.area}} ]{{/if}}
+    {{#if arma.descriptores}} · {{arma.descriptores}}{{/if}}
+</div>
+

@@ -1,0 +1,11 @@
+<div>
+    <label class="w-60">{{localize "Ad6.Etiquetas.fase"}}:</label><b>{{fase}}</b><br/>
+    <label class="w-60">{{localize "Ad6.Etiquetas.tirada"}}:</label><b>{{tipo}}</b><br/>
+    {{#if (neq error "")}}<label class="w-375">{{error}}</label><br/>{{/if}}
+    <label class="w-60">{{localize "Ad6.Etiquetas.exito-s"}}:</label><b>{{exitos}}</b>{{#if sinergia}} <i class="fa-brands fa-superpowers" title="{{localize "Ad6.Etiquetas.tiradaConSinergia"}}"></i>{{/if}}<br/>  
+    <div class="mrg-xl">
+            {{#each dados as | die | }}
+            <div class ="mrg dado-{{die.total}} mrg-r5" style="height:30px; width: 30px; text-align: center;"></div>
+            {{/each}}
+    </div>
+</div>

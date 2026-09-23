@@ -1,0 +1,42 @@
+            <div id="IZQUIERDA">
+                <header class="gap-6 chk-ct gap-6 h-20" style="gap: 6px;">
+                    <div class="w-60 gap-5"></div>
+                                        <div class="w-60 gap-5 tx-pq tx-cnt">{{localize "Ad6.Etiquetas.asistir"}}</div>
+                    <div class="w-60 gap-5 tx-pq tx-cnt">{{localize "Ad6.Etiquetas.observar"}}</div>
+                    <div class="w-60 gap-5 tx-pq tx-cnt">{{localize "Ad6.Etiquetas.ocultar"}}</div>
+                </header>
+                
+                <div class="flx gap-5 cnt-horizontal" >
+                    <div class="chk-ct tx-red w-60" >{{localize "Ad6.Etiquetas.soporte"}}</div>
+                    {{> tenienteHexHabilidad  fase="soporteAsistir" valor=system.asistir}}
+                    {{> tenienteHexHabilidad  fase="soporteObservar" valor=system.observar}}
+                    {{> tenienteHexHabilidad  fase="soporteOcultar" valor=system.ocultar}}
+                </div>
+
+                <header class="gap-6 chk-ct h-20" style="gap: 6px;">
+                    <div class="w-60 gap-5"></div>
+                                        <div class="w-60 gap-5 tx-pq tx-cnt">{{localize "Ad6.Etiquetas.atacar"}}</div>
+                    <div class="w-60 gap-5 tx-pq tx-cnt">{{localize "Ad6.Etiquetas.defender"}}</div>
+                    <div class="w-60 gap-5 tx-pq tx-cnt">{{localize "Ad6.Etiquetas.redirigir"}}</div>
+                </header>
+
+                <div class="flx gap-5 cnt-horizontal">
+                    <div class="chk-ct tx-red w-60">{{localize "Ad6.Etiquetas.operaciones"}}</div>
+                    {{> tenienteHexHabilidad  fase="operacionesAtacar" valor=system.atacar}}
+                    {{> tenienteHexHabilidad  fase="operacionesDefender" valor=system.defender}}
+                    {{> tenienteHexHabilidad  fase="operacionesRedirigir" valor=system.redirigir}}
+                </div>
+
+                <header class="gap-6 chk-ct h-20" style="gap: 6px;">
+                    <div class="w-60 gap-5"></div>
+                                        <div class="w-95 gap-5 tx-pq tx-cnt">{{localize "Ad6.Etiquetas.interactuar"}}</div>
+                    <div class="w-95 gap-5 tx-pq tx-cnt">{{localize "Ad6.Etiquetas.inhibir"}}</div>
+                </header>
+
+                <div class="flx gap-5 cnt-horizontal">
+                    <div class="chk-ct tx-red w-60">{{localize "Ad6.Etiquetas.cinematica"}}</div>
+                    {{> tenienteHexHabilidad  fase="cinematicaInteractuar" valor=system.interactuar sp=true}}
+                    {{> tenienteHexHabilidad  fase="cinematicaInhibir" valor=system.inhibir sp=true}}
+                    
+                </div>
+            </div>

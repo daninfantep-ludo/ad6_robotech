@@ -1,0 +1,12 @@
+<div class="menu-context fila-ext {{#if (neq tipoDato "talento")}}mrg-la{{/if}}">
+    <input type="checkbox" id="menu-{{id}}" class="menu-toggle">
+    <label for="menu-{{id}}" title="{{localize "Ad6.Etiquetas.masOpciones"}}" class="boton-ico menu-pin"><i class="fas fa-ellipsis-vertical"></i></label>
+    <div class="menu-panel">
+        {{#if infinito}}        
+        <button title ="{{localize "Ad6.Etiquetas.infinito"}}" class="boton-ico" data-id="{{id}}" type="button" data-action="infinitoItem" data-item-id="{{tal.id}}" data-tipo="{{tipoDato}}"><i class="fas fa-solid fa-infinity"></i></button>                
+        {{/if}}
+                <button title="{{localize "Ad6.Etiquetas.verDetalleEditar"}}" data-id="{{id}}" class="boton-ico" data-action="itemEditar" data-tipo="{{tipoDato}}"><i class="fas fa-pen-to-square"></i></button>
+        <button title="{{localize "Ad6.Etiquetas.enviarAlChat"}}" data-id="{{id}}" class="boton-ico" data-action="itemChat" data-tipo="{{tipoDato}}"><i class="fas fa-comment"></i></button>
+        <button title="{{localize "Ad6.Etiquetas.borrar"}}" data-id="{{id}}" class="boton-ico" data-action="itemBorrar" data-tipo="{{tipoDato}}"><i class="fas fa-trash"></i></button>
+    </div>
+</div>

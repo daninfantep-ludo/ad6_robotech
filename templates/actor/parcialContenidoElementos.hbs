@@ -1,0 +1,18 @@
+        <div style="width: 378px;" >
+            <div class="chk-ct" style="height:20px;">
+                {{#if @root.elementos}}
+                <div class="w-375 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.nombreDelElemento"}}</div>
+                {{/if}}
+                <div class="fila-ext mrg-l5">                
+                    <button title="{{localize "Ad6.Etiquetas.anadirElemento"}}" class="boton-ico" data-action="itemAnadir" data-tipo="elemento"><i class="fas fa-solid fa-plus"></i> </button>
+                </div>
+            </div>
+            <div class="fd-column" data-item-id="{{ele.id}}">
+                {{#each elementos as |ele|}}
+                <div class="chk-ct">
+                    <input type="text" data-id="{{ele.id}}" data-campo="name" value="{{ele.name}}" class="change tx mrg w-375"/>
+                    {{> parcialContextoGeneral id=ele.id infinito=false tipoDato="elemento"}}
+                </div>
+                {{/each}}
+            </div>
+        </div>

@@ -1,0 +1,164 @@
+<section id="VITALES" class ="div-panel tx"> 
+     
+        <header class="div-panel-titulo cnt-horizontal">
+                <span class="flex-0-1-auto">{{localize "Ad6.Etiquetas.vitales"}}</span>
+        {{!-- Los dos menús contextuales (upgrades y configuración) van AGRUPADOS
+             y pegados: el grupo se empuja a la derecha con un solo "mrg-la" y
+             los iconos quedan juntos (sin márgenes automáticos entre ellos). --}}
+        <div class="cnt-horizontal mrg-la">
+            <div class="menu-context menu-contenido">
+                {{> parcialEmergenteUpgrades upgrades = upgrades}}
+            </div>
+            <div class="menu-context menu-contenido">
+                {{> parcialEmergenteVehiculo velocidades = velocidades}}
+            </div>
+        </div>
+
+    </header>
+    <div class="cnt-horizontal">
+        {{> parcialRetrato}}
+        <div id="columna-izquierda-vitales">
+            <div>
+                <label class="w-80">{{localize "Ad6.Etiquetas.nombre"}}</label>
+                <input type="text" name="name" value="{{actor.name}}" class="tx mrg w-200" ></input>
+            </div>
+            <div>
+                <label class="w-80">{{localize "Ad6.Etiquetas.escala"}}</label>
+                <select data-blindaje="S" name ="armaduraPrincipal.system.armadura.tipo" class="change tx mrg w-105" data-id="{{armaduraPrincipal.id}}" data-campo ="armadura.tipo">
+                    {{selectOptions config.Escalas selected = armaduraPrincipal.system.armadura.tipo  localize=true}}
+                </select>
+            </div>                   
+            {{#if (neq velocidades.length 1)}}
+            <div class="flx cnt-horizontal">
+
+                <div>
+                    <div class="panel-container" >
+                        {{#each velocidades as |ve|}}
+                        <div class="modulo-control">
+                            <div class="ranura">
+                                <button class="palanca-btn" data-action="cambiarVelocidad" aria-pressed="{{ve.system.seleccionado}}" data-id="{{ve.id}}">{{ve.system.inicial}}</button>
+                            </div>
+                        </div>
+                        {{/each}}
+                    </div>
+                </div>
+                    <div class="flx fd-column">
+
+                        <div>
+                            <label class="w-80">{{localize "Ad6.Etiquetas.modo"}}</label>
+                            <input type="text" readonly value="{{velocidadPrincipal.name}}" class="tx mrg w-100" ></input>
+                        </div>
+                        <div>
+                            <label class="w-80">{{localize "Ad6.Etiquetas.velocidad"}}</label>
+                            <input type="text" readonly value="{{calcularVelocidad velocidadPrincipal.system.velocidad system.motores}}" class="tx mrg w-60" ></input>
+                        </div>
+                    </div>
+            </div>
+            {{/if}}
+            {{#if (eq velocidades.length 1)}}
+            <div>
+                <label class="w-80">{{localize "Ad6.Etiquetas.velocidad"}}</label>
+                <input type="text" value="{{calcularVelocidad velocidadPrincipal.system.velocidad system.motores}}" name ="velocidadPrincipal.system.velocidad" data-id="{{velocidadPrincipal.id}}" data-campo="velocidad" class="change tx mrg w-60" ></input>
+            </div>
+            {{/if}}
+
+        </div>
+        <div id="columna-derecha-vitales" >
+            <div class="flx cnt-horizontal">
+                <label class="w-100">{{localize "Ad6.Etiquetas.designacion"}}</label>
+                <input  name="system.designacion" value="{{system.designacion}}" class="tx mrg w-200" type="text"></input>
+            </div>            
+            <div class="flx cnt-horizontal vam ">
+                <label class="w-100">{{localize "Ad6.Etiquetas.armadura"}}</label>
+                                {{> parcialMaxValor
+                                            valor=armaduraPrincipal.system.armadura.restante
+                                            maximo=armaduraPrincipal.system.armadura.valor
+                                            dataId=armaduraPrincipal.id
+                                            campo="armadura.restante"
+                                            titulo=""
+                                            it=true
+                                            anchura="w-45"
+                                        }} 
+              <!--  <input  name="armaduraPrincipal.system.armadura.restante" value="{{armaduraPrincipal.system.armadura.restante}}" data-id="{{armaduraPrincipal.id}}" data-campo ="armadura.restante" class="change tx tx-cnt mrg w-40" type="text"></input>
+                /
+                <input  name="armaduraPrincipal.system.armadura.valor" value="{{armaduraPrincipal.system.armadura.valor}}" data-id="{{armaduraPrincipal.id}}" data-campo ="armadura.valor" class="change tx tx-cnt mrg w-40" type="text"></input>
+                -->
+            <div class="flx cnt-horizontal vam">
+                {{> parcialResistencias proteccion=armaduraPrincipal.system.armadura }}
+            <button title="{{localize "Ad6.Etiquetas.verDetalleEditar"}}" data-id="{{armaduraPrincipal.id}}" class="boton-ico" data-action="itemEditar"><i class="fas fa-pen-to-square"></i></button>
+            </div>
+
+            </div>
+            {{#if (novac armaduraExtra)}}
+            <div class="flx cnt-horizontal vam">
+                <label class="w-100">{{armaduraExtra.name}}</label>
+                {{> parcialMaxValor
+                                            valor=armaduraExtra.system.armadura.restante
+                                            maximo=armaduraExtra.system.armadura.valor
+                                            dataId=armaduraExtra.id
+                                            campo="armadura.restante"
+                                            titulo=""
+                                            it=true
+                                            anchura="w-45"
+                                        }}                
+                <!--<input  name="armaduraExtra.system.armadura.restante" value="{{armaduraExtra.system.armadura.restante}}" data-id="{{armaduraExtra.id}}"  data-campo ="armadura.restante" class="change tx tx-cnt mrg w-40" type="text"></input>
+                /
+                <input  name="armaduraExtra.system.armadura.valor" value="{{armaduraExtra.system.armadura.valor}}" data-id="{{armaduraExtra.id}}"  data-campo ="armadura.valor" class="change tx tx-cnt mrg w-40" type="text"></input>
+                -->
+                <select data-blindaje="N" name ="armaduraExtra.system.armadura.tipo" class="change tx mrg w-70" data-id="{{armaduraExtra.id}}" data-campo ="armadura.tipo">
+                    {{selectOptions config.Escalas selected=armaduraExtra.system.armadura.tipo localize=true}}
+                </select>      
+                    
+                <button title="{{localize "Ad6.Etiquetas.verDetalleEditar"}}" data-id="{{armaduraExtra.id}}" class="boton-ico" data-action="itemEditar"><i class="fas fa-pen-to-square"></i></button>
+                <button title="{{localize "Ad6.Etiquetas.borrar"}}" data-id="{{armaduraExtra.id}}" class="boton-ico" data-action="itemBorrar"><i class="fas fa-trash"></i></button>
+            </div>
+            {{/if}}
+            <div class="flx cnt-horizontal vam">
+                <div >
+                    <label class="w-100 mrg-r3">{{localize "Ad6.Etiquetas.estructura"}}</label>
+                    {{> parcialMaxValor
+                        valor=system.estructura.restante
+                        maximo=system.estructura.maximo
+                        dataId=0
+                        campo="system.estructura.restante"
+                        titulo=""
+                        
+                        anchura="w-45"
+                        it=false
+                    }}  
+                    <div class="menu-context menu-contenido mrg-la">
+                    {{> parcialEmergenteEstructura}}
+                    </div>
+                </div>
+                <!--<input  name="system.estructura.restante" value="{{system.estructura.restante}}"  class="tx tx-cnt mrg w-40" type="text"></input>
+                /
+                <input  name="system.estructura.maximo" value="{{system.estructura.maximo}}"  class="tx tx-cnt mrg w-40" type="text"></input>
+                -->
+                
+                <div class="mrg-l5 flx contenido-horizontal vam">
+                    <div class="vam">
+                        <i class="fas fa-microchip" title="{{localize "Ad6.Etiquetas.recuentoHardwares"}}"></i>
+                    </div>
+                    <div class="vam tx mrg-l10">
+                        {{#if system.esBasico}}{{localize "Ad6.Etiquetas.basico"}}{{else}}
+                            {{> parcialMaxValor
+                                valor=totalHardwareRestante
+                                maximo=totalHardware
+                                dataId=0
+                                campo=""
+                                titulo=""
+                                anchura="w-45"
+                                it=false
+                                rl=true
+                            }}  
+                        
+                       
+                        
+                        {{/if}}
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div> 
+</section>   

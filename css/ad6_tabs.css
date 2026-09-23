@@ -1,0 +1,94 @@
+
+/* Scrollbar styling for Webkit browsers */
+.tab-content::-webkit-scrollbar {
+  width: 12px;
+}
+
+.tab-content::-webkit-scrollbar-track {
+  background: #2a2a2a;
+}
+
+.tab-content::-webkit-scrollbar-thumb {
+  background: #0078d4;
+  border-radius: 6px;
+  border: 2px solid #2a2a2a;
+}
+
+.tab-content::-webkit-scrollbar-thumb:hover {
+  background: #005a9e;
+}
+
+/* Clases PROPIAS del sistema para las pestañas (prefijo ad6-), para no
+   chocar con la clase global ".tab"/".tab.active" que usa Foundry en sus
+   ventanas (p. ej. la configuración de escena). Solo estas gobiernan el
+   mostrar/ocultar de las pestañas de NUESTRAS hojas. */
+.ad6-tab {
+  display: none !important;
+}
+
+.ad6-tab.active {
+  display: flex !important;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+
+.navigable-tabs [role="tab"][aria-selected="true"],
+nav[class*="navigable-tabs"] [role="tab"][aria-selected="true"],
+.tab-button[aria-selected="true"],
+.tab-button:hover,
+.tab-button.active {
+  background: var(--color-borde);
+  border-color: var(--color-brillo);
+  color: var(--color-letras);
+      border-top-right-radius: 10px;
+      border-top-left-radius: 0px;
+      border-bottom-right-radius: 0px;
+      border-bottom-left-radius: 0px;
+    corner-top-right-shape: bevel;
+        font-weight: bold;
+    text-shadow: 2px 2px 2px var(--color-sombra-texto);
+    outline: none;
+}
+
+.navigable-tabs [role="tab"]:hover,
+nav[class*="navigable-tabs"][role="tab"]:hover,
+.tab-button {
+  
+  border-color: var(--color-brillo);
+  color: var(--color-letras);
+      border-top-right-radius: 10px;
+      border-top-left-radius: 0px;
+      border-bottom-right-radius: 0px;
+      border-bottom-left-radius: 0px;      
+    corner-top-right-shape: bevel;
+        font-weight: bold;
+    
+}
+
+.tab-content {
+  overflow-y: auto;
+  flex: 1;
+  box-sizing: border-box;
+  scrollbar-color: var(--color-borde) var(--color-fondo-caja);
+  scrollbar-width: thin;
+}
+
+.tab-content::-webkit-scrollbar {
+  width: 12px;
+}
+
+.tab-content::-webkit-scrollbar-track {
+  background: var(--color-fondo-caja);
+}
+
+.tab-content::-webkit-scrollbar-thumb {
+  background: var(--color-borde);
+  border-radius: 6px;
+  border: 2px solid var(--color-fondo-caja);
+}
+
+.tab-content::-webkit-scrollbar-thumb:hover {
+  background: var(--color-destacado);
+}

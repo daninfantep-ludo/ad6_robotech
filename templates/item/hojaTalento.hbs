@@ -1,0 +1,21 @@
+<div class="form-group  mrg-xl" >
+  <label class="label-item w-120">{{localize "Ad6.Etiquetas.tipo"}}</label>
+  <input class="text-item w-200" type="text" name="system.tipo" value="{{system.tipo}}"/>
+</div>
+<div class="form-group  mrg-xl" >
+  <label class="label-item w-120">{{localize "Ad6.Etiquetas.usos-max"}}</label>
+  <input class="text-item w-60 tx-cnt" type = "text" name="system.usos.maximo" value="{{system.usos.maximo}}"/>
+  <button class="w-40 ml-10 boton-ico" type="button" data-action="ponerInfinito" data-item-id="{{document.id}}">
+        <i class="fas fa-solid fa-infinity"></i>
+    </button>
+</div>
+<div class="form-group  mrg-xl">
+  <label class="label-item w-120">{{localize "Ad6.Etiquetas.usos-act"}}</label>
+  <input class="text-item w-60 tx-cnt" type = "text" name="system.usos.restante" value="{{system.usos.restante}}"/>
+</div>  
+<div class="form-group  mrg-xl">
+    <prose-mirror target="system.description" name="system.descripcion" value="{{system.descripcion}}" toggled="true">
+      {{{descripcionRica}}} {{!--the enriched text--}}
+    </prose-mirror>
+</div>
+

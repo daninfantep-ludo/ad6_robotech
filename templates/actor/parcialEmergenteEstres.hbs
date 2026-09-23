@@ -1,0 +1,6 @@
+{{!-- id único por actor (ver parcialEmergenteConfiguracion). --}}
+<input type="checkbox" id="menu-config-estres-{{actor.id}}" class="menu-toggle">
+<label for="menu-config-estres-{{actor.id}}" title="{{localize "Ad6.Etiquetas.estres"}}" class="tx-red boton-ico menu-pin"><i class="fas fa-masks-theater"></i></label>
+<div class="menu-panel  tx-red">   
+    {{> parcialContenidoEstres hexagonos = system.piloto.system.estres agotamiento=system.agotamiento}}
+</div>

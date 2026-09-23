@@ -1,0 +1,33 @@
+{{!--
+    Botones microchip para los hardwares de un equipo.
+    Muestra UN botón con el icono fa-microchip por cada elemento del array
+    `hardwares`. Verde si el valor es true (operativo) y rojo si es false
+    (estropeado). El usuario puede pulsar cada botón para alternar.
+
+    Parámetros:
+      * hardwares      -> array de booleans (system.hardwares del item)
+      * dataId         -> id del item (para poder actualizarlo)
+      * titulo         -> tooltip opcional para los botones
+
+{{#each hardwares as |estado idx|}}
+
+--}}
+
+{{#each hardwares as |estado idx| }}
+    {{#if ../basico}}
+    <button type="button" disabled
+         class="boton-hardware-desactivado">            
+        <i class="fas fa-microchip"></i>
+    </button>
+    {{else}}<button type="button"
+            class="boton-hardware {{#if estado}}hardware-verde{{else}}hardware-rojo{{/if}}"
+            data-action="toggleHardware"
+            data-id="{{../dataId}}"
+            data-index="{{@index}}"
+            title="{{#if estado}}{{titulo}} ({{localize "Ad6.Etiquetas.operativo"}}){{else}}{{titulo}} ({{localize "Ad6.Etiquetas.estropeado"}}){{/if}}"
+            aria-label="{{titulo}} {{idx}}">
+        <i class="fas fa-microchip"></i>
+    </button>
+    {{/if}}
+{{/each}}
+

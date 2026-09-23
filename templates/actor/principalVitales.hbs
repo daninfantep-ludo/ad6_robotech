@@ -1,0 +1,94 @@
+<section id="VITALES" class ="div-panel tx"> 
+    <header class="div-panel-titulo cnt-horizontal">
+                <span class="flex-0-1-auto">{{localize "Ad6.Etiquetas.vitales"}}</span>
+        {{!-- Menús contextuales agrupados: Mejoras (upgrades) + configuración. --}}
+        <div class="cnt-horizontal mrg-la">
+            <div class="menu-context menu-contenido">
+                {{> parcialEmergenteUpgrades upgrades = upgrades}}
+            </div>
+            <div class="menu-context menu-contenido">
+                {{> parcialEmergenteConfiguracion principal=true}}
+            </div>
+        </div>
+
+    </header>
+    <div class="cnt-horizontal">
+        {{> parcialRetrato}}
+
+        
+        <div id="columna-izquierda-vitales">
+            <div>
+                <label class="w-80">{{localize "Ad6.Etiquetas.nombre"}}</label>
+                <input type="text" name="name" value="{{actor.name}}" class="tx mrg w-200" ></input>
+                {{#if (eq system.especie "tiresio")}}
+                <button type="button" class="boton-ico" data-action="editarClones" title="{{localize "Ad6.Mensajes.Clon.editar"}}"><i class="fa-solid fa-person"></i></button>
+                {{/if}}
+            </div>
+            <div>
+                <label class="w-80">{{localize "Ad6.Etiquetas.carrera"}}</label>
+                <select name ="system.carrera" class="tx mrg w-105">
+                    {{selectOptions config.Carreras selected = system.carrera  localize=true}}
+                </select>
+                <select name ="system.especialidad" class="tx mrg w-150">
+                    {{selectOptions especialidadesCarrera selected = system.especialidad  localize=true}}
+                </select>
+            </div>        
+            <div>
+                <label class="w-80">{{localize "Ad6.Etiquetas.especie"}}</label>
+                <select name ="system.especie" class="tx mrg w-120" data-especie-select>
+                    <options value=""></options>
+                    {{selectOptions config.Especies selected = system.especie  localize=true}}
+                </select>
+            </div>        
+
+            <div>
+                <label class="w-80">{{localize "Ad6.Etiquetas.nivel"}}</label>
+                <input name="system.nivel" value="{{system.nivel}}" class="con-flechas tx mrg w-60  tx-cnt" type="number"></input>
+                <label class="w-60 mrg-l5">{{localize "Ad6.Etiquetas.xppc"}}</label>
+                <input name="system.construccion" value="{{system.construccion}}" class="con-flechas tx mrg w-60 tx-cnt" type="number"></input>
+            </div>
+            <div>
+            </div>
+            <div>
+                <label class="w-80">{{localize "Ad6.Etiquetas.velocidad"}}</label>
+                <input  name="system.velocidad" value="{{system.velocidad}}" class="tx tx-cnt mrg w-60" type="text"></input>
+            </div>
+
+        </div>
+        <div id="columna-derecha-vitales" >
+
+
+            <div >
+                <label class="w-100">{{localize "Ad6.Etiquetas.rango"}}</label>
+                <select name="system.rango.codigo" class="tx mrg w-60">
+                    {{selectOptions config.Rangos selected = system.rango.codigo  localize=true}}
+                </select>
+                <input name="system.rango.descripcion" value="{{system.rango.descripcion}}" class="tx mrg w-120" type="text"></input>
+            </div>     
+            <div >
+                <label class="w-100">{{localize "Ad6.Etiquetas.fama"}}</label>
+                <select name ="system.fama.codigo" class="tx mrg w-60">
+                    {{selectOptions config.Famas selected = system.fama.codigo  localize=true}}
+                </select>
+                <input name="system.fama.descripcion" value="{{system.fama.descripcion}}" class="tx mrg w-120" type="text"></input>
+            </div>   
+            <div >
+                <label  class="w-100">{{localize "Ad6.Etiquetas.fortuna"}}</label>
+                <select name="system.fortuna.codigo" class="tx mrg w-60">
+                    {{selectOptions config.Fortunas selected = system.fortuna.codigo  localize=true}}
+                </select>
+                <input name="system.fortuna.descripcion" value="{{system.fortuna.descripcion}}" class="tx mrg w-120" type="text"></input>
+            </div>   
+            <div class="chk-ct">
+                <label class="w-100">{{localize "Ad6.Etiquetas.disposicion"}}</label>
+                <input name="system.naturaleza.descriptor" value="{{system.naturaleza.descriptor}}" class="tx mrg w-200" type="text"></input>
+                <label title ="{{localize "Ad6.Mensajes.Disposicion.ayuda"}}"   class="check-control"><input type="checkbox" name="system.naturaleza.usado" data-action="clickDisposicion"  data-valor="{{system.naturaleza.usado}}" {{#if system.naturaleza.usado}}checked{{/if}} /></label>
+            </div>
+            <div class="chk-ct">
+                <label class="w-100">{{localize "Ad6.Etiquetas.conducta"}}</label>
+                <input name="system.conducta.descriptor" value="{{system.conducta.descriptor}}" class="tx mrg w-200" type="text"></input>
+                <label title ="{{localize "Ad6.Mensajes.Conducta.ayuda"}}" class="check-control"><input type="checkbox"  name="system.conducta.usado" data-action="clickConducta" data-valor="{{system.conducta.usado}}" {{#if system.conducta.usado}}checked{{/if}}/></label>
+            </div>
+        </div>
+    </div> 
+</section>   

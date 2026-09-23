@@ -1,0 +1,13 @@
+<div class="form-group  mrg-xl">
+  <label class="label-item w-120">{{localize "Ad6.Etiquetas.inicialBoton"}}</label>
+  <input  class="text-item w-60 tx-cnt" type="text" name="system.inicial" value="{{system.inicial}}"/>
+</div>
+<div class="form-group  mrg-xl">
+  <label class="label-item w-120">{{localize "Ad6.Etiquetas.velocidad"}}</label>
+  <input  class="text-item w-60 tx-cnt" type="text" name="system.velocidad" value="{{system.velocidad}}"/>
+</div>
+<div class="form-group  mrg-xl">
+    <prose-mirror target="system.description" name="system.descripcion" value="{{system.descripcion}}" toggled="true">
+      {{{descripcionRica}}} {{!--the enriched text--}}
+    </prose-mirror>
+</div>  

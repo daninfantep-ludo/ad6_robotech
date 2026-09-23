@@ -1,0 +1,30 @@
+{{!-- id único por actor (ver parcialEmergenteConfiguracion). --}}
+<input type="checkbox" id="menu-config-vehiculo-{{actor.id}}" class="menu-toggle">
+<label for="menu-config-vehiculo-{{actor.id}}" title="{{localize "Ad6.Etiquetas.configuracion"}}" class="tx-red boton-ico menu-pin"><i class="fas fa-gear"></i></label>
+<div class="menu-panel  tx-red">   
+    <header class="flx cnt-horizontal vam">
+        <div class="vam">{{localize "Ad6.Etiquetas.perfilesVelocidad"}}</div>
+        <div class="vam mrg-la"><button title="{{localize "Ad6.Etiquetas.anadirPerfilVelocidad"}}" class="boton-ico" data-action="itemAnadir" data-tipo="perfilVelocidad"><i class="fas fa-solid fa-plus"></i> </button></div>
+    </header>
+    {{#each velocidades as |vel|}}  
+    <div class="flx cnt-horizontal vam">
+        <label class="w-80 vam mrg-l5">{{vel.name}}</label>
+        <button title="{{localize "Ad6.Etiquetas.verDetalleEditar"}}" data-id="{{vel.id}}" class="boton-ico" data-action="itemEditar"><i class="fas fa-pen-to-square"></i></button>
+        <button title="{{localize "Ad6.Etiquetas.enviarAlChat"}}" data-id="{{vel.id}}" class="boton-ico" data-action="itemChat"><i class="fas fa-comment"></i></button>
+        <button title="{{localize "Ad6.Etiquetas.borrar"}}" data-id="{{vel.id}}" class="boton-ico" data-action="itemBorrar"><i class="fas fa-trash"></i></button>
+    </div>
+    {{/each}}
+        <div class="menu-fila">
+            <label class="w-120">{{localize "Ad6.Etiquetas.esBasico"}}</label>
+                        <label title ="{{localize "Ad6.Etiquetas.basicoNoUsaHardware"}}" class="check-control"><input data-action="clickConfigVehiculo" data-campo ="system.esBasico" data-valor="{{system.esBasico}}" type="checkbox" {{checked system.esBasico}} /></label>
+        </div>
+        <div class="menu-fila">
+            <label class="w-120">{{localize "Ad6.Etiquetas.usaLocalizaciones"}}</label>
+                        <label title ="{{localize "Ad6.Etiquetas.navesUsanLocalizaciones"}}" class="check-control"><input data-action="clickConfigVehiculo" data-campo ="system.usaLocalizaciones" data-valor="{{system.usaLocalizaciones}}" type="checkbox" {{checked system.usaLocalizaciones}} /></label>
+        </div>
+        <div class="menu-fila">
+            <label class="w-120">{{localize "Ad6.Etiquetas.usaSistemas"}}</label>
+                        <label title ="{{localize "Ad6.Etiquetas.mechaUsanSistemas"}}" class="check-control"><input data-action="clickConfigVehiculo" data-campo ="system.usaSistemas" data-valor="{{system.usaSistemas}}" type="checkbox" {{checked system.usaSistemas}} /></label>
+        </div>
+</div>
+

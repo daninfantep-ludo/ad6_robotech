@@ -1,0 +1,60 @@
+<section id="TIRADA" class ="div-panel tx flex-1-1-0">
+    <header class="div-panel-titulo cnt-horizontal vam">
+        <div class="flex-0-1-auto check-control">
+            {{localize "Ad6.Etiquetas.tirada"}}
+        </div>
+
+        <!-- Tiradas "fijadas" de la ronda: un botón de dado por slot
+             (dice-one/dice-two/dice-three), cada uno abre un popup para
+             guardar/consultar su tirada, + un botón para resetear todas.
+             El bloque de cada botón vive en el partial parcialTiradaBoton.hbs
+             y se itera sobre "tiradasFijadas" (lista que prepara la hoja), de
+             modo que añadir un cuarto dado sería tocar SOLO esa lista. -->
+        <div class="flx cnt-horizontal vam mrg-la">
+            {{#each tiradasFijadas}}
+                {{> parcialTiradaBoton n=n icono=icono tirada=tirada actorId=../actor.id}}
+            {{/each}}
+            
+            <button title="{{localize "Ad6.Etiquetas.resetearTiradasGuardadas"}}" class="boton-ico boton-ico-mini" data-action="resetearTiradas">
+                <i class="fas fa-rotate"></i>
+            </button>
+        </div>
+    </header>
+    <div class="flx cnt-horizontal vam">
+        <!-- Los dos selects apilados uno sobre el otro.
+             Se fuerza el ancho con style porque en modo columna las clases
+             w-* (que usan flex-basis) no controlan bien el ancho horizontal. -->
+        <div id="SELECTS" class="flx fd-column " >
+            <div><label class="w-40 tx-red">{{localize "Ad6.Etiquetas.tipo"}}</label>
+            <select class="mrg tx-cnt wn-200" name="system.tirada" >
+                {{selectOptions config.TipoTirada selected = system.tirada  localize=true}}
+            </select>    
+            </div>
+            <div>
+                <label class="w-40 tx-red">{{localize "Ad6.Etiquetas.fase"}}</label>
+            {{#if bloquearFase}}
+                {{!-- La subfase se elige con los botones hexagonales (teniente /
+                     vehículo de teniente / nave sin piloto): mostramos solo la
+                     etiqueta localizada de la fase actual. --}}
+                <label class="mrg tx-cnt wn-200">{{localize (concat "Ad6.FaseAccion." system.fase)}}</label>
+            {{else}}
+            <select class="mrg tx-cnt wn-200" name="system.fase" >
+                {{selectOptions config.FaseAccion selected = system.fase  localize=true}}
+            </select>
+            {{/if}}
+            </div>
+        </div>
+        <div id="HEX" class="flx mrg-xl gap-5 vam">            
+            <div class="hex-input hex-input-agotamiento">
+                <input type="number" name="system.dados" value="{{system.dados}}" class="hex-input-numero" step="1" min="0"/>
+            </div>
+        </div>
+        {{#if system.agotamiento}}
+        <div class="flx cnt-horizontal check-control">
+            <input title="{{localize "Ad6.Etiquetas.soloAgotamiento"}}" name="system.hastaAgotamiento" data-valor="{{system.hastaAgotamiento}}" {{checked system.hastaAgotamiento}} type="checkbox"/>
+        </div>
+        {{/if}}
+        <button title="{{localize "Ad6.Etiquetas.tirar"}}" class="boton-ico" data-action="tirarDados"><i class="fas fa-solid fa-dice-d6"></i> </button>
+        <button title="{{localize "Ad6.Etiquetas.resetearTirada"}}" data-action="borrarTirada" class="boton-ico"><i class="fas fa-solid fa-trash"></i> </button>
+    </div>
+</section>

@@ -1,0 +1,27 @@
+            <section  id="ESTRES" class ="div-panel tx flex-1-1-0">
+                <header class="div-panel-titulo cnt-horizontal">
+                    <span class="flex-0-1-auto">{{localize "Ad6.Etiquetas.estres"}}</span>
+                                        <div class="menu-context menu-ancho mrg-la">
+                        {{!-- id único por actor: dos hojas abiertas no deben compartir id. --}}
+                        <input type="checkbox" id="menu-estres-{{actor.id}}" class="menu-toggle"/>
+                        <label for="menu-estres-{{actor.id}}" title="{{localize "Ad6.Etiquetas.verDramas"}}" class="tx-red boton-ico menu-pin">
+                            <i class="fas fa-masks-theater"></i>
+                            </label>
+                        <div class="menu-panel">
+                                <div class="fila-ext">
+                                    <label class="w-40 tx-red">{{localize "Ad6.Etiquetas.drama1"}}</label>
+                                    <input name="system.dramas.0" value="{{system.dramas.[0]}}" type="text" class="tx-red mrg txt-fill"/>
+                                </div>
+                                <div class="fila-ext">
+                                    <label class="w-40 tx-red">{{localize "Ad6.Etiquetas.drama2"}}</label>
+                                    <input name="system.dramas.1" value="{{system.dramas.[1]}}" type="text" class="tx-red mrg txt-fill"/>
+                                </div>
+                                <div class="fila-ext">
+                                    <label class="w-40 tx-red">{{localize "Ad6.Etiquetas.drama3"}}</label>
+                                    <input name="system.dramas.2" value="{{system.dramas.[2]}}" type="text" class="tx-red mrg txt-fill"/>
+                                </div>
+                        </div>
+                    </div>
+                </header>
+               {{> parcialContenidoEstres hexagonos = system.estres agotamiento=system.agotamiento}}
+            </section>

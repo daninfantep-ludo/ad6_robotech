@@ -1,0 +1,74 @@
+{{!--
+    Suities de equipo PERSONALES del piloto (system.personal === true) mostrados
+    en la pestaña "Especiales" del VEHÍCULO, debajo de talentos y elementos.
+
+    NO se copian al vehículo: se listan EN VIVO desde el piloto (context.
+    suitEquiposPersonales), igual que talentos/elementos/habilidades. Como las
+    acciones (gastar/recargar/editar/marcar siendoUsado) usan
+    Func.ObtenerItem, que resuelve al piloto cuando el item no pertenece al
+    vehículo, TODAS operan sobre el item REAL del personaje (los usos se
+    consumen en la ficha del piloto, no en una copia).
+
+    La fila reutiliza exactamente el mismo aspecto que la de suities de equipo de
+    tabEquipo.hbs (parcialCuerpoEquipos + valor + usos + bancos/hardwares), pero
+    SIN el botón "+" de añadir (los suits personales son del piloto y no se
+    crean desde el vehículo).
+--}}
+<div style="width: 100%">
+    <header class="chk-ct" style="height:20px;">
+        {{#if @root.suitEquiposPersonales}}
+        <div class="w-200 tx-pq tx-cnt">{{localize "Ad6.Etiquetas.suitEquipo"}}</div>
+        <div class="w-50 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.rango"}}</div>
+        <div class="w-50 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.dano"}}</div>
+        <div class="w-50 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.pen"}}</div>
+        <div class="w-50 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.areachica"}}</div>
+        <div class="w-40"></div>
+        <div class="w-100 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.descriptores"}}</div>
+        <div class="w-30 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.valor"}}</div>
+        <div class="w-45 tx-pq tx-cnt">{{localize "Ad6.Etiquetas.usos"}}</div>
+        <!--<div class="w-45 tx-pq tx-cnt">{{localize "Ad6.Etiquetas.bancos"}}</div>-->
+        {{/if}}
+    </header>
+    <div class="fd-column" ID="SUITEQUIPOS_PERSONALES">
+        {{#each suitEquiposPersonales as |se|}}
+        <div class="chk-ct">
+            {{> parcialCuerpoEquipos  se=se eqSuit=true}}
+            <div class="w-30">
+                <input title="{{localize "Ad6.Etiquetas.habilidad"}}" type="text" data-id="{{se.id}}" data-campo="valor" value="{{se.system.valor}}" class="change tx mrg w-30 tx-cnt"/>
+            </div>
+            {{> parcialMaxValor
+                valor=se.system.usos.restante
+                maximo=se.system.usos.maximo
+                dataId=se.id
+                it=true
+                campo="usos.restante"
+                titulo=(localize "Ad6.Etiquetas.usosRestantes")
+                anchura="w-45"
+            }}
+            {{#if se.system.esBanco}}
+                {{> parcialMaxValor
+                    valor=se.system.bancos.restante
+                    maximo=se.system.bancos.maximo
+                    dataId=se.id
+                    it=true
+                    campo="bancos.restante"
+                    titulo=(localize "Ad6.Etiquetas.bancosRestantes")
+                    anchura="w-45"
+                }}
+            {{else if se.system.esHardware}}
+                {{#if (neq @root.actor.type "enjambre")}}
+                {{> parcialHardwares basico=@root.system.esBasico hardwares=se.system.hardwares dataId=se.id titulo=(localize "Ad6.Etiquetas.hardware")}}
+                {{/if}}
+            {{else}}
+                <div class="w-45"></div>
+            {{/if}}
+            {{!-- Botones sobre el item REAL del piloto (resueltos por ObtenerItem):
+                 usar (gasta un uso) y recargar; el resto (editar/chat/infinito/
+                 borrar) va en el menú contextual "...". --}}
+            <!--<button title="{{localize "Ad6.Etiquetas.usar"}}" class="boton-ico" data-id="{{se.id}}" data-action="gastarItem"><i class="fas fa-solid fa-play"></i></button>
+            <button title="{{localize "Ad6.Etiquetas.recargar"}}" class="boton-ico" data-id="{{se.id}}" data-action="recargarItem" data-valor="{{se.system.usos.maximo}}"><i class="fas fa-solid fa-rotate"></i></button>-->
+            {{> parcialContextoGeneral id=se.id infinito=true tipoDato="suitEquipo"}}
+        </div>
+        {{/each}}
+    </div>
+</div>

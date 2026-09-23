@@ -1,0 +1,164 @@
+<section id="EQUIPO" class="tab ad6-tab equipos tx  {{tab.cssClass}} div-panel txt-fill" data-group="primary" data-tab="equipo"  role="tabpanel">
+<div class="tab-content txt-fill flx">
+    <div>
+        {{#if (neq actor.type "vehiculo")}}
+        <header class="chk-ct" style="height:20px;">  
+            {{#if @root.armaduras}}              
+                        <div class="w-200 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.armadura"}}</div>
+            <div class="w-40 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.tipo"}}</div>
+            <div class="w-20 tx-pq tx-cnt" ></div>
+            <div class="w-40 tx-pq tx-cnt" style="margin-right: 2px; margin-left: 42px;" >{{localize "Ad6.Etiquetas.valor"}}</div>
+            <div class="w-60 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.resiste"}}</div>
+            <div class="w-20 tx-pq tx-cnt"  ></div>                
+            <div class="w-100 tx-pq tx-cnt"  >{{localize "Ad6.Etiquetas.otros"}}</div>        
+            {{/if}}
+            <div class="fila-ext mrg-la"  >                
+                <button title="{{localize "Ad6.Etiquetas.anadirArmadura"}}" class="boton-ico" data-action="itemAnadir" data-tipo="armadura"><i class="fas fa-solid fa-plus"></i> </button>
+            </div>
+        </header>
+        <div class="fd-column" ID="ARMADURAS">
+            {{#each armaduras as |ar|}}
+            <div class="chk-ct">
+                <input  type="text" data-id="{{ar.id}}" data-campo="name" value="{{ar.name}}" class="change tx mrg w-200"/>
+                <select class="change tx tx-cnt mrg w-40" data-id="{{ar.id}}" data-campo ="armadura.tipo">
+                        {{#each @root.config.Escalas as |label escala|}}
+                            <option value="{{escala}}" {{#if (eq ar.system.armadura.tipo escala)}}selected{{/if}}>
+                            {{escalaLetra escala}}  
+                            </option>
+                        {{/each}}                          
+                </select>
+                <label  title="{{localize "Ad6.Etiquetas.esEscudo"}}" class="check-control">
+                    <input type="checkbox" class="chk-change" data-campo="armadura.ablativa" data-id="{{ar.id}}" 
+                        data-valor="{{ar.system.armadura.ablativa}}" {{checked ar.system.armadura.ablativa}}>
+                </label>          
+                    <div style="margin-left: 42px;">
+                                {{> parcialMaxValor
+                    valor=ar.system.armadura.restante
+                    maximo=ar.system.armadura.valor
+                    dataId=ar.id
+                    it=true
+                    campo="armadura.restante"
+                    dataSyncMax=true
+                    titulo=(localize "Ad6.Etiquetas.armadura")
+                    anchura="w-50"
+                }}      </div>
+                <input  title ="{{localize "Ad6.Etiquetas.resiste"}}" type="text" data-id="{{ar.id}}" data-campo="armadura.resiste" value="{{ar.system.armadura.resiste}}" class="change tx mrg w-50 tx-cnt"/>
+                <label  title="{{localize "Ad6.Etiquetas.equiparArmadura"}}" class="check-control">
+                    <input type="checkbox" class="chk-change" data-campo="equipada" data-id="{{ar.id}}" 
+                        data-valor="{{ar.system.equipada}}" {{checked ar.system.equipada}}>
+                </label>     
+                <div class="w-100 flx cnt-horizontal tx-cnt jcc">
+                    {{> parcialResistencias proteccion=ar.system.armadura }}
+                </div>
+                {{> parcialContextoGeneral  id=ar.id infinito=false tipoDato="armadura"}}
+            </div>
+            {{/each}}
+        </div>
+        {{/if}}
+            {{> parcialHeaderEquipos  eqSuit=false wp=true hayBancos=equiposHayBancos}}            
+        <div class="fd-column" ID="ARMAS">
+                                                            {{#each equipos as |eq|}}
+                            <div class="chk-ct">
+                                {{> parcialCuerpoEquipos  se=eq  eqSuit=false}}
+                                <div class="w-30"></div>
+                                <div class="w-45"></div>
+                                {{#if eq.system.esBanco}}
+                                    {{> parcialMaxValor
+                                        valor=eq.system.bancos.restante
+                                        maximo=eq.system.bancos.maximo
+                                        dataId=eq.id
+                                        it=true
+                                        campo="bancos.restante"
+                                        titulo=(localize "Ad6.Etiquetas.bancosRestantes")
+                                        anchura="w-45"
+                                    }}
+                                {{else if eq.system.esHardware}}
+                                    {{#if (neq @root.actor.type "enjambre")}}                
+                                    {{> parcialHardwares basico=@root.system.esBasico hardwares=eq.system.hardwares dataId=eq.id titulo=(localize "Ad6.Etiquetas.hardware")}}
+                                    {{/if}}
+                                {{else}}
+                                    <div class="w-45"></div>
+                                {{/if}}
+                                {{> parcialContextoGeneral  id=eq.id infinito=false tipoDato="equipo"}}
+                            </div>
+                            {{/each}}
+        </div>            
+        {{> parcialHeaderEquipos  eqSuit=true wp=false hayBancos=suitEquiposHayBancos}}
+        <div class="fd-column" ID="SUITEQUIPOS">
+            {{#each suitEquipos as |se|}}
+            <div class="chk-ct">
+                {{> parcialCuerpoEquipos  se=se eqSuit=true}}
+                <div class="w-30">
+                <input title ="{{localize "Ad6.Etiquetas.habilidad"}}" type="text" data-id="{{se.id}}" data-campo="valor" value="{{se.system.valor}}" class="change tx mrg w-30 tx-cnt"/>   
+                </div>
+                <!--<div class="w-80">
+                <input title ="Restantes" type="text" data-id="{{se.id}}" data-campo="usos.restante" value="{{se.system.usos.restante}}" class="change tx mrg w-30 tx-cnt"/> /
+                <input title = "Máximos" type="text" data-id="{{se.id}}" data-campo="usos.maximo" value="{{se.system.usos.maximo}}" class="change tx mrg w-30 tx-cnt"/> 
+                </div>-->
+                {{> parcialMaxValor
+                    valor=se.system.usos.restante
+                    maximo=se.system.usos.maximo
+                    dataId=se.id
+                    it=true
+                    campo="usos.restante"
+                    titulo=(localize "Ad6.Etiquetas.usosRestantes")
+                    anchura="w-45"
+                }}
+                    {{#if se.system.esBanco}}
+                        {{> parcialMaxValor
+                            valor=se.system.bancos.restante
+                            maximo=se.system.bancos.maximo
+                            dataId=se.id
+                            it=true
+                            campo="bancos.restante"
+                            titulo=(localize "Ad6.Etiquetas.bancosRestantes")
+                            anchura="w-45"
+                        }}
+                    {{else if se.system.esHardware}}        
+                        
+                        {{#if (neq @root.actor.type "enjambre")}}                
+                        {{> parcialHardwares basico=@root.system.esBasico hardwares=se.system.hardwares dataId=se.id titulo=(localize "Ad6.Etiquetas.hardware")}}
+                        {{/if}}
+                    {{else}}
+                        <div class="w-45"></div>
+                    {{/if}}
+                {{> parcialContextoGeneral  id=se.id infinito=true tipoDato="suitEquipo"}}
+            </div>
+            {{/each}}
+        </div>
+            {{#if (eq actor.type "vehiculo")}}
+      <div class="chk-ct" style="height:20px;">
+        {{#if @root.hardwares}}
+        <div class="w-200 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.nombreDelHardware"}}</div>
+        {{/if}}
+        <div class="fila-ext mrg-la">
+          <button title="{{localize "Ad6.Etiquetas.anadirHardware"}}" class="boton-ico" data-action="itemAnadir" data-tipo="hardware"><i class="fas fa-solid fa-plus"></i> </button>
+        </div>
+      </div>
+      <div class="fd-column" ID="HARDWARES">
+        {{#each hardwares as |hr|}}
+        <div class="chk-ct">
+          <input type="text" data-id="{{hr.id}}" data-campo="name" value="{{hr.name}}" class="change tx mrg w-200"/>
+          {{#if @root.system.esBasico }}
+            <button type="button" disabled
+                class="boton-hardware-desactivado">            
+                <i class="fas fa-microchip"></i>
+            </button>          
+          {{else}}
+          <button type="button"
+                  class="boton-hardware {{#if hr.system.marcado}}hardware-verde{{else}}hardware-rojo{{/if}}"
+                  data-action="clickLocalizacion"
+                  data-id="{{hr.id}}"
+                  title="{{#if hr.system.marcado}}{{localize "Ad6.Etiquetas.operativo"}}{{else}}{{localize "Ad6.Etiquetas.destruido"}}{{/if}}">
+            <i class="fas fa-microchip"></i>
+          </button>
+          {{/if}}
+          {{> parcialContextoGeneral id=hr.id infinito=false tipoDato="hardware"}}
+        </div>
+        {{/each}}
+      </div>
+
+            {{/if}}
+
+    </div>
+</section>

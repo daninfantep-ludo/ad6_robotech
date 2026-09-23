@@ -1,0 +1,32 @@
+{{#if system.usaSistemas }}
+<section id="SISTEMAS" class ="div-panel tx "> 
+    <header class="div-panel-titulo cnt-horizontal">
+        <div class="cnt-horizontal  check-control" >
+            {{localize "Ad6.Etiquetas.sistemas"}}
+        </div>    
+    </header>
+    <div class="flx fd-column">
+        <div class="cnt-horizontal vam mrg">
+            <span class="w-60 tx-pq">{{localize "Ad6.Etiquetas.sensores"}}</span>
+            <button type="button" class="sistema-btn sistema-btn-{{system.sensores}}  txt-fill tx-pq"
+                    data-action="clickSistema" data-sistema="sensores">{{{localize (concat "Ad6.TipoTirada." system.sensores)}}}</button>
+        </div>
+        <div class="cnt-horizontal vam mrg">
+            <span class="w-60 tx-pq">{{localize "Ad6.Etiquetas.punteria"}}</span>
+            <button type="button" class="sistema-btn sistema-btn-{{system.apuntado}} txt-fill tx-pq"
+                    data-action="clickSistema" data-sistema="apuntado">{{{localize (concat "Ad6.TipoTirada." system.apuntado)}}}</button>
+        </div>
+        <div class="cnt-horizontal vam mrg">
+            <span class="w-60 tx-pq">{{localize "Ad6.Etiquetas.impulsores"}}</span>
+            <button type="button" class="sistema-btn sistema-btn-{{system.impulsores}} txt-fill tx-pq"
+                    data-action="clickSistema" data-sistema="impulsores">{{{localize (concat "Ad6.TipoTirada." system.impulsores)}}}</button>
+        </div>
+        <div class="cnt-horizontal vam mrg">
+            <span class="w-60 tx-pq">{{localize "Ad6.Etiquetas.motores"}}</span>
+            <button type="button" class="sistema-btn txt-fill tx-pq sistema-btn-{{quitarPorcentaje system.motores}}"
+                    data-action="clickSistema" data-sistema="motores">{{{system.motores}}}</button>
+        </div>
+    </div>
+</section>  
+{{/if}}
+

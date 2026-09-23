@@ -1,0 +1,31 @@
+<section id="HABILIDADES" class="tab ad6-tab habilidades tx  {{tab.cssClass}} div-panel txt-fill" data-group="primary" data-tab="habilidades"  role="tabpanel">
+<div class="tab-content txt-fill flx">
+        <div>
+            <div class="chk-ct" style="height:20px;">
+                {{#if @root.habilidades}}
+                <div class="w-175 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.habilidad"}}</div>
+                                <div class="w-175 tx-pq tx-cnt">{{localize "Ad6.Etiquetas.beneficio"}}</div>
+                                <div class="w-175 tx-pq tx-cnt">{{localize "Ad6.Etiquetas.costo"}}</div>
+                                <div class="w-60 tx-pq tx-cnt">{{localize "Ad6.Etiquetas.valor"}}</div>
+                {{/if}}
+                <div class="fila-ext mrg-la">                
+                    <button title="{{localize "Ad6.Etiquetas.anadirHabilidad"}}" class="boton-ico" data-action="itemAnadir" data-tipo="habilidad"><i class="fas fa-solid fa-plus"></i> </button>
+                </div>
+            </div>
+            <div class="fd-column" ID="HABILIDADES">
+                {{#each habilidades as |hab|}}
+                <div class="chk-ct">
+                <input type="text" data-id="{{hab.id}}" data-campo="name" value="{{hab.name}}" class="change tx mrg w-175"/>
+                <input type="text" data-id="{{hab.id}}" data-campo="beneficio" value="{{hab.system.beneficio}}" class="change tx mrg w-175"/>
+                <input type="text" data-id="{{hab.id}}" data-campo="costo" value="{{hab.system.costo}}" class="change tx mrg w-175"/>
+                <input type="number" data-id="{{hab.id}}" data-campo="valor" value="{{hab.system.valor}}" class="change tx mrg w-60 tx-cnt con-flechas"/>
+                                <label title="{{localize "Ad6.Etiquetas.usarHabilidad"}}" class="check-control">
+                    <input type="checkbox" class="chk-change" data-id="{{hab.id}}" data-campo="marcado" data-action="clickHabilidad" 
+                     data-valor="{{hab.system.marcado}}" {{checked hab.system.marcado}}></label>
+                    {{> parcialContextoGeneral id=hab.id infinito=false tipoDato="habilidad"}}
+                </div>
+                {{/each}}
+
+    </div>
+        </div>
+</section>

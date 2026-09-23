@@ -1,0 +1,19 @@
+            <header class="chk-ct" style="height:20px;">
+                {{#if (or (and eqSuit @root.suitEquipos) @root.equipos)}}
+                <div class="w-200 tx-pq tx-cnt" >{{#if eqSuit}}{{localize "Ad6.Etiquetas.suitEquipo"}}{{else}}{{localize "Ad6.Etiquetas.arma"}}{{/if}}</div>
+                                <div class="w-50 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.rango"}}</div>
+                                <div class="w-50 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.dano"}}</div>
+                                <div class="w-50 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.pen"}}</div>
+                                <div class="w-50 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.areachica"}}</div>
+                                <div class="w-40"></div>
+                                <div class="w-100 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.descriptores"}}</div>
+                                <div class="w-30 tx-pq tx-cnt" >{{#if eqSuit}}{{localize "Ad6.Etiquetas.valor"}}{{/if}}</div>
+                                <div class="w-45 tx-pq tx-cnt">{{#if eqSuit}}{{localize "Ad6.Etiquetas.usos"}}{{/if}}</div>
+                                {{#if hayBancos}}
+                                <div class="w-45 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.bancos"}}</div>
+                                {{/if}}
+                {{/if}}
+                <div class="fila-ext mrg-la">                
+                    <button title="{{localize "Ad6.Etiquetas.anadir"}} {{#if eqSuit}}{{localize "Ad6.Etiquetas.suitEquipo"}}{{/if}}{{#if wp}}{{localize "Ad6.Etiquetas.arma"}}{{/if}}" class="boton-ico" data-action="itemAnadir" data-tipo="{{#if eqSuit}}suitEquipo{{/if}}{{#if wp}}equipo{{/if}}"><i class="fas fa-solid fa-plus"></i> </button>
+                </div>
+            </header>    

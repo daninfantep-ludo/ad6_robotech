@@ -1,0 +1,44 @@
+<section id="VITALES" class ="div-panel tx"> 
+     
+    <header class="div-panel-titulo cnt-horizontal">
+        <span class="flex-0-1-auto">{{localize "Ad6.Etiquetas.vitales"}}</span>
+    </header>
+    <div class="cnt-horizontal">
+        {{> parcialRetrato}}
+        <div id="columna-izquierda-vitales">
+            <div>
+                <label class="w-80">{{localize "Ad6.Etiquetas.nombre"}}</label>
+                <input type="text" name="name" value="{{actor.name}}" class="tx mrg w-200" ></input>
+            </div>
+        </div>
+        <div id="columna-derecha-vitales" class="mrg-l10">
+            <div class="mrg flx cnt-horizontal">
+                <div id="HEX" class="flx fd-column mrg-r10">            
+                    <div style="height:20px" class="tx-pq">{{localize "Ad6.Etiquetas.unidades"}}</div>
+                    <div class="hex-input hex-boton-normal">
+                        <input type="number" name="system.unidades" readonly value="{{system.unidades}}" class="hex-input-numero" step="1" min="0"/>
+                    </div>
+                </div>
+                <div id="HEX" class="flx fd-column  mrg-r10">            
+                    <div style="height:20px" class="tx-pq">{{localize "Ad6.Etiquetas.restantes"}}</div>
+                    <div class="hex-input hex-boton-normal">
+                        <input type="number" name="system.restantes" value="{{system.restantes}}" class="hex-input-numero" step="1" min="0"/>
+                    </div>
+                        <button title="{{localize "Ad6.Etiquetas.restaurar"}}" class="boton-ico-chico"  data-action="restaurar" ><i class="fas fa-solid fa-rotate"></i> </button>
+                </div>
+                <div class="flx fd-column">
+                    <div style="height:15px" class="tx-pq"></div>
+                    <div class="flx cnt-horizontal">
+                        <button title="{{localize "Ad6.Etiquetas.sumarUno"}}" class="boton-ico-chico"   data-action="sumarUno" ><i class="fas fa-solid fa-angle-right"></i> </button>
+                                                <button title="{{localize "Ad6.Etiquetas.sumarCinco"}}" class="boton-ico-chico"   data-action="sumarCinco" ><i class="fas fa-solid fa-angles-right"></i> </button>
+                    </div>
+                    <div class="flx cnt-horizontal">
+                        <button title="{{localize "Ad6.Etiquetas.restarUno"}}" class="boton-ico-chico"  data-action="restarUno" ><i class="fas fa-solid fa-angle-left"></i> </button>
+                                                <button title="{{localize "Ad6.Etiquetas.restarCinco"}}" class="boton-ico-chico"   data-action="restarCinco" ><i class="fas fa-solid fa-angles-left"></i> </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div> 
+</section>   

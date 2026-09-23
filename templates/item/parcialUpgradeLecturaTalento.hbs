@@ -1,0 +1,24 @@
+{{!--
+    Fila de TALENTO en SOLO LECTURA para la hoja de un UPGRADE.
+    Replica los mismos campos/aspecto que parcialContenidoTalentos.hbs, pero SIN
+    edición. Sólo conserva el botón de quitar de la lista.
+
+    Parámetros:
+      * tal  -> la COPIA del item (objeto plano): tal.name, tal.system...
+      * idx  -> índice en la lista (para el botón quitar).
+--}}
+<div class="chk-ct">
+    {{!-- Nombre --}}
+    <div class="w-200 mrg mrg-r10">{{tal.name}}</div>
+
+    {{!-- Tipo --}}
+    <div class="w-150 tx-cnt mrg">{{tal.system.tipo}}</div>
+
+    {{!-- Usos (restante / máximo) --}}
+    <div class="w-45 tx-cnt mrg">{{tal.system.usos.restante}} / {{tal.system.usos.maximo}}</div>
+
+    {{!-- Botón quitar de la lista del upgrade --}}
+    <div class="fila-ext mrg-la">
+        <button type="button" class="boton-ico" data-action="upgradeBorrarTalento" data-index="{{idx}}" title="{{localize "Ad6.Upgrade.quitar"}}"><i class="fas fa-trash"></i></button>
+    </div>
+</div>

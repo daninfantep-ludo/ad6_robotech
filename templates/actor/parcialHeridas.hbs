@@ -1,0 +1,36 @@
+<section  id="HERIDAS" class="div-panel tx flex-0-1-auto" >
+    <header class="div-panel-titulo cnt-horizontal">
+        <div >{{localize "Ad6.Etiquetas.tituloHeridas"}}</div>
+        <div class="cnt-horizontal fila-ext txt-fill" >
+
+            <div class="mrg-la">{{#if (neq system.heridasParams.armadura.restante 0)}}<i class="fa-solid fa-shield" title="{{localize "Ad6.Etiquetas.armadura"}} {{system.heridasParams.armadura.restante}}{{escalaLetra system.heridasParams.armadura.tipo}}"></i>{{/if}}</div>
+            
+            <!--{{#if (neq system.heridasParams.armadura.resistencias.0.adicional 0)}}<div ><i class="fa-solid fa-bolt" title="{{localize "Ad6.Etiquetas.adicAntiEnergia"}} {{system.heridasParams.armadura.resistencias.0.adicional}}"></i></div>{{/if}}
+            {{#if (neq system.heridasParams.armadura.resistencias.1.adicional 0)}}<div ><i class="fa-solid fa-bolt" title="{{localize "Ad6.Etiquetas.adicNoMelee"}} {{system.heridasParams.armadura.resistencias.1.adicional}}"></i></div>{{/if}}
+            {{#if (neq system.heridasParams.armadura.resistencias.2.adicional 0)}}<div ><i class="fa-solid fa-snowflake" title="{{localize "Ad6.Etiquetas.adicFrio"}} {{system.heridasParams.armadura.resistencias.2.adicional}}"></i></div>{{/if}}
+            {{#if (neq system.heridasParams.armadura.resiste 0)}}<div ><i class="fa-solid fa-crosshairs" title="{{localize "Ad6.Etiquetas.resiste"}} {{system.heridasParams.armadura.resiste}}"></i>{{/if}}-->
+            {{> parcialResistencias proteccion=system.heridasParams.armadura }}
+        </div>
+    </header>
+        <div class="mrg-xl flx gap-5" >
+            {{#each system.heridas}}
+                {{#if (eq visible true)}}
+                <button data-action="clickHerida" data-indice="{{@index}}"
+                class="hex-boton {{leeHex ../system.heridasParams.valorHeridas}} hex-boton-{{color}}{{#if (eq marcado true)}} agotado{{/if}}" type="button" aria-pressed="{{marcado}}"
+                title="{{#if (neq ../system.heridasParams.valorHeridas "L")}}{{../system.heridasParams.valorHeridas}}{{/if}}">
+                    <span class="hex-letra">{{letra}}</span>
+                </button>
+                {{/if}}
+            {{/each}}
+            <div class="flx fd-column">
+                {{#if (eq system.especie "tiresio")}}
+                <button type="button"  class="boton-ico-chico" data-action="clickClon" data-indice="0" title="{{system.clones.[0].nombre}} - {{system.clones.[0].heridas}} {{localize "Ad6.Etiquetas.heridas"}}">
+                    <i class="fa-solid fa-person clon-{{cambiaClon system.clones.[0].heridas}}"></i>
+                </button>
+                <button type="button"  class="boton-ico-chico" data-action="clickClon" data-indice="1" title="{{system.clones.[1].nombre}} - {{system.clones.[1].heridas}} {{localize "Ad6.Etiquetas.heridas"}}">
+                    <i class="fa-solid fa-person clon-{{cambiaClon system.clones.[1].heridas}}"></i>
+                </button>
+                {{/if}}
+            </div>
+        </div>
+</section>

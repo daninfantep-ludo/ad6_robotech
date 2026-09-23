@@ -1,0 +1,1608 @@
+/* variables y clases globales a usar en todas las hojas */
+@import url('https://fonts.googleapis.com/css?family=Exo+2:wght@600;700;800;900&display=swap');
+:root{
+    --color-borde: #4682B4; /* borde de las cajas y del fondo del título */
+    --color-brillo: rgba(170, 220, 255, 0.75); /* brillo externo de las cajas */
+    --color-letras: #FFFFFF; /* letras en general */
+    --color-sombra-texto:  rgba(0, 0, 0, 0.85); /* sombra de los títulos */
+    --color-fondo-hojas: #000000; /* fondos de hojas actor/item */
+    --color-fondo-caja: #222222; /* fondo de las cajas de contenido */
+    --color-destacado:#1769aa; /* ccolor para cosas destacadas como los checkboxes */
+    --color-fondo-agotado: #171A14;
+    --color-rojo-agotado:#674548;
+    --color-rojo-hover:#C85B55;
+    --color-rojo:#A94747;
+    --color-ambar-agotado:#716441;
+    --color-ambar-hover:#D5A83D;
+    --color-ambar:#B88628;
+    --color-verde-agotado:#5D6840;
+    --color-verde:#8FA63F;
+    --color-verde-hover:#adcf33;
+    --color-blanco: #fff;
+    --color-heroico: #D5A83D;
+    --color-heroico-hover: #F0C556;
+    --color-heroico-agotado: #9A723A;
+    --color-estres: #E65C00;
+    --color-estres-hover: #FF751A;
+    --color-estres-agotado: #A64B16;    
+    --color-agotamiento: #FF00FF; /* fucsia, para el hexágono de agotamiento */
+}
+
+input[type="number"].con-flechas::-webkit-inner-spin-button,
+input[type="number"].con-flechas::-webkit-outer-spin-button {
+  appearance: auto !important;
+  -webkit-appearance: auto !important;
+  display: block !important;
+  opacity: 1 !important;
+}
+
+/* ------------------------------------------------------------------
+   Ventana de interacción de Combate (Ad6_AppCombate)
+   Misma estructura "caja con borde" que el resto del sistema. Se usa
+   tanto para la pantalla del Atacante como la del Defensor.
+------------------------------------------------------------------- */
+.ad6.combate .window-content {
+  background: var(--color-fondo-hojas);
+  /* El contenido es una columna flex de alto completo para que la caja del log
+     pueda EXPANDIRSE cuando se agranda la ventana. */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.ad6-combate-cuerpo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 4px;
+  font-family: "Exo 2";
+  color: var(--color-letras);
+  /* Ocupa todo el alto disponible y permite que sus hijos "crezcan". */
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.ad6-combate-caja {
+  background: var(--color-fondo-caja);
+  border: 1px solid var(--color-borde);
+  box-shadow: 0 0 2px var(--color-brillo);
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ad6-combate-titulo {
+  font-weight: bold;
+  font-size: 0.95rem;
+  border-bottom: 1px solid var(--color-borde);
+  padding-bottom: 3px;
+}
+
+/* Título de la caja del LOG: título a la izquierda y botón "copiar" a la
+   derecha (mismo renglón). Se apoya en .ad6-combate-titulo (fuente/borde) y
+   solo lo convierte en fila flex. */
+.ad6-log-titulo-caja {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ad6-boton-copiar-log {
+  padding: 2px 6px;
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+/* Fila del buscador de objetivos: input texto + datalist */
+.ad6-combate-buscador {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ad6-combate-buscador input[type="text"] {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Lista de resultados del buscador de objetivos. Se muestra SOLO el nombre;
+   el uuid viaja en data-uuid (no visible). Oculta por defecto (la gobierna el
+   listener de la app). */
+.ad6-combate-resultados {
+  list-style: none;
+  margin: 2px 0 0 0;
+  padding: 0;
+  max-height: 140px;
+  overflow-y: auto;
+  border: 1px solid var(--color-borde);
+  background: var(--color-fondo-caja);
+}
+
+.ad6-combate-resultado {
+  padding: 2px 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--color-letras);
+}
+
+.ad6-combate-resultado:hover {
+  background: var(--color-borde);
+}
+
+/* Lista de objetivos seleccionados */
+.ad6-combate-objetivos {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  max-height: 160px;
+  overflow-y: auto;
+}
+
+.ad6-combate-objetivo-fila {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ad6-combate-objetivo-img {
+  width: 20px;
+  height: 20px;
+  object-fit: cover;
+  border: 1px solid var(--color-borde);
+  background: var(--color-fondo-caja);
+}
+
+.ad6-combate-objetivo-nombre {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Fila de datos del arma (nombre - daño - pen - área - descriptores) */
+.ad6-combate-arma {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ad6-combate-arma-datos {
+  flex: 1 1 auto;
+  font-size: 0.8rem;
+}
+
+/* La caja del LOG crece para ocupar el espacio sobrante de la ventana. */
+.ad6-combate-caja-log {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* Log del cálculo: caja con scroll (antes era un textarea; ahora es un div
+   para poder dar color a las líneas resaltadas). */
+.ad6-combate-log {
+  width: 100%;
+  box-sizing: border-box;
+  /* Crece con la ventana: ocupa todo el alto de su caja. */
+  flex: 1 1 auto;
+  min-height: 80px;
+  overflow-y: auto;
+  font-family: "Courier New", monospace;
+  font-size: 0.75rem;
+  line-height: 1.15;          /* interlineado compacto */
+  color: var(--color-letras);
+  background: var(--color-fondo-agotado);
+  border: 1px solid var(--color-brillo);
+  padding: 4px;
+  /* IMPORTANTE: NO usar "pre-wrap". El HTML de la plantilla mete saltos de
+     línea e indentación entre los {{#each}} que, con pre-wrap, se renderizan
+     como líneas vacías (lo que antes no pasaba con el textarea). Con "normal"
+     el navegador los colapsa y solo se ve el texto de cada entrada. */
+  white-space: normal;
+  word-break: break-word;
+}
+
+.ad6-log-linea {
+  display: block;
+  line-height: 1.15;
+  margin: 0;
+  padding: 0;
+  /* El sangrado (padding-left) se aplica inline por la app en las entradas
+     que vienen indentadas con espacios, para que el wrap lo respete. */
+}
+
+/* --- Colores de las líneas resaltadas del log ---
+   destruido -> ROJO + negrita
+   aplicar   -> ÁMBAR + negrita
+   sinDano   -> VERDE + negrita
+   titulo    -> cabecera de sección (subrayado suave) */
+.ad6-log-destruido {
+  color: var(--color-rojo-hover);
+  font-weight: bold;
+}
+
+.ad6-log-aplicar {
+  color: var(--color-ambar-hover);
+  font-weight: bold;
+}
+
+.ad6-log-sinDano {
+  color: var(--color-verde-hover);
+  font-weight: bold;
+}
+
+.ad6-log-titulo {
+  color: var(--color-brillo);
+  font-weight: bold;
+  border-bottom: 1px solid var(--color-borde);
+  margin-top: 3px;
+}
+
+/* La caja de "Defensa de los objetivos" (vista atacante).
+   OJO: el acotado de alto + scroll queda DESACTIVADO temporalmente para probar.
+   Si se quiere reactivar, descomentar estas dos reglas. */
+/*
+.ad6-combate-caja-defensas {
+  max-height: 130px;
+  overflow-y: auto;
+}
+*/
+
+/* Defensa de los objetivos (vista del atacante): una entrada COMPACTA por
+   defensor, con DOS filas: (1) imagen + nombre; (2) total + fuentes. */
+.ad6-defensa-objetivo {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 2px 0;
+  border-bottom: 1px solid rgba(70, 130, 180, 0.35);   /* separación tenue */
+}
+
+.ad6-defensa-objetivo:last-child {
+  border-bottom: none;
+}
+
+.ad6-defensa-objetivo-cab {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+}
+
+.ad6-defensa-objetivo-detalle {
+  font-size: 0.75rem;
+  line-height: 1.15;
+  padding-left: 26px;       /* alineado bajo el nombre (20px img + 6px gap) */
+  white-space: normal;
+}
+
+/* Título COLAPSABLE (sección Objetivos): fila clicable con flecha a la derecha. */
+.ad6-titulo-colapsable {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+}
+
+.ad6-flecha-colapsable {
+  transition: transform 0.15s ease;
+}
+
+/* Estado COLAPSADO: oculta el cuerpo y gira la flecha hacia la izquierda. */
+.ad6-caja-objetivos.ad6-colapsado .ad6-caja-objetivos-cuerpo {
+  display: none;
+}
+
+.ad6-caja-objetivos.ad6-colapsado .ad6-flecha-colapsable {
+  transform: rotate(-90deg);
+}
+
+.ad6-combate-pie {
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+  /* El pie no crece: alto natural. */
+  flex: 0 0 auto;
+}
+
+/* Botón CERRAR destacado: ocupa TODO el ancho y va en tono ROJO. */
+.ad6-boton-cerrar {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  width: 100%;
+  padding: 6px 8px;
+
+  font-family: "Exo 2";
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: var(--color-letras);
+
+  background: var(--color-rojo-agotado);
+  border: 1px solid var(--color-rojo-hover);
+  border-radius: 0;
+  cursor: pointer;
+}
+
+.ad6-boton-cerrar:hover {
+  background: var(--color-rojo);
+  border: 1px solid var(--color-rojo-hover);
+  box-shadow: 0 0 4px var(--color-brillo);
+}
+
+.ad6-boton-cerrar:active {
+  background: var(--color-rojo-hover);
+}
+
+/* Penetración FINAL dentro de la fila de un arma (select MINÚSCULO).
+   Va justo a la derecha de "Pen x|y" (mismo renglón), así que el margen es
+   pequeño y el select es estrecho: solo mostrará un número de un dígito. */
+.ad6-pen-final {
+  margin-left: 4px;
+}
+
+.ad6-pen-final-select {
+  width: 30px;                 /* estrecho: un solo dígito + flecha nativa */
+  height: 18px;
+  padding: 0 0 0 2px;
+  font-family: "Exo 2";
+  font-size: 0.7rem;
+  line-height: 1;
+  vertical-align: middle;
+  color: var(--color-letras);
+  background: var(--color-fondo-caja);
+  border: 1px solid var(--color-brillo);
+  border-radius: 0;
+}
+
+.ad6-pen-final-valor {
+  font-size: 0.7rem;
+}
+
+/* Daño FINAL dentro de la fila de un arma (select). Mismo mecanismo que la
+   penetración, pero el select es MÁS ANCHO porque las opciones son notaciones
+   de daño ("2xL", "1M"...) y no un solo dígito. */
+.ad6-dano-final {
+  margin-left: 4px;
+}
+
+.ad6-dano-final-select {
+  width: 48px;                 /* cabe "2xL" + flecha nativa (un poco más estrecho: le sobraba) */
+  height: 18px;
+  padding: 0 0 0 2px;
+  font-family: "Exo 2";
+  font-size: 0.7rem;
+  line-height: 1;
+  vertical-align: middle;
+  color: var(--color-letras);
+  background: var(--color-fondo-caja);
+  border: 1px solid var(--color-brillo);
+  border-radius: 0;
+}
+
+.ad6-dano-final-valor {
+  font-size: 0.7rem;
+}
+
+
+/* Hoja de item: el contenedor ocupa todo el alto y apila verticalmente. */
+.ad6_robotech.sheet.item .item-sheet-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* En las hojas cuya descripción es HIJO DIRECTO del contenedor (patrón A:
+   hojaArmadura, hojaTalento, hojaHabilidad, hojaPerfilVelocidad,
+   hojaLocalizacion), el bloque del prose-mirror se estira a todo el alto. */
+.ad6_robotech.sheet.item .item-sheet-container > .form-group:has(prose-mirror) {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.ad6_robotech.sheet.item .item-sheet-container > .form-group:has(prose-mirror) prose-mirror {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* En las hojas con .layout-flex (hojaEquipo, hojaSuitEquipo) el prose-mirror
+   conserva una altura mínima para que el editor siempre se vea. */
+.ad6_robotech.sheet.item .layout-flex prose-mirror {
+  min-height: 180px;
+}
+
+.window-content {  /* para que no ponga tanto margen que se pierde mucha pantalla */
+    padding: 4px;
+}
+
+/* Importación de las fuentes para Exo2 */
+
+/* fuente general */
+.tx{
+    font-family: "Exo 2";
+    font-size: 1rem;
+    color: var(--color-letras)
+}
+.tx-cnt{
+    text-align: center;
+}
+.tx-iz{
+    text-align: left;
+}
+.tx-pq{
+    font-size: 0.65rem;
+}
+
+.tx-red{
+        font-family: "Exo 2";
+    font-size: 0.75rem;
+    color: var(--color-letras)
+}
+
+/* definición de la caja y título*/
+
+.div-panel {
+    margin: 3px;
+    position: relative;
+    isolation: isolate;
+    padding: 0.5rem;
+    color: var(--color-letras);
+    background: var(--color-fondo-caja);
+    border-top-right-radius: 10px;
+    corner-top-right-shape: bevel;
+    border: 1px solid var(--color-borde);
+    box-shadow: 0 0 2px var(--color-brillo);
+}
+
+.div-panel-titulo {
+    box-sizing: border-box;
+    display: block;
+    margin: -0.5rem -0.5rem 0.5rem;
+    width: calc(100% + 1rem);
+    padding: 0.15rem 1rem 0.25rem;
+    line-height: 1.2;
+    background: var(--color-borde);
+    color: var(--color-letras);
+    font-weight: bold;
+    text-shadow: 2px 2px 3px var(--color-sombra-texto);
+    border-top-right-radius: 8px;
+    corner-top-right-shape: bevel;
+}
+
+
+/* En la lista de objetos (sidebar), oculta el icono solo en los item */
+#sidebar .directory .directory-item.item .thumbnail {
+  display: none !important;
+}
+
+#sidebar .directory .directory-item.item {
+  padding-left: 12px;
+  min-height: unset;     
+  height: 40px;           
+  line-height: normal;    
+  padding-bottom: 6px;
+  vertical-align:middle;
+}
+
+
+/* clases generales para definir anchos y márgenes */
+
+.ml-10{
+  margin-left: 10px;
+}
+.w-15{
+  width: 15px;
+}
+.w-20{
+  width: 20px;
+}
+.w-30{
+  width: 30px;
+  flex: 0 0 30px;
+}
+
+.w-40{
+  width: 40px;
+}
+.w-45{
+  width: 40px;
+}
+.w-50{
+  width: 50px;
+}
+
+.w-60{
+  width: 60px;
+  /*flex: 0 0 60px;*/
+}
+
+.w-65{
+  width: 65px;
+  /*flex: 0 0 60px;*/
+}
+.w-70{
+  width: 70px;
+  /*flex: 0 0 60px;*/
+}
+.w-75{
+  width: 75px;
+  flex: 0 0 75px;
+}
+
+.w-80{
+  width:80px;
+  /*flex: 0 0 80px;*/
+}
+
+.w-90{
+  width: 90px;
+  /*flex: 0 0 90px;*/
+}
+
+.w-95{
+  width: 95px;
+  flex: 0 0 95px;
+}
+
+.w-100{
+  width: 100px;
+  flex: 0 0 100px;
+}
+
+.w-105{
+  width: 105px;
+  flex: 0 0 105px;
+}
+
+.w-110{
+  width: 110px;
+  flex: 0 0 110px;
+}
+
+.w-120{
+  width: 120px;
+  flex: 0 0 120px;
+}
+
+.w-130{
+  width: 130px;
+}
+
+.w-140{
+  width: 140px;
+}
+
+.w-150{
+  width: 150px;
+  flex: 0 0 150px;
+
+}
+
+.w-175{
+  width: 175px;
+  flex: 0 0 175px;
+
+}
+.w-180{
+  width: 180px;
+  flex: 0 0 180px;
+
+}
+.w-185{
+  width: 185px;
+  flex: 0 0 185px;
+
+}
+.w-200{
+  width: 200px;
+  flex: 0 0 200px;
+
+}
+.w-300{
+  width: 300px;
+  flex: 0 0 300px;
+
+}
+
+/* esta medida tan específica es para que cuadre el checkbox
+   de agotamiento. Ahora que caigo en inglés será diferente */
+.w-375{
+  width: 375px;
+  flex: 0 0 375px;
+
+}
+/* esto solo existe para que el panel de movimientos
+   heroicos tenga el mismo ancho que el de heridas
+   en el momento inicial de la hoja */
+.mw-171
+{
+  min-width: 171px;
+}
+.wn-200
+{
+  width: 200px;
+}
+
+.compensa-vert
+{
+  margin-top: -5px;
+}
+.gap-5
+{
+    gap: 5px;
+}
+
+.gap-6
+{
+    gap: 6px;
+}
+
+.gap-10
+{
+    gap: 10px;
+}
+
+.h-20
+{
+  height: 20px;
+}
+.h-full{
+height:100%;
+}
+.jcc{
+justify-content: center;
+}
+
+label /* para que todas las label tomen la clase de width que se les ponga */
+{
+  display: inline-block;  
+}
+
+.vam{ /* centrar verticalmente */
+  align-items: center;
+}
+
+.mrg{  /* margen para itemes de formularios para separarlos*/
+  margin-bottom: 1px;
+  margin-top: 1px;
+}
+
+.pl-4{  /* margen para itemes de formularios para separarlos*/
+  padding-left: 4px;
+}
+
+.mrg-r5{  /* margen para itemes de formularios para separarlos*/
+  margin-right: 5px;  
+}
+
+.mrg-r10{  /* margen para itemes de formularios para separarlos*/
+  margin-right: 10px;  
+}
+.mrg-l3{  /* margen para itemes de formularios para separarlos*/
+  margin-left: 3px;  
+}
+
+.mrg-r3{  /* margen para itemes de formularios para separarlos*/
+  margin-right: 3px;  
+}
+
+.mrg-l5{  /* margen para itemes de formularios para separarlos*/
+  margin-left: 5px;  
+}
+.mrg-l10{  
+  margin-left: 10px;  
+}
+
+.mrg-xl{  /* margen para itemes de formularios para separarlos mas*/
+  margin-bottom: 5px;
+  margin-top: 5px;
+}
+
+.mrg-xxl{  /* margen para itemes de formularios para separarlos mas*/
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
+
+.mrg-ra{ /* sirve para tirar a la derecha a partir de un div determinado */
+    margin-right: auto;
+}
+.mrg-la{ /* sirve para tirar a la derecha a partir de un div determinado */
+    margin-left: auto;
+}
+
+/* sirve para cuando tienes que hacer contenedores horizontales */
+.cnt-horizontal{
+    display:flex; 
+    flex-direction: row; 
+    gap:6px;
+}
+
+.fila-ext{ /* para un div que pueda crecer */
+    display: flex; width:100%"
+}
+
+.txt-fill{ /* para que el textbox se alargue si cambia el container */
+    flex: 1 1 auto;
+}
+
+.flx{
+    display: flex;
+}
+
+.fd-column
+{
+  flex-direction: column;
+}
+
+/* este es para que el div de las heridas (de las características)
+   se mantenga a la derecha */
+
+.al-self-end
+{
+  align-self: flex-end;
+}
+
+.flex-1-1-0  /* clase junto con la de abajo para los contenedores */
+{            /* horizontales que deben ajustarse al tamaño total */
+flex: 1 1 0;
+}
+
+.flex-1-1-auto  /* clase junto con la de abajo para los contenedores */
+{            /* horizontales que deben ajustarse al tamaño total */
+flex: 1 1 auto;
+}
+
+.flex-0-1-auto
+{
+flex: 0 1 auto;
+}
+
+.flex-0-0-auto
+{
+flex: 0 0 auto;
+}
+/* alinea al centro los checkboxes cuando están acompañados de input text, se pone el en divl de arriba */
+.chk-ct{
+    display: flex; align-items: center; gap: 3px;
+}
+
+/* Menú contextual "..." agrupado para las filas de las pestañas */
+.menu-context {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* checkbox oculto que actúa de interruptor del menú */
+.menu-toggle {
+  position: absolute;
+  width: 0;
+  height: 0;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* el botón "..." (label) tiene el mismo estilo que .boton-ico */
+.menu-pin {
+  margin-left: 3px;
+  cursor: pointer;
+}
+
+/* panel superpuesto: oculto por defecto */
+.menu-panel {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 20;
+  flex-direction: row;    /* despliegue horizontal: los botones en línea */
+  align-items: center;
+  gap: 2px;
+  padding: 2px 4px;
+  min-width: 34px;
+  background: var(--color-fondo-caja);
+  border: 1px solid var(--color-borde);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+
+/* cuando el interruptor está marcado, se muestra el panel */
+.menu-toggle:checked ~ .menu-panel {
+  display: flex;
+}
+
+/* Centra verticalmente el texto del label del menú de Estructura con
+   respecto a su contenedor (que incluye también el input). */
+.centrar{
+  display: inline-flex;
+  align-items: center;
+  height: 100%;
+}
+
+/* Variante para menús con formulario apilado (p. ej. el de Estrés).
+   Ancho fijo y orientación vertical para acomodar filas label+campo.
+   Se aplica solo donde se añade la clase "menu-ancho" al .menu-context,
+   sin afectar al resto de menús (que siguen horizontales y compactos).
+
+   NOTA sobre el z-index: cada .div-panel tiene "isolation: isolate", lo que
+   crea un contexto de apilamiento propio que CONFINARÍA al panel dentro del
+   panel de Estrés y lo dejaría por debajo de panelTirada (renderizado después,
+   con su propio contexto). Para que este panel ancho pueda superar a los demás
+   PARTS "solo con CSS":
+     - se ANULA el isolation del panel de Estrés (#ESTRES),
+     - se eleva el z-index del panel emergente a un valor alto. */
+#ESTRES {
+  isolation: auto;             /* saca al panel del contexto del .div-panel de Estrés */
+}
+
+#VITALES {
+  isolation: auto;             /* igual que ESTRES: permite que su menú flote sobre todo */
+}
+
+/* Variante ancha fija para formularíos con campos largos (p. ej. los Dramas). */
+.menu-ancho .menu-panel {
+  flex-direction: column;      /* filas apiladas verticalmente */
+  align-items: stretch;
+  width: 370px;                /* 40 (label) + 320 (campo) + padding/gap */
+  padding: 6px;
+  gap: 4px;
+  box-sizing: border-box;
+  right: 0;                    /* ancla el borde derecho al del botón "..." en el header */
+  z-index: 1000;               /* alto: por encima de otros PARTS (p. ej. panelTirada) */
+}
+
+/* Clase general de menú emergente ADAPTABLE AL CONTENIDO.
+   No fuerza un ancho fijo (a diferencia de .menu-ancho): el panel se ajusta
+   al tamaño de los labels/controles que se le metan dentro. Se usa junto con
+   .menu-context (basta con poner la clase en el contenedor .menu-context).
+   Mantiene la orientación vertical (filas apiladas) para cualquier contenido. */
+.menu-contenido .menu-panel {
+  flex-direction: column;      /* apila verticalmente el contenido */
+  align-items: stretch;
+  width: max-content;          /* se adapta al contenido real (sin ancho fijo) */
+  min-width: 220px;            /* un mínimo razonable para que respire */
+  max-width: 440px;            /* tope para no desbordar la pantalla */
+  padding: 6px;
+  gap: 4px;
+  box-sizing: border-box;
+  right: 0;
+  z-index: 1000;               /* por encima de otros PARTS */
+  white-space: nowrap;         /* evita saltos de línea entre label + control */
+}
+
+.menu-contenido .menu-panel > div {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+}
+
+/* Centrado vertical de las filas del menú del Vehículo.
+   La regla genérica ".menu-contenido .menu-panel > div" aplica
+   "align-items: stretch" y, al ser más específica que la clase .vam,
+      alineaba el texto de cada fila del #each hacia arriba.
+   Al anclarla al id del toggle con "~" (hermano siguiente) y así vencemos
+   el "align-items: stretch" de la regla genérica.
+
+   NOTA: el id del toggle es ahora "menu-config-principal-<actorId>" (único
+   por hoja, para poder tener dos hojas abiertas a la vez). Por eso el
+   selector usa "id^=" (empieza por) en lugar de un id fijo. */
+[id^="menu-config-principal"] ~ .menu-panel > div {
+  align-items: center;
+}
+
+/* Permite que algunos controles, si son muy largos, respeten un ancho máximo
+   para no desbordar (los que tengan .txt-fill o inputs) */
+.menu-contenido .menu-panel input[type="text"] {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* --- Filas del menú adaptable ---
+   Cada línea horizontal del panel: texto alineado a la izquierda y sus
+   controles (checkboxes) separados 10px del final del texto.
+   Se usa como clase en cada fila (<div class="menu-fila">). */
+.menu-contenido .menu-fila {
+  display: flex;
+  flex-direction: row;
+  align-items: center;          /* checkboxes centrados verticalmente al texto */
+  justify-content: flex-start;  /* texto pegado a la izquierda */
+  gap: 10px;                    /* 10px entre el texto y sus checkboxes */
+  white-space: nowrap;          /* no partir la línea */
+}
+
+/* El texto de cada fila ocupa solo su ancho natural (no se expande) */
+.menu-contenido .menu-fila > label {
+  flex: 0 0 auto;
+}
+
+/* Cabecera de cada tirada "fijada" (tirada1/tirada2/tirada3): título a la izquierda y
+   su botón individual de "resetear" a la derecha. */
+.menu-contenido .menu-fila.tirada-guardada-cabecera {
+  justify-content: space-between;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--color-borde);
+  margin-bottom: 2px;
+}
+
+/* Separador + leve margen superior entre el contenido guardado y el botón de
+   "guardar" (floppy) del popup de cada tirada. */
+.menu-contenido .menu-fila.mrg-t-pq {
+  margin-top: 6px;
+  padding-top: 4px;
+  border-top: 1px solid var(--color-borde);
+}
+
+
+/* Cuando el texto y su checkbox van juntos en un .check-control
+   (p. ej. "Talento Rugido de León" + checkbox), se separan 10px también */
+.menu-contenido .menu-fila .check-control {
+  gap: 10px;
+}
+
+.menu-ancho .menu-panel .fila-ext {
+  gap: 4px;
+  align-items: center;
+}
+
+.menu-ancho .menu-panel .fila-ext label {
+  flex: 0 0 80px;              /* etiqueta fija de 80px */
+}
+
+.menu-ancho .menu-panel .fila-ext input {
+  flex: 1 1 auto;              /* el campo ocupa el resto (≈320px) */
+  min-width: 0;
+}
+
+
+/* formato de los elementos de formulario para uniformidad*/
+input[type="text"],
+input[type="number"],
+select {
+    border: 1px solid var(--color-brillo);
+    background-color: var(--color-fondo-caja);
+}
+
+/* tengo que diferneciar esto porque si no le pone mucho padding a los select */
+input[type="text"],
+input[type="number"]
+{
+    box-sizing: border-box;
+    height: 25px;
+    line-height: 1.2;
+    vertical-align: middle;
+    border-radius: 0px;
+    padding: 4px;
+
+}
+select {
+    box-sizing: border-box;
+    height: 25px;
+    padding: 0px;
+    line-height: 1.2;
+    vertical-align: middle;
+    border-radius: 0px;
+}
+
+
+/* clasess para que el control checkbox se vea bien */
+.check-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.check-control input[type="checkbox"] {
+  all: unset;
+  display: inline-grid;
+  place-content: center;
+  position: relative;
+}
+
+.check-control input[type="checkbox"] {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  gap: 6px;
+  all: unset;
+  display: inline-grid;
+  place-content: center;
+  position: relative;
+
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  padding: 0;
+
+  background: var(--color-fondo-caja) !important;
+  border: 1px solid var(--color-brillo) !important;
+  border-radius: 2px;
+  box-shadow: none !important;
+  outline: none !important;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+.check-control input[type="checkbox"]:checked {
+  background: var(--color-fondo-caja);
+  border: 1px solid var(--color-brillo);
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.check-control input[type="checkbox"]::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  transform: scale(0);
+  transition: transform 120ms ease-in-out;
+  background: var(--color-destacado);
+  border-radius: 1px;
+
+  position: absolute;
+  inset: 3px; /* margen interno homogéneo */
+}
+
+  
+
+/* ---------- Botones de sistemas del vehículo ----------
+   Botones compactos que acompañan a cada fila (Sensores, Puntería,
+   Impulsores, Motores). Bajitos (heredan altura del contenido+padding),
+   texto pequeño (tx-pq) y un poco espaciados entre sí. */
+.sistema-btn {
+  box-sizing: border-box;
+  padding: 1px 8px;
+  /* altura reducida y compacta */
+  height: 14px;   /* 22 */
+  min-height: 0px;
+  min-width: 92px;
+  cursor: pointer;
+
+  font-family: "Exo 2";
+  color: var(--color-letras);
+  background: var(--color-fondo-caja);
+  border: 1px solid var(--color-borde);
+  /*border-radius: 3px;*/
+  border-radius: 0px;
+  text-align: left;
+  line-height: 1.2;
+  flex: 1 1 auto;
+  white-space: nowrap;
+}
+.sistema-btn-ventaja, .sistema-btn-apoyo
+{
+  background: var(--color-verde-agotado) !important;
+  border: 1px solid var(--color-verde-hover) !important;
+}
+
+.sistema-btn-ventaja:hover, .sistema-btn-apoyo:hover
+{
+  background: var(--color-verde) !important;
+  border: 1px solid var(--color-verde-hover) !important;
+}
+
+
+.sistema-btn-obstaculo, .sistema-btn-75,  .sistema-btn-50, .sistema-btn-25
+{
+  background: var(--color-ambar-agotado) !important;
+  border: 1px solid var(--color-ambar-hover) !important;
+}
+
+.sistema-btn-obstaculo:hover, .sistema-btn-75,  .sistema-btn-50, .sistema-btn-25
+{
+  background: var(--color-ambar) !important;
+  border: 1px solid var(--color-ambar-hover) !important;
+}
+
+.sistema-btn-desventaja, .sistema-btn-0
+{
+  background: var(--color-rojo-agotado) !important;
+  border: 1px solid var(--color-rojo-hover) !important;
+}
+
+.sistema-btn-desventaja:hover, .sistema-btn-0
+{
+  background: var(--color-rojo) !important;
+  border: 1px solid var(--color-rojo-hover) !important;
+}
+
+.sistema-btn:hover {
+  box-shadow: 0 0 4px var(--color-brillo);
+  background: var(--color-fondo-agotado);
+}
+/* refuerza el espaciado entre filas del panel de sistemas */
+#SISTEMAS .cnt-horizontal.mrg {
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+
+/* ------------------------------------------------------------------
+   Ventana compartida de Asistencia (Ad6_AppAsistencia)
+   Muestra los pools de asistencia activos y sus 3 botones.
+------------------------------------------------------------------- */
+.ad6.asistencia .window-content {
+  background: var(--color-fondo-hojas);
+}
+
+.ad6-asistencia-cuerpo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-family: "Exo 2";
+  color: var(--color-letras);
+}
+
+.ad6-asistencia-selector {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 4px;
+}
+
+.ad6-asistencia-selector label {
+  flex: 0 0 auto;
+  font-size: 0.75rem;
+}
+
+.ad6-asistencia-selector select {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.ad6-asistencia-actor-fijo {
+  padding: 0 4px;
+}
+
+.ad6-asistencia-pool {
+  background: var(--color-fondo-caja);
+  border: 1px solid var(--color-borde);
+  box-shadow: 0 0 2px var(--color-brillo);
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ad6-asistencia-cabecera {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ad6-asistencia-retrato {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border: 1px solid var(--color-borde);
+  border-radius: 3px;
+  background: var(--color-fondo-caja);
+}
+
+.ad6-asistencia-datos {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ad6-asistencia-nombre {
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.ad6-asistencia-exitos {
+  font-size: 0.85rem;
+}
+
+.ad6-asistencia-exitos b {
+  font-size: 1.1rem;
+  color: var(--color-heroico);
+}
+
+.ad6-asistencia-botones {
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.ad6-asistencia-botones .boton-ico {
+  border: 1px solid var(--color-borde);
+  background: var(--color-fondo-agotado);
+  font-family: "Exo 2";
+  font-size: 0.75rem;
+  color: var(--color-letras);
+  padding: 3px 8px;
+}
+
+.ad6-asistencia-botones .boton-ico:hover {
+  background: var(--color-borde);
+}
+
+.ad6-asistencia-vacio {
+  padding: 8px 4px;
+  text-align: center;
+}
+
+/* ------------------------------------------------------------------
+   Los mensajes-aviso de sincronización de Asistencia NO deben verse en el
+   log del chat: se emiten solo para transportar el flag que sincroniza los
+   pools. Se les añade la clase .ad6-asistencia-aviso desde el hook
+   "renderChatMessageHTML" del servicio.
+
+   Como el elemento del mensaje cambia de etiqueta/clase según la versión
+   (li.chat-message, article.chat-message, .message...), no forzamos un
+   ancestro concreto: basta con apuntar a la propia clase, cubriendo también
+   el envoltorio por si la clase cae en un hijo. El `display:none !important`
+   garantiza que gane a cualquier estilo de Foundry o del tema.
+------------------------------------------------------------------- */
+.ad6-asistencia-aviso,
+.ad6-asistencia-aviso.chat-message,
+.ad6-asistencia-aviso.message,
+#chat .ad6-asistencia-aviso,
+#chat-log .ad6-asistencia-aviso,
+.chat-log .ad6-asistencia-aviso,
+.chat-scroll .ad6-asistencia-aviso,
+.message.ad6-asistencia-aviso,
+li.chat-message.ad6-asistencia-aviso,
+article.chat-message.ad6-asistencia-aviso {
+  display: none !important;
+}
+
+/* estilos boton normal chico, de icono font awesome */
+/************************************************/
+
+.boton-ico {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 4px;
+    color: var(--color-letras);
+    background-color: transparent;
+    border: none;
+    border-width: 0;
+    border-radius: 3px;
+
+    cursor: pointer;
+}
+
+/* ------------------------------------------------------------------
+   Iconos de combate (ataque / defensa)
+   El color amarillo/dorado de los iconos del flujo de combate se
+   factoriza aquí para no repetir estilos inline por las plantillas.
+------------------------------------------------------------------- */
+.ad6-ico-ataque,
+.ad6-ico-defensa {
+  color: rgb(255, 212, 59);
+}
+
+.boton-ico:hover {
+    background-color: var(--color-borde);
+}
+
+.boton-ico:active {
+    border: none;
+}
+
+.boton-ico:focus {
+    border: none;
+}
+
+.boton-ico-chico {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0px;
+    color: var(--color-letras);
+    background-color: transparent;
+    border: none;
+    border-width: 0;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+/* Botón de icono MINI: caja cuadrada con el glifo a 0.75rem y un margen
+   interior mínimo para que siga siendo pulsable. Pensado para igualar el botón
+   de "resetear tiradas guardadas" al tamaño de los iconos del header de la
+   tirada. Clase NUEVA: no afecta a nada que ya exista hasta que se aplique. */
+.boton-ico-mini {
+    width: 0.75rem;
+    height: 0.75rem;
+    min-width: 0.75rem;
+    min-height: 0.75rem;
+    padding: 1px;
+    box-sizing: content-box;
+}
+
+.boton-ico-mini > i {
+    font-size: 0.75rem;
+    line-height: 1;
+}
+/************************************************/
+
+/* Módulo del Piloto en la hoja de Vehículo */
+.piloto-imagen {
+    border: 1px solid var(--color-borde);
+    border-radius: 3px;
+    object-fit: cover;
+    background: var(--color-fondo-caja);
+}
+
+.piloto-nombre {
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+/* Miembro de la formación ANIQUILADO (0 unidades): capa apagada + calavera.
+   Es SOLO visual; en cuanto el campo "cantidad" vuelva a ser > 0, desaparece. */
+.ad6-miembro-muerto {
+  position: relative;
+  opacity: 0.4;
+  filter: grayscale(1);
+}
+
+/* La calavera se ancla a la derecha de la fila, centrada verticalmente en el
+   espacio que ocupa el miembro. */
+.ad6-icono-muerto {
+  margin-left: 15px;
+  align-self: center;
+  padding: 0;
+  font-size: 1.4rem;
+  color: var(--color-rojo-hover);
+  text-shadow: 0 0 4px var(--color-sombra-texto);
+}
+
+.piloto-vacio {
+        min-width: 150px;
+    padding: 4px;
+    border: 1px dashed var(--color-borde);
+    border-radius: 3px;
+}
+
+/* Aviso rojo NO pulsable: el piloto asignado no cumple las competencias del
+   vehículo. Lleva el color rojo (estilo de parcialSistemas) y cursor por
+   defecto para no parecer interactivo. */
+.piloto-sin-comp {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  height: 24px;
+  min-width: 24px;
+  padding: 30px 7px;
+  /*cursor: default;*/          /* NO es pulsable */
+  /*pointer-events: none;*/
+
+  color: var(--color-letras);
+  background: var(--color-rojo-agotado);
+  border: 1px solid var(--color-rojo-hover);
+  border-radius: 0px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------------
+   Componente "Medidor Valor/Máximo" (medidor-max)
+   Un input editable con el máximo superpuesto abajo a la derecha.
+------------------------------------------------------------------- */
+.medidor-max {
+    position: relative;
+    display: inline-flex;
+    /*align-items: center;
+    justify-content: center;*/
+    align-items: flex-start;
+    justify-content: left;
+    box-sizing: border-box;
+    /* El contenedor aporta el borde, así que la altura total (incluido el
+       borde) debe igualar los 25px de un input estándar del sitio. */
+    height: 25px;
+    border: 1px solid var(--color-brillo);
+    background: var(--color-fondo-caja);
+}
+
+.medidor-max .medidor-max-valor {
+    width: 100%;
+    box-sizing: border-box;
+    min-width: 0;
+    /* Misma altura que el resto de inputs del sitio (25px en total).
+       El contenedor mide 25px con su borde, así que aquí, sin borde
+       propio, se restan los 2px de los bordes del contenedor. */
+    height: 23px;
+    text-align: left;
+    padding-left: 0.5rem;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    color: var(--color-letras);
+    font-family: "Exo 2";
+    font-size: 1rem;
+}
+
+/* ------------------------------------------------------------------
+   ANCHO de los textbox de ÉXITOS en la ventana de Combate.
+   Estos son los medidores (parcialMaxValor) donde el ATACANTE escribe
+   sus éxitos por arma (.exitos-ataque) y el DEFENSOR los suyos por
+   fuente (.exitos-defensa). El medidor base mide w-60 (60px); aquí lo
+   dejamos LIGERAMENTE MÁS ESTRECHO (50px). Ajusta este valor si lo
+   necesitas: ¡es el único sitio que hay que tocar para el ancho de
+   estos textbox!
+------------------------------------------------------------------- */
+.medidor-max.exitos-ataque,
+.medidor-max.exitos-defensa {
+    width: 50px;
+}
+
+/* El máximo, muy pequeño, abajo a la derecha y con un borde fino
+   del color del brillo para que se lea sin entorpecer el input */
+.medidor-max .medidor-max-maxi {
+    position: absolute;
+    right: 1px;
+    bottom: 1px;
+    padding: 0 3px;
+    font-size: 0.6rem;
+    line-height: 1.1;
+    font-family: "Exo 2";
+    color: var(--color-letras);
+    /*border: 1px solid var(--color-brillo);*/
+    /*border-top-left-radius: 4px;
+    border-bottom-right-radius: 4px;*/
+    /*background: rgba(0, 0, 0, 0.8);*/
+
+    pointer-events: none; /* no interfiere con el click del input */
+    white-space: nowrap;
+}
+/************************************************/
+
+
+/*
+Para poner flechas a un campo de tipo number se añaden
+estas clases. Puedes poner "con-flechas" si quieres
+flechas y ya está (siempre que sea number)
+*/
+input[type="number"].con-flechas {
+  appearance: auto !important;
+  -moz-appearance: auto !important;
+  -webkit-appearance: auto !important;
+}
+
+input[type="number"].con-flechas::-webkit-inner-spin-button,
+input[type="number"].con-flechas::-webkit-outer-spin-button {
+  appearance: auto !important;
+  -webkit-appearance: auto !important;
+  display: block !important;
+  opacity: 1 !important;
+}
+/* ==========================================================================
+   COMBAT TRACKER - FASES (ad6_trackerFases.mjs)
+   ==========================================================================
+   El tracker nativo muestra TIRADAS FIJADAS (Combatants de fase). Las filas de
+   presencia se ocultan; las de fase se decoran con un icono de macrofase en el
+   hueco de la iniciativa, los �xitos + sinergia y los botones de acci�n. */
+
+/* Filas de presencia: ocultas (se fuerzan desde JS, refuerzo visual). */
+li.combatant.ad6-fila-presencia-oculta {
+  display: none !important;
+}
+
+/* Filas de fase: no aplican los controles nativos de actor (ojo/calavera/
+   ping/pan). El estado "derrotado" vive en el Combatant de presencia. Los
+   BOTONES propios se inyectan aparte en .ad6-fase-datos. */
+li.combatant.ad6-fila-fase .combatant-controls {
+  display: none !important;
+}
+
+/* La fila de fase no se "activa" (no tiene token): sin el resaltado de turno. */
+li.combatant.ad6-fila-fase {
+  cursor: default;
+}
+
+/* Icono de macrofase en el hueco de la iniciativa. */
+li.combatant.ad6-fila-fase .token-initiative.ad6-celda-macrofase {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Icono de macrofase PULSABLE (consumir acción): soporte/cinemática. */
+.ad6-ico-macrofase.ad6-ico-macrofase-consumible {
+  cursor: pointer;
+  transition: transform 0.12s ease, filter 0.12s ease;
+}
+
+.ad6-ico-macrofase.ad6-ico-macrofase-consumible:hover {
+  transform: scale(1.2);
+  filter: brightness(1.4) drop-shadow(0 0 3px currentColor);
+}
+
+.ad6-ico-macrofase {
+  font-size: var(--font-size-18, 18px);
+  opacity: 0.9;
+}
+
+/* Color por macrofase (coherente con la sem�ntica del juego). */
+.ad6-celda-macrofase.ad6-macrofase-soporte .ad6-ico-macrofase { color: #3fa7d6; }
+.ad6-celda-macrofase.ad6-macrofase-operaciones .ad6-ico-macrofase { color: #d65f3f; }
+.ad6-celda-macrofase.ad6-macrofase-cinematica .ad6-ico-macrofase { color: #9b6fd6; }
+
+/* Zona de datos de la tirada (�xitos, sinergia y botones). */
+.ad6-fase-datos {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+  flex-wrap: wrap;
+}
+
+.ad6-fase-exitos {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-weight: bold;
+}
+
+.ad6-exitos-num {
+  min-width: 14px;
+  text-align: center;
+}
+
+.ad6-ico-sinergia {
+  color: #c9a227;
+}
+
+/* En el tracker el icono de sinergia va pequeño (cabe en la fila). */
+li.combatant.ad6-fila-fase .ad6-ico-sinergia {
+  font-size: 12px;
+}
+
+/* Botones de acci�n compactos dentro de la fila. */
+.ad6-fase-btn {
+  width: 20px;
+  height: 20px;
+  line-height: 1;
+  padding: 0;
+  font-size: 11px;
+}
+
+/* Botón ACELERAR (Push): sube la acción una macrofase a cambio de fatiga. Se
+   tiñe en naranja (color de "esfuerzo"/estrés) para distinguirlo del resto de
+   acciones. El icono (fa-regular fa-circle-up) mantiene ese color. */
+.ad6-fase-btn.acelerar {
+  color: var(--color-estres);
+}
+
+.ad6-fase-btn.acelerar:hover {
+  color: var(--color-estres-hover);
+  filter: brightness(1.3) drop-shadow(0 0 3px var(--color-estres));
+}
+
+/* Fila de fase SIN �xitos disponibles (ya "actu�" o la tirada fall�): se
+   atenúa con un filtro oscuro para denotar que ya no queda nada que asignar. */
+li.combatant.ad6-fila-fase.ad6-fase-sin-exitos {
+  opacity: 0.45;
+  filter: grayscale(0.7) brightness(0.75);
+}
+
+/* Aun atenuada, mantiene legible el nombre y el icono de macrofase. */
+li.combatant.ad6-fila-fase.ad6-fase-sin-exitos .token-name,
+li.combatant.ad6-fila-fase.ad6-fase-sin-exitos .ad6-ico-macrofase {
+  opacity: 1;
+  filter: none;
+}

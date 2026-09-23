@@ -1,0 +1,10 @@
+{{!-- id único por actor (ver parcialEmergenteConfiguracion). --}}
+<input type="checkbox" id="menu-config-estrucutra-{{actor.id}}" class="menu-toggle">
+<label for="menu-config-estrucutra-{{actor.id}}" title="{{localize "Ad6.Etiquetas.estructura"}}" class="tx-red boton-ico menu-pin"><i class="fas fa-pen-to-square"></i></label>
+<div class="menu-panel  tx-red ">   
+    <div class="flx cnt-horizontal vam centrar">
+        <label class="w-100 vam mrg-r5 centrar ">{{localize "Ad6.Etiquetas.estructuraMaxima"}}</label>
+        <input  name="system.estructura.maximo" value="{{system.estructura.maximo}}"  class="tx tx-cnt mrg w-40" type="text"></input>
+    </div>
+</div>
+<!-- esta hueá solo sirve para cambiar la estructura máxima-->

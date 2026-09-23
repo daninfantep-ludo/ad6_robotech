@@ -1,0 +1,34 @@
+{
+    "TYPES": {
+        "Actor": {
+             "enjambre": "Swarm"
+            ,"teniente": "Lieutenant"
+            ,"principal": "Main"
+            ,"conflicto": "Conflict"
+            ,"vehiculo": "Vehicle"
+        },
+        "Item": {
+             "habilidad": "Skill"
+            ,"equipo": "Gear"
+            ,"suitEquipo": "Equipment Suite"
+            ,"talento": "Talent"
+            ,"armadura": "Armor"
+        }
+    },
+    "Ad6":{
+         "Etiquetas":
+         {
+             "item-descripcion": "Description"
+            ,"item-detalles": "Details"
+         }
+        ,"Mensajes":
+        {
+             "ventana.combate": "Combat"
+            ,"ventana.asistencia": "Assistance"
+            ,"ventana.atacante": "Attacker: {nombre}"
+            ,"ventana.defensor": "Defender: {nombre}"
+            ,"ventanaCombate.copiarLog": "Log copied to clipboard."
+            ,"ventanaCombate.errorCopiarLog": "Could not copy the log to the clipboard."
+        }
+    }
+}

@@ -1,0 +1,19 @@
+{{!--
+    Hardwares de un equipo/suitEquipo en la hoja de un UPGRADE, en modo SOLO
+    LECTURA. Se pinta un icono de CHIP por hardware, desactivado (mismo aspecto
+    que el del mecha BÁSICO en tabEquipo.hbs), para indicar que el item lleva
+    hardware sin permitir interactuar con él.
+
+    Parámetros:
+      * hardwares -> array de booleanos (system.hardwares de la copia).
+      * titulo    -> tooltip opcional.
+--}}
+<div class="w-45 fila-ext mrg-la">
+    {{#each hardwares as |estado idx| }}
+        <button type="button" disabled
+                class="boton-hardware-desactivado"
+                title="{{../titulo}}">
+            <i class="fas fa-microchip"></i>
+        </button>
+    {{/each}}
+</div>

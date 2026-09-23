@@ -1,0 +1,10 @@
+<div class="form-group mrg-xl chk-cnt">
+  <label class="label-item w-120">{{localize "Ad6.Etiquetas.marcado"}}</label>
+  <input type="checkbox" class="text-item check-control" name="system.marcado"
+         data-valor="{{system.marcado}}" {{checked system.marcado}}/>
+</div>
+<div class="form-group  mrg-xl">
+  <prose-mirror target="system.description" name="system.descripcion" value="{{system.descripcion}}" toggled="true">
+    {{{descripcionRica}}} {{!--the enriched text--}}
+  </prose-mirror>
+</div>

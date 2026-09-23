@@ -1,0 +1,34 @@
+{{!--
+    Medidor "Valor / Máximo" reutilizable.
+    Muestra un input editable (el valor restante) y, superpuesto en la esquina
+    inferior derecha, el máximo de forma no editable y en texto pequeño.
+
+    Parámetros:
+      * valor      -> número actual (restante), editable.
+      * maximo     -> número máximo, solo visual.
+      * dataId     -> id del item al que pertenece el campo (para el guardado).
+      * campo      -> ruta del campo a guardar (ej: "usos.restante").
+      * titulo     -> tooltip opcional que se muestra en el input.
+      * anchura    -> ancho del componente (por defecto "w-60").
+      * campoMax   -> opcional, si se pasa añade el máximo también como input
+                       "change" oculto para poder guardarlo de otra forma.
+      * dataSyncMax -> opcional, si es true añade data-sync-max="true" al input
+                       editable para que la hoja sepa que, al teclear el valor,
+                       también debe sincronizar el máximo (ver _onTextChange).
+--}}
+<div class="medidor-max {{#if anchura}}{{anchura}}{{else}}w-60{{/if}} {{#if extraClass}}{{extraClass}}{{/if}}" title="{{titulo}}">
+    <input type="text"
+           class="{{#if it}}change{{/if}} medidor-max-valor"
+           {{#if rl}} readonly {{/if}}
+           {{#if it}}
+           data-id="{{dataId}}"
+           data-campo="{{campo}}"
+           {{#if dataSyncMax}}data-sync-max="true"{{/if}}
+           {{else}}
+           name="{{campo}}"
+           {{/if}}
+           value="{{valor}}"
+           {{#if titulo}}title="{{titulo}}"{{/if}}/>
+    <span class="medidor-max-maxi">{{maximo}}</span>
+</div>
+

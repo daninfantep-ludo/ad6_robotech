@@ -1,0 +1,111 @@
+<div class="cnt-horizontal">
+    <div class="form-group grupo-campos mrg-r10">
+        <div class="form-group  mrg-xl">
+            <label class="label-item w-140">{{localize "Ad6.Etiquetas.rango"}}</label>
+                <select class="mrg w-60 tx-cnt" name="system.rango">
+                    {{selectOptions config.Rango selected = system.rango  localize=true}}
+                </select> 
+        </div>
+        <div class="form-group  mrg-xl chk-cnt">
+            <label class="label-item w-140">{{localize "Ad6.Etiquetas.extendido"}}</label>
+            <input type="checkbox" class="check-control chk-change" name="system.extendido"
+                        data-valor="{{system.extendido}}" {{checked system.extendido}}></label>
+        </div>
+        <div class="form-group  mrg-xl">
+            <label class="label-item w-140">{{localize "Ad6.Etiquetas.dano"}}</label>
+            <input class="text-item w-60 tx-cnt" type = "text" name="system.dano" value="{{system.dano}}"/>
+        </div>
+        <div class="form-group  mrg-xl">
+            <label class="label-item w-140">{{localize "Ad6.Etiquetas.penetracion"}}</label>
+            <input class="text-item w-60 tx-cnt" type = "text" name="system.penetracion" value="{{system.penetracion}}"/>
+        </div>
+        <div class="form-group  mrg-xl">
+            <label class="label-item w-140">{{localize "Ad6.Etiquetas.area"}}</label>
+            <input class="text-item w-60 tx-cnt" type = "text" name="system.area" value="{{system.area}}"/>
+        </div>
+        <div class="form-group  mrg-xl chk-cnt">
+            <label class="label-item w-140">{{localize "Ad6.Etiquetas.acuatica"}}</label>
+            <input type="checkbox" class="check-control chk-change" name="system.agua"
+                        data-valor="{{system.agua}}" {{checked system.agua}}></label>
+        </div>
+        <div class="form-group  mrg-xl chk-cnt">
+            <label class="label-item w-140">{{localize "Ad6.Etiquetas.aBocajarro"}}</label>
+            <input type="checkbox" class="check-control chk-change" name="system.bocajarro"
+                        data-valor="{{system.bocajarro}}" {{checked system.bocajarro}}></label>
+        </div>
+        <div class="form-group  mrg-xl chk-cnt">
+            <label class="label-item w-140">{{localize "Ad6.Etiquetas.pesada"}}</label>
+            <input type="checkbox" class="check-control chk-change" name="system.pesada"
+                        data-valor="{{system.pesada}}" {{checked system.pesada}}></label>
+        </div>        
+        <div class="form-group  mrg-xl chk-cnt">
+            <label class="label-item w-140">{{localize "Ad6.Etiquetas.esHardware"}}</label>
+            <input type="checkbox" class="check-control chk-change" name="system.esHardware"
+                        data-valor="{{system.esHardware}}" {{checked system.esHardware}}></label>
+        </div>
+    <div class="form-group mrg-xl">
+                <label class="label-item w-140">{{localize "Ad6.Etiquetas.bancosMaximos"}}</label>
+        <input class="text-item w-60 tx-cnt" type = "text" name="system.bancos.maximo" value="{{system.bancos.maximo}}"/>
+    </div>
+
+
+    </div>
+    <div class="form-group grupo-campos">
+        <div class="form-group  mrg-xl chk-cnt">
+            <label class="label-item w-140">{{localize "Ad6.Etiquetas.incendiaria"}}</label>
+            <input type="checkbox" class="check-control chk-change" name="system.incendiaria"
+                        data-valor="{{system.incendiaria}}" {{checked system.incendiaria}}></label>
+        </div>
+        <div class="form-group  mrg-xl chk-cnt">
+            <label class="label-item w-140">{{localize "Ad6.Etiquetas.corrosiva"}}</label>
+            <input type="checkbox" class="check-control chk-change" name="system.corrosiva"
+                        data-valor="{{system.corrosiva}}" {{checked system.corrosiva}}></label>
+        </div>
+        <div class="form-group  mrg-xl chk-cnt flx cnt-horizontal">
+            <div class="form-group  mrg-xl chk-cnt flx cnt-horizontal">
+                <label class="label-item w-60">{{localize "Ad6.Etiquetas.energia"}}</label>
+                <input type="checkbox" class="check-control chk-change" name="system.danoEnergia"
+                            data-valor="{{system.danoEnergia}}" {{checked system.danoEnergia}}></label>
+            </div>     
+            <div class="form-group  mrg-xl chk-cnt flx cnt-horizontal">
+                <label class="label-item w-60">{{localize "Ad6.Etiquetas.melee"}}</label>
+                <input type="checkbox" class="check-control chk-change" name="system.danoMelee"
+                            data-valor="{{system.danoMelee}}" {{checked system.danoMelee}}></label>
+            </div>                    
+        </div>
+        <div class="form-group  mrg-xl chk-cnt">
+            <label class="label-item w-140">{{localize "Ad6.Etiquetas.bloqueo"}}</label>
+            <input type="checkbox" class="check-control chk-change" name="system.bloqueo"
+                        data-valor="{{system.bloqueo}}" {{checked system.bloqueo}}></label>
+        </div>
+        <div class="form-group  mrg-xl chk-cnt">
+            <label class="label-item w-140">{{localize "Ad6.Etiquetas.misiles"}}</label>
+            <input type="checkbox" class="check-control chk-change" name="system.misiles"
+                        data-valor="{{system.misiles}}" {{checked system.misiles}}></label>
+        </div>
+        <div class="form-group  mrg-xl chk-cnt">
+            <label class="label-item w-140">{{localize "Ad6.Etiquetas.silenciosa"}}</label>
+            <input type="checkbox" class="check-control chk-change" name="system.silenciosa"
+                        data-valor="{{system.silenciosa}}" {{checked system.silenciosa}}></label>
+        </div>
+        <div class="form-group  mrg-xl chk-cnt">
+            <label class="label-item w-140">{{localize "Ad6.Etiquetas.francotirador"}}</label>
+            <input type="checkbox" class="check-control chk-change" name="system.francotirador"
+                        data-valor="{{system.francotirador}}" {{checked system.francotirador}}></label>
+        </div>
+         <div class="form-group  mrg-xl chk-cnt">
+        </div>
+        <div class="form-group  mrg-xl chk-cnt">
+            <label class="label-item w-140">{{localize "Ad6.Etiquetas.esBancoArmas"}}</label>
+            <input type="checkbox" class="check-control chk-change" name="system.esBanco"
+                        data-valor="{{system.esBanco}}" {{checked system.esBanco}}></label>
+        </div>
+    <div class="form-group  mrg-xl">
+        <label class="label-item w-140">{{localize "Ad6.Etiquetas.bancosRestantes"}}</label>
+        <input class="text-item w-60  tx-cnt" type = "text" name="system.bancos.restante" value="{{system.bancos.restante}}"/>
+    </div>
+    </div>
+</div>
+<div class="form-group grupo-campos cnt-horizontal tx-red">
+{{localize "Ad6.Etiquetas.notaBancos"}}
+</div>

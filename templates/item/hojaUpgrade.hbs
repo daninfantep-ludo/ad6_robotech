@@ -1,0 +1,228 @@
+{{!--
+    Hoja de edición de un item de tipo "upgrade" (Mejora).
+    Un upgrade es un PACK de mejoras removible que se aplica a un vehículo:
+    - Unos BONOS numéricos (estructura, armadura, resistir, energía, no-melee, frío).
+    - IMÁGENES opcionales:
+        * El PROPIO img del item (retrato): al equipar sustituye actor.img. Se
+          edita con el patrón estándar de Foundry  data-edit="img".
+        * system.imgToken: textura del token del vehículo. Se edita con
+          data-edit="system.imgToken".
+    - Una LISTA de armaduras, equipos y suities de equipo que se añaden al
+      vehículo al equipar y se eliminan al desequipar.
+    Las tres listas se rellenan ARRASTRANDO items reales (armadura / equipo /
+    suitEquipo) sobre esta hoja.
+
+    ESTRUCTURA:
+      - Dos columnas arriba:
+          * IZQUIERDA: las dos imágenes (retrato del item + token), apiladas.
+          * DERECHA   : nombre y todos los bonos.
+      - Debajo, a ancho completo: armaduras, equipos y suities de equipo.
+--}}
+
+<div class="layout-flex fd-column">
+
+    {{!-- === DOS COLUMNAS: IMÁGENES | NOMBRE + BONOS === --}}
+    <div class="cnt-horizontal">
+
+        {{!-- Columna IZQUIERDA: las dos imágenes, apiladas verticalmente.
+             Ambas usan la action "editarImagen" del item: al pinchar abren el
+             FilePicker y guardan en la ruta indicada en data-edit (img raíz del
+             item, o el campo system.imgToken).
+             Si la imagen es la de por DEFECTO (item-bag / mystery-man) o está
+             vacía, en vez del icono genérico se muestra un placeholder de texto
+             "Click para cambiar" (también clickable). --}}
+        <div class="form-group grupo-campos fd-column mrg-r10 ">
+            {{!-- Retrato: es el img del propio item. --}}
+            {{#if (esImgDefecto document.img)}}
+            <div class="profile-img"
+                 data-ruta="img"
+                 data-action="editarImagen"
+                 title="{{document.name}} {{localize "Ad6.Mensajes.clickCambiar"}}"
+                 style="display:flex; align-items:center; justify-content:center; width:90px; height:90px; box-sizing:border-box; padding:4px; text-align:center; cursor:pointer; border:1px dashed var(--color-brillo); margin-bottom:6px; font-size:11px;">
+                {{localize "Ad6.Upgrade.imagen"}} ({{localize "Ad6.Mensajes.clickCambiar"}})
+            </div>
+            {{else}}
+            <img class="profile-img"
+                 src="{{document.img}}"
+                 title="{{document.name}} {{localize "Ad6.Mensajes.clickCambiar"}}"
+                 data-ruta="img"
+                 data-action="editarImagen"
+                 width="90" height="90"
+                 style="display:block; cursor:pointer; border: 1px solid var(--color-brillo); margin-bottom: 6px;"/>
+            {{/if}}
+            {{!-- Token: system.imgToken. --}}
+            {{#if system.imgToken}}
+            <img class="profile-img"
+                 src="{{system.imgToken}}"
+                 title="{{localize "Ad6.Upgrade.imagenToken"}} {{localize "Ad6.Mensajes.clickCambiar"}}"
+                 data-ruta="system.imgToken"
+                 data-action="editarImagen"
+                 width="90" height="90"
+                 style="display:block; cursor:pointer; border: 1px solid var(--color-brillo);"/>
+            {{else}}
+            <div class="profile-img"
+                 data-ruta="system.imgToken"
+                 data-action="editarImagen"
+                 title="{{localize "Ad6.Upgrade.imagenToken"}} {{localize "Ad6.Mensajes.clickCambiar"}}"
+                 style="display:flex; align-items:center; justify-content:center; width:90px; height:90px; box-sizing:border-box; padding:4px; text-align:center; cursor:pointer; border:1px dashed var(--color-brillo); font-size:11px;">
+                {{localize "Ad6.Upgrade.imagenToken"}} ({{localize "Ad6.Mensajes.clickCambiar"}})
+            </div>
+            {{/if}}
+        </div>
+
+        {{!-- Columna DERECHA: nombre + bonos. --}}
+        <div class="form-group grupo-campos fd-column">
+            {{!-- Nombre --}}
+            <div class="chk-ct fila-ext mrg-xl">
+                <label class="label-item w-140">{{localize "Ad6.Etiquetas.nombre"}}</label>
+                <input class="w-200" name="name" type="text" value="{{document.name}}" placeholder="{{localize "Ad6.Etiquetas.nombre"}}"/>
+            </div>
+            {{!-- DESIGNACIÓN del vehículo: si NO está vacía, al EQUIPAR el upgrade
+                 sustituye la designación del vehículo (system.designacion del
+                 actor) por esta (y al desequipar se restaura la original, guardada
+                 internamente en system.designacionOriginal). Si está vacía, o el
+                 actor no tiene ese campo, no se toca nada. --}}
+            <div class="chk-ct fila-ext mrg-xl">
+                <label class="label-item w-140">{{localize "Ad6.Upgrade.designacion"}}</label>
+                <input class="w-200" name="system.designacion" type="text" value="{{system.designacion}}" placeholder="{{localize "Ad6.Upgrade.designacion"}}"/>
+            </div>
+            {{!-- Bonos --}}
+            <div class="chk-ct fila-ext mrg-xl">
+                <label class="label-item w-140">{{localize "Ad6.Upgrade.bonoEstructura"}}</label>
+                <input class="text-item w-60 tx-cnt" type="text" name="system.bonoEstructura" value="{{system.bonoEstructura}}"/>
+            </div>
+            <div class="chk-ct fila-ext mrg-xl">
+                <label class="label-item w-140">{{localize "Ad6.Upgrade.bonoArmadura"}}</label>
+                <input class="text-item w-60 tx-cnt" type="text" name="system.bonoArmadura" value="{{system.bonoArmadura}}"/>
+            </div>
+            <div class="chk-ct fila-ext mrg-xl">
+                <label class="label-item w-140">{{localize "Ad6.Upgrade.bonoResistir"}}</label>
+                <input class="text-item w-60 tx-cnt" type="text" name="system.bonoResistir" value="{{system.bonoResistir}}"/>
+            </div>
+            {{!-- Bonos de RESISTENCIA: se iteran como un ARRAY de
+                 {descriptor, adicional} (MISMO patrón que la hoja de armadura).
+                 Así es independiente del número de resistencias: para añadir o
+                 quitar un tipo de ataque basta con editar este array, sin tocar
+                 la plantilla. El "descriptor" viaja en un hidden para poder
+                 localizar la resistencia correspondiente del Blindaje al
+                 (des)equipar. --}}
+            <label>{{localize "Ad6.Etiquetas.resistenciasAdicionales"}}</label>
+            <div class="flx cnt-horizontal">
+              {{#each system.bonosResistencias as |res|}}
+              <div class="form-group flx fd-column">
+                <label class="label-item tx-red tx-cnt">
+                  {{localize res.descriptor}}
+                </label>
+                <input
+                  class="text-item w-60 tx-cnt"
+                  type="number"
+                  name="system.bonosResistencias.{{@index}}.adicional"
+                  value="{{res.adicional}}"
+                />
+                <input
+                  type="hidden"
+                  name="system.bonosResistencias.{{@index}}.descriptor"
+                  value="{{res.descriptor}}"
+                />
+              </div>
+              {{/each}}
+            </div>
+        </div>
+    </div>
+
+    {{!-- === ARMADURAS A INYECTAR (solo lectura) ===
+         Se muestran con el mismo aspecto que tabEquipo.hbs, pero SIN edición:
+         el upgrade se CONSTRUYE arrastrando items reales sobre la hoja. Cada
+         fila conserva SÓLO el botón de quitar de la lista. --}}
+    <div class="form-group grupo-campos fd-column">
+        <header class="chk-ct" style="height:20px;">
+            <div class="w-200 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.armadura"}}</div>
+            <div class="w-40 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.tipo"}}</div>
+            <div class="w-20 tx-pq tx-cnt" ></div>
+            <div class="w-60 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.valor"}}</div>
+            <!--<div class="w-60 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.resiste"}}</div>-->
+            <div class="w-100 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.otros"}}</div>
+        </header>
+        <div class="fd-column" ID="UPGRADE_ARMADURAS">
+            {{#each system.armaduras as |ar idx|}}
+                {{> parcialUpgradeLecturaArmadura ar=ar idx=idx }}
+            {{/each}}
+        </div>
+    </div>
+
+    {{!-- === EQUIPOS (ARMAS) A INYECTAR (solo lectura) === --}}
+    <div class="form-group grupo-campos fd-column">
+        <header class="chk-ct" style="height:20px;">
+            <div class="w-200 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.arma"}}</div>
+            <div class="w-50 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.rango"}}</div>
+            <div class="w-50 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.dano"}}</div>
+            <div class="w-50 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.pen"}}</div>
+            <div class="w-50 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.areachica"}}</div>
+            <div class="w-40"></div>
+            <div class="w-100 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.descriptores"}}</div>
+            <div class="w-30 tx-pq tx-cnt" ></div>
+            <div class="w-45 tx-pq tx-cnt"></div>
+        </header>
+        <div class="fd-column" ID="UPGRADE_EQUIPOS">
+            {{#each system.equipos as |eq idx|}}
+                {{> parcialUpgradeLecturaEquipo se=eq eqSuit=false idx=idx borrar="upgradeBorrarEquipo" }}
+            {{/each}}
+        </div>
+    </div>
+
+    {{!-- === SUITIES DE EQUIPO A INYECTAR (solo lectura) === --}}
+    <div class="form-group grupo-campos fd-column">
+        <header class="chk-ct" style="height:20px;">
+            <div class="w-200 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.suitEquipo"}}</div>
+            <div class="w-50 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.rango"}}</div>
+            <div class="w-50 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.dano"}}</div>
+            <div class="w-50 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.pen"}}</div>
+            <div class="w-50 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.areachica"}}</div>
+            <div class="w-40"></div>
+            <div class="w-100 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.descriptores"}}</div>
+            <div class="w-30 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.valor"}}</div>
+            <div class="w-45 tx-pq tx-cnt">{{localize "Ad6.Etiquetas.usos"}}</div>
+        </header>
+        <div class="fd-column" ID="UPGRADE_SUITEQUIPOS">
+            {{#each system.suitEquipos as |se idx|}}
+                {{> parcialUpgradeLecturaEquipo se=se eqSuit=true idx=idx borrar="upgradeBorrarSuitEquipo" }}
+            {{/each}}
+        </div>
+    </div>
+
+    {{!-- === TALENTOS A INYECTAR (solo lectura) ===
+         Sólo se inyectan en actores de tipo "principal" (ver servicio de
+         upgrades). En vehículo/teniente se ignoran al equipar. --}}
+    <div class="form-group grupo-campos fd-column">
+        <header class="chk-ct" style="height:20px;">
+            <div class="w-200 tx-pq tx-cnt" >{{localize "Ad6.Upgrade.talentos"}}</div>
+            <div class="w-150 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.tipo"}}</div>
+            <div class="w-45 tx-pq tx-cnt" >{{localize "Ad6.Etiquetas.usos"}}</div>
+        </header>
+        <div class="fd-column" ID="UPGRADE_TALENTOS">
+            {{#each system.talentos as |tal idx|}}
+                {{> parcialUpgradeLecturaTalento tal=tal idx=idx }}
+            {{/each}}
+        </div>
+    </div>
+
+    {{!-- === ELEMENTOS A INYECTAR (solo lectura) ===
+         Sólo se inyectan en actores de tipo "principal" (ver servicio de
+         upgrades). En vehículo/teniente se ignoran al equipar. --}}
+    <div class="form-group grupo-campos fd-column">
+        <header class="chk-ct" style="height:20px;">
+            <div class="w-375 tx-pq tx-cnt" >{{localize "Ad6.Upgrade.elementos"}}</div>
+        </header>
+        <div class="fd-column" ID="UPGRADE_ELEMENTOS">
+            {{#each system.elementos as |ele idx|}}
+                {{> parcialUpgradeLecturaElemento ele=ele idx=idx }}
+            {{/each}}
+        </div>
+    </div>
+
+    <div class="form-group grupo-descripcion">
+        <prose-mirror target="system.description" name="system.descripcion" value="{{system.descripcion}}" toggled="true">
+        {{{descripcionRica}}} {{!--the enriched text--}}
+        </prose-mirror>
+    </div>
+</div>

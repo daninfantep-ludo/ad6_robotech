@@ -1,0 +1,24 @@
+<section id="VEHICULOHABILIDADESTRIPULACION" class="tab ad6-tab habilidades tx  {{tab.cssClass}} div-panel txt-fill" data-group="primary" data-tab="habilidades"  role="tabpanel">
+    <div class="flx fd-column gap-5">
+
+        <div class="flx cnt-horizontal gap5">
+            {{> parcialTenienteHabilidades}}
+            <div id="DERECHA" class="flx fd-column">
+                <div>
+                    <label class="w-80">{{localize "Ad6.Etiquetas.tripulacion"}}</label>
+                    <select name ="system.tipoTripulacion" class="tx mrg w-120" data-tipoTripulacion-select>
+                        {{selectOptions config.TipoTripulacion selected = system.tipoTripulacion  localize=true}}
+                    </select>
+                </div>    
+                <div>
+                    <label class="w-80">{{localize "Ad6.Etiquetas.tipo"}}</label>
+                    <select name ="system.rolNave" class="tx mrg w-120" data-rolNave-select>
+                        <options value=""></options>
+                        {{selectOptions config.RolNave selected = system.rolNave  localize=true}}
+                    </select>
+                </div>
+            </div>                    
+            </div>
+        </div>
+    </div>
+</section>

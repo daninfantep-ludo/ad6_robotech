@@ -1,0 +1,32 @@
+<div class="nombres-clones-dialog">
+
+  <div class="campo-clon">
+    <label for="nombre-clon-1">
+      {{localize "Ad6.Etiquetas.nombreClon"}} (1)
+    </label>
+
+    <input
+      id="nombre-clon-1"
+      type="text"
+      name="nombreClon1"
+      value="{{clones.[0].nombre}}"
+      autocomplete="off">
+  </div>
+
+  <div class="campo-clon">
+    <label for="nombre-clon-2">
+      {{localize "Ad6.Etiquetas.nombreClon"}} (2)
+    </label>
+
+    <input
+      id="nombre-clon-2"
+      type="text"
+      name="nombreClon2"
+      value="{{clones.[1].nombre}}"
+      autocomplete="off">
+  </div>
+
+  <input type="hidden" name ="heridasClon1" value="{{clones.[0].heridas}}"/>
+  <input type="hidden" name ="heridasClon2" value="{{clones.[1].heridas}}"/>
+
+</div>

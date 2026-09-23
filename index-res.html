@@ -1,0 +1,408 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"/>
+
+        <style>
+        @import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@600;700;800;900&display=swap');
+        @import url('/css/ad6_robotech_generales.css');
+        @import url('/css/ad6_robotech_hex_heridas.css');
+        @import url('/css/ad6_tabs.css');
+
+                /* Contenedor principal que simula el fondo naranja del panel */
+        .panel-container {
+            background-color: #d65a31; /* Color naranja retro de la cabina */
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            width: fit-content;
+            margin: 50px auto;
+            border-radius: 10px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5), 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        /* Simulación de la ranura oscura por donde se desliza el botón */
+        .ranura {
+            width: 80px;
+            height: 250px;
+            background-color: #1a1a1a; /* Fondo oscuro de la ranura */
+            border-radius: 8px;
+            position: relative;
+            box-shadow: inset 3px 3px 10px rgba(0,0,0,0.8), inset -3px -3px 10px rgba(255,255,255,0.1);
+            overflow: hidden;
+        }
+
+        /* Estilo base de la palanca-botón */
+        .palanca-btn {
+            width: 70px;
+            height: 70px;
+            background-color: #ffffff; /* Bloque blanco principal */
+            border: none;
+            border-radius: 8px;
+            position: absolute;
+            left: 5px;
+            cursor: pointer;
+            
+            /* Tipografía y diseño de la letra */
+            font-family: 'Arial Black', sans-serif;
+            font-size: 2.2rem;
+            color: #005691; /* Color azul de las letras del panel */
+            
+            /* Efecto 3D del botón tipo bloque */
+            box-shadow: 0 5px 0px #b3b3b3, 
+                        3px 8px 10px rgba(0,0,0,0.4);
+            
+            /* Animación suave al cambiar de posición */
+            transition: top 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* Posición por defecto: APAGADO / ABAJO */
+        .palanca-btn[aria-pressed="false"] {
+            top: 170px; /* Se queda en la parte inferior de la ranura */
+        }
+
+        /* Posición modificada: ACTIVO / ARRIBA */
+        .palanca-btn[aria-pressed="true"] {
+            top: 10px; /* Sube a la parte superior de la ranura */
+            color: #0088cc; /* Un azul un poco más brillante al activarse */
+            box-shadow: 0 5px 0px #b3b3b3, 
+                        0px 2px 5px rgba(0,0,0,0.2);
+        }
+
+        /* Pequeño indicador luminoso decorativo encima de cada ranura */
+        .indicador-luces {
+            width: 40px;
+            height: 8px;
+            background-color: #3a6073;
+            margin: 0 auto 15px auto;
+            border-radius: 2px;
+            box-shadow: inset 1px 1px 3px rgba(0,0,0,0.5);
+        }
+        
+        /* Contenedor individual para alinear la luz con su respectiva ranura */
+        .modulo-control {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+    </style>
+</head> 
+<body bgcolor="black">
+    <section style="width:800px">
+    <section class="window-content"><section id="VITALES" class="div-panel tx" data-application-part="principalVitales"> 
+    <header class="div-panel-titulo">
+        Vitales
+    </header>
+    <div class="cnt-horizontal">
+        <div style="position: relative; flex: 0 0 80px; margin-right: 3px;">
+            <img class="profile-img" src="icons/svg/mystery-man.svg" title="Aessa (Click para cambiar)" data-actor-id="9iehkTTnxDW82gBO" data-action="editPortrait" width="80" height="80" style="display: block; border: 1px solid var(--color-brillo) ">
+        </div>
+        <div id="columna-izquierda-vitales">
+            <div>
+                <label class="w-80">Nombre</label>
+                <input type="text" name="name" value="Aessa" class="tx mrg w-200">
+            </div>
+            <div>
+                <label class="w-80">Carrera</label>
+                <select name="system.carrera" class="tx mrg w-105">
+                    <option value="piloto" selected="">Piloto</option><option value="oficial">Oficial</option><option value="tecnico">Técnico</option><option value="interprete">Intérprete</option><option value="espia">Espía</option><option value="marine">Marine</option><option value="nomada">Nómada</option><option value="triunvirato">Triunvirato</option><option value="voluntario">Voluntario</option>
+                </select>
+                <select name="system.especialidad" class="tx mrg w-150">
+                    <option value="Ad6.Especialidades.Piloto.as" selected="">As</option><option value="Ad6.Especialidades.Piloto.liderEscuadron">Líder Escuadrón</option><option value="Ad6.Especialidades.Piloto.ala">Ala</option><option value="Ad6.Especialidades.Piloto.reconocimiento">Reconocimiento</option><option value="Ad6.Especialidades.Piloto.senuelo">Señuelo</option>
+                </select>
+            </div>        
+            <div>
+                <label class="w-80">Especie</label>
+                <select name="system.especie" class="tx mrg w-100" data-especie-select="">
+                    <options value=""></options>
+                    <option value="humano" selected="">Humano</option><option value="zentraedi">Zentraedi</option><option value="tiresio">Tiresiano</option><option value="invid">Invid</option><option value="karbarrano">Karbarrano</option><option value="praxiana">Praxiana</option><option value="garuda">Garudano</option><option value="spheris">Spheriano</option><option value="peryton">Perytoniano</option><option value="haydonita">Haydonita</option>
+                </select>
+            </div>        
+            <div>
+                <label class="w-80">Rango</label>
+                <select name="system.rango.codigo" class="tx mrg w-60">
+                    <option value="r0" selected="">[R0]</option><option value="r1">[R1]</option><option value="r2">[R2]</option><option value="r3">[R3]</option><option value="r4">[R4]</option><option value="r5">[R5]</option><option value="r6">[R6]</option>
+                </select>
+                <input name="system.rango.descripcion" value="" class="tx mrg w-120" type="text">
+            </div>     
+            <div>
+                <label class="w-80">Fama</label>
+                <select name="system.fama.codigo" class="tx mrg w-60">
+                    <option value="f0" selected=""></option><option value="f1">[F1]</option><option value="f2">[F2]</option><option value="f3">[F3]</option><option value="f4">[F4]</option>
+                </select>
+                <input name="system.fama.descripcion" value="" class="tx mrg w-120" type="text">
+            </div>   
+            <div>
+                <label class="w-80">Fortuna</label>
+                <select name="system.fortuna.codigo" class="tx mrg w-60">
+                    <option value="w0" selected=""></option><option value="w1">[W1]</option><option value="w2">[W2]</option><option value="w3">[W3]</option><option value="w4">[W4]</option><option value="w5">[W5]</option><option value="w6">[W6]</option>
+                </select>
+                <input name="system.fortuna.descripcion" value="" class="tx mrg w-120" type="text">
+            </div>   
+        </div>
+        <div id="columna-derecha-vitales">
+            <div>
+                <label class="w-100">Nivel</label>
+                <input name="system.nivel" value="1" class="con-flechas tx mrg w-60  tx-cnt" type="number">
+                <label class="w-60 mrg-l5">PX / PC</label>
+                <input name="system.construccion" value="" class="con-flechas tx mrg w-60 tx-cnt" type="number">
+            </div>
+            <div>
+            </div>
+            <div>
+                <label class="w-100">Velocidad</label>
+                <input name="system.velocidad" value="" class="tx tx-cnt mrg w-60" type="text">
+            </div>
+            <div>
+                <label class="w-100">Agotamiento</label>
+                <input name="system.agotamiento" value="5" class="con-flechas tx tx-cnt mrg w-60" type="number">
+
+            </div>
+            <div class="chk-ct">
+                <label class="w-100">M. Heróicos</label>
+                <input name="system.heroicos.restante" value="1" class="tx mrg w-40 tx-cnt" readonly="" type="number"> /
+                <input name="system.heroicos.maximo" value="1" class="tx mrg w-40 tx-cnt" readonly="" type="number">
+                <button title="Usar un Movimiento Heróico" class="boton-ico" data-action="gastarHeroico"><i class="fas fa-solid fa-play"></i> </button>
+                <button title="Recargar Movimientos Heróicos" class="boton-ico" data-action="recargarHeroicos" data-valor="1"><i class="fas fa-solid fa-rotate"></i> </button>
+                <label title="Tengo un Movimiento Heróico adicional" class="check-control"><input type="checkbox" name="system.heroicoExtra" data-action="clickHeroico" data-valor="false"></label>
+            </div>
+            <div class="chk-ct">
+                <label class="w-100">Disposición</label>
+                <input name="system.naturaleza.descriptor" value="" class="tx mrg w-200" type="text">
+                <label title="Usar el volver a tirar de Disposición" class="check-control"><input type="checkbox" name="system.naturaleza.usado" data-action="clickDisposicion" data-valor="false"></label>
+            </div>
+            <div class="chk-ct">
+                <label class="w-100">Conducta</label>
+                <input name="system.conducta.descriptor" value="" class="tx mrg w-200" type="text">
+                <label title="Usar el volver a tirar de Conducta" class="check-control"><input type="checkbox" name="system.conducta.usado" data-action="clickConducta" data-valor="false"></label>
+            </div>
+        </div>
+    </div> 
+</section><div class="cnt-horizontal" data-application-part="principalEstresHeridas">
+            <section id="ESTRES" class="div-panel tx flex-1-1-0">
+                <header class="div-panel-titulo ">
+                    Estrés
+                </header>
+                <div class="mrg-xl flx gap-5">
+                        <button data-action="clickEstres" data-indice="0" class="hex-boton hex-boton-estres" type="button" aria-pressed="false">
+                            <span class="hex-letra">&nbsp;</span>
+                        </button>
+                        <button data-action="clickEstres" data-indice="1" class="hex-boton hex-boton-estres" type="button" aria-pressed="false">
+                            <span class="hex-letra">&nbsp;</span>
+                        </button>
+                        <button data-action="clickEstres" data-indice="2" class="hex-boton hex-boton-estres" type="button" aria-pressed="false">
+                            <span class="hex-letra">&nbsp;</span>
+                        </button>
+                        <button data-action="clickEstres" data-indice="3" class="hex-boton hex-boton-estres" type="button" aria-pressed="false">
+                            <span class="hex-letra">&nbsp;</span>
+                        </button>
+                        <button data-action="clickEstres" data-indice="4" class="hex-boton hex-boton-estres" type="button" aria-pressed="false">
+                            <span class="hex-letra">&nbsp;</span>
+                        </button>
+                </div>
+                <div class="fila-ext">
+                    <label class="w-80">Drama 1</label>
+                    <input name="system.dramas.0" value="" type="text" class="tx-red mrg txt-fill">
+                </div>
+                <div class="fila-ext">
+                    <label class="w-80 ">Drama 2</label>
+                    <input name="system.dramas.1" value="" type="text" class="tx-red mrg txt-fill">
+                </div>
+                <div class="fila-ext">
+                    <label class="w-80">Drama 3</label>
+                    <input name="system.dramas.2" value="" type="text" class="tx-red mrg txt-fill">
+                </div>
+            </section>
+<section id="HERIDAS" class="div-panel tx flex-0-1-auto">
+    <header class="div-panel-titulo cnt-horizontal">
+        <div class="cnt-horizontal fila-ext txt-fill">
+            <div>Heridas</div>
+            <div class="mrg-la"></div>
+            
+            
+            
+            
+        </div>
+    </header>
+    <div style="display: flex; flex-direction:column;">
+        <div class="mrg-xxl flx gap-5">
+                <button data-action="clickHerida" data-indice="3" class="hex-boton  hex-boton-verde" type="button" aria-pressed="false" title="">                    
+                    <span class="hex-letra">B</span>
+                </button>
+                <button data-action="clickHerida" data-indice="4" class="hex-boton  hex-boton-ambar" type="button" aria-pressed="false" title="">                    
+                    <span class="hex-letra">B</span>
+                </button>
+                <button data-action="clickHerida" data-indice="5" class="hex-boton  hex-boton-rojo" type="button" aria-pressed="false" title="">                    
+                    <span class="hex-letra">C</span>
+                </button>
+            <div class="flx fd-column">
+            </div>
+
+        </div>
+        <div class="al-self-end">
+            <div class="chk-ct">
+                <label class="w-100 mrg-l5 ">Endurecido</label>
+                <label title="Tengo el primer nivel del talento Endurecido" class="check-control mrg"><input name="system.heridasParams.endurecido.nivel1" data-action="clickEndurecido1" data-valor="false" type="checkbox"></label>
+                <label title="Tengo el segundo nivel del talento Endurecido" class="check-control mrg"><input name="system.heridasParams.endurecido.nivel2" data-action="clickEndurecido2" data-valor="false" type="checkbox"></label>
+            </div>
+            <div class="chk-ct">
+                <label class="w-100 mrg-l5">Mejorado</label>
+                <label title="Compré un nivel de heridas extra durante la creación de personaje" class="check-control mrg"><input name="system.heridasParams.mejorado" data-action="clickMejorado" data-valor="false" type="checkbox"></label>
+            </div>
+        </div>
+    </div>
+</section></div><section id="TIRADA" class="div-panel tx" data-application-part="tirada"> 
+    <header class="div-panel-titulo cnt-horizontal">
+        <div class="cnt-horizontal  check-control">
+            Tirada
+        </div>
+        <div class="w-375"></div>
+        <div>
+            <label class="check-control mrg tx-pq">Sólo hasta Agotamiento</label>
+            <input type="checkbox">
+        </div>
+    
+    </header>
+    <label class="w-40">Tipo</label>
+    <select class="mrg w-50 tx-cnt" name="system.tirada">
+        <option value="ventaja">[+2]</option><option value="apoyo">[+1]</option><option value="normal">[0]</option><option value="obstaculo">[-1]</option><option value="desventaja" selected="">[-2]</option>
+    </select>
+    <label class="mrg-l5 w-40">Mod.</label>
+    <input class="mrg w-50 tx-cnt con-flechas" name="system.modificador" type="number" step="1" value="3">
+    <label class="mrg-l5 w-50">Fase</label>
+    <select class="mrg w-150" name="system.fase">
+        <option value="ninguna"></option><option value="soporteAsistir">[Sop] Asistir</option><option value="soporteOcultar">[Sop] Ocultar</option><option value="soporteObservar" selected="">[Sop] Observar</option><option value="operacionesAtacar">[Ops] Atacar</option><option value="operacionesDefender">[Ops] Defender</option><option value="operacionesRedirigir">[Ops] Redirigir</option><option value="cinematicaInteractuar">[Cin] Interactuar</option><option value="cinematicaInhibir">[Cin] Inhibir</option>
+    </select>
+    <label class="mrg-l5 w-50">Dados</label>
+    <input title="Habilidades" name="system.dados" value="1" class="mrg w-50 tx-cnt con-flechas" type="number" step="1" min="1">
+    <input title="Equipo" name="system.dadosEquipo" value="1" class="mrg w-50 tx-cnt con-flechas" type="number" step="1" min="1">
+    <button title="Hacer la Tirada" class="boton-ico"><i class="fas fa-solid fa-dice-d6"></i> </button>
+    <button title="Resetear la Tirada" class="boton-ico"><i class="fas fa-solid fa-delete-left"></i> </button>
+</section><nav class="navigable-tabs cnt-horizontal pl-4 mrg-xl" role="tablist" data-group="primary" data-application-part="tabs">
+    <button role="tab" aria-selected="true" aria-controls="habilidades-panel" class="tab-button tx w-120 active" data-tab="habilidades" data-group="primary">
+      
+      Habilidades
+    </button>
+    <button role="tab" aria-selected="false" aria-controls="elementos-panel" class="tab-button tx w-120" data-tab="elementos" data-group="primary">
+      
+      Elementos
+    </button>
+    <button role="tab" aria-selected="false" aria-controls="talentos-panel" class="tab-button tx w-120" data-tab="talentos" data-group="primary">
+      
+      Talentos
+    </button>
+    <button role="tab" aria-selected="false" aria-controls="equipo-panel" class="tab-button tx w-120" data-tab="equipo" data-group="primary">
+      
+      Equipo
+    </button>
+    <button role="tab" aria-selected="false" aria-controls="competencias-panel" class="tab-button tx w-120" data-tab="competencias" data-group="primary">
+      
+      Competencias
+    </button>
+    <button role="tab" aria-selected="false" aria-controls="notas-panel" class="tab-button tx w-120" data-tab="notas" data-group="primary">
+      
+      Notas
+    </button>
+</nav>
+<section  id="HABILIDADES" class="tab habilidades div-panel txt-fill active tx" data-group="primary" data-tab="habilidades" role="tabpanel" data-application-part="habilidades">
+    <div class="tab-content txt-fill flx" id="HABILIDADES">
+        <div>
+            <li class="chk-ct">
+                <div class="w-175 tx-pq tx-cnt" >Habilidad</div>
+                <div class="w-175 tx-pq tx-cnt" >Beneficio</div>
+                <div class="w-175 tx-pq tx-cnt" >Costo</div>
+                <div class="w-60 tx-pq tx-cnt" >Valor</div>
+                <div class="fila-ext mrg-la">                
+                    <button title="Añadir una Habilidad" class="boton-ico" data-action="gastarHeroico"><i class="fas fa-solid fa-plus"></i> </button>
+                </div>
+            </li>
+            <li class="chk-ct">
+                <input type="text" name="name" value="Adelante con todo" class="tx mrg w-175">
+                <input type="text" name="name" value="Hacer avances" class="tx mrg w-175">
+                <input type="text" name="name" value="Tozudez" class="tx mrg w-175">
+                <input type="number" name="name" value="4" class="tx mrg w-60 tx-cnt con-flechas">
+                <label title="Usar Habilidad" class="check-control"><input type="checkbox" name="" data-action="clickDisposicion" data-valor="false"></label>
+                <button title="Ver Detalle / Editar" class="boton-ico" data-action="gastarHeroico"><i class="fas fa-solid fa-pen-to-square"></i> </button>
+                <button title="Enviar al Chat" class="boton-ico" data-action="gastarHeroico"><i class="fas fa-solid fa-comment"></i> </button>
+                <button title="Borrar" class="boton-ico mrg-l10" data-action="gastarHeroico"><i class="fas fa-solid fa-trash"></i> </button>
+
+            </li>
+            <li class="chk-ct">
+                <input type="text" name="name" value="Alpha strike" class="tx mrg w-175">
+                <input type="text" name="name" value="Conseguir todo" class="tx mrg w-175">
+                <input type="text" name="name" value="Debilitado" class="tx mrg w-175">
+                <input type="number" name="name" value="3" class="tx mrg w-60 tx-cnt con-flechas">
+                <label title="Usar Habilidad" class="check-control"><input type="checkbox" name="" data-action="clickDisposicion" data-valor="false"></label>
+                <button title="Ver Detalle / Editar" class="boton-ico" data-action="gastarHeroico"><i class="fas fa-solid fa-pen-to-square"></i> </button>
+                <button title="Enviar al Chat" class="boton-ico" data-action="gastarHeroico"><i class="fas fa-solid fa-comment"></i> </button>
+                <button title="Borrar" class="boton-ico mrg-l10" data-action="gastarHeroico"><i class="fas fa-solid fa-trash"></i> </button>
+            </li>
+            <li class="chk-ct">
+                <input type="text" name="name" value="Cubre a tu amigo" class="tx mrg w-175">
+                <input type="text" name="name" value="Ayuda" class="tx mrg w-175">
+                <input type="text" name="name" value="En cercanía" class="tx mrg w-175">
+                <input type="number" name="name" value="3" class="tx mrg w-60 tx-cnt con-flechas">
+                <label title="Usar Habilidad" class="check-control"><input type="checkbox" name="" data-action="clickDisposicion" data-valor="false"></label>
+                <button title="Ver Detalle / Editar" class="boton-ico" data-action="gastarHeroico"><i class="fas fa-solid fa-pen-to-square"></i> </button>
+                <button title="Enviar al Chat" class="boton-ico" data-action="gastarHeroico"><i class="fas fa-solid fa-comment"></i> </button>
+                <button title="Borrar" class="boton-ico mrg-l10" data-action="gastarHeroico"><i class="fas fa-solid fa-trash"></i> </button>
+            </li>
+            <li class="chk-ct">
+                <input type="text" name="name" value="Ataque al paso" class="tx mrg w-175">
+                <input type="text" name="name" value="Escaramuza" class="tx mrg w-175">
+                <input type="text" name="name" value="Movimiento" class="tx mrg w-175">
+                <input type="number" name="name" value="3" class="tx mrg w-60 tx-cnt con-flechas">
+                <label title="Usar Habilidad" class="check-control"><input type="checkbox" name="" data-action="clickDisposicion" data-valor="false"></label>
+                <button title="Ver Detalle / Editar" class="boton-ico" data-action="gastarHeroico"><i class="fas fa-solid fa-pen-to-square"></i> </button>
+                <button title="Enviar al Chat" class="boton-ico" data-action="gastarHeroico"><i class="fas fa-solid fa-comment"></i> </button>
+                <button title="Borrar" class="boton-ico mrg-l10" data-action="gastarHeroico"><i class="fas fa-solid fa-trash"></i> </button>
+            </li>
+            <li class="chk-ct">
+                <input type="text" name="name" value="Barrido Escáner" class="tx mrg w-175">
+                <input type="text" name="name" value="Detalles" class="tx mrg w-175">
+                <input type="text" name="name" value="Enfocarse" class="tx mrg w-175">
+                <input type="number" name="name" value="3" class="tx mrg w-60 tx-cnt con-flechas">
+                <label title="Usar Habilidad" class="check-control"><input type="checkbox" name="" data-action="clickDisposicion" data-valor="false"></label>
+                <button title="Ver Detalle / Editar" class="boton-ico" data-action="gastarHeroico"><i class="fas fa-solid fa-pen-to-square"></i> </button>
+                <button title="Enviar al Chat" class="boton-ico" data-action="gastarHeroico"><i class="fas fa-solid fa-comment"></i> </button>
+                <button title="Borrar" class="boton-ico mrg-l10" data-action="gastarHeroico"><i class="fas fa-solid fa-trash"></i> </button>
+            </li>            
+            <li class="chk-ct">
+                <input type="text" name="name" value="Con Dios y ayuda" class="tx mrg w-175">
+                <input type="text" name="name" value="Suerte" class="tx mrg w-175">
+                <input type="text" name="name" value="Desesperado" class="tx mrg w-175">
+                <input type="number" name="name" value="3" class="tx mrg w-60 tx-cnt con-flechas">
+                <label title="Usar Habilidad" class="check-control"><input type="checkbox" name="" data-action="clickDisposicion" data-valor="false"></label>
+                <button title="Ver Detalle / Editar" class="boton-ico" data-action="gastarHeroico"><i class="fas fa-solid fa-pen-to-square"></i> </button>
+                <button title="Enviar al Chat" class="boton-ico" data-action="gastarHeroico"><i class="fas fa-solid fa-comment"></i> </button>
+                <button title="Borrar" class="boton-ico mrg-l10" data-action="gastarHeroico"><i class="fas fa-solid fa-trash"></i> </button>
+            </li>
+            <li class="chk-ct">
+                <input type="text" name="name" value="Con Dios y ayuda" class="tx mrg w-175">
+                <input type="text" name="name" value="Suerte" class="tx mrg w-175">
+                <input type="text" name="name" value="Desesperado" class="tx mrg w-175">
+                <input type="number" name="name" value="3" class="tx mrg w-60 tx-cnt con-flechas">
+                <label title="Usar Habilidad" class="check-control"><input type="checkbox" name="" data-action="clickDisposicion" data-valor="false"></label>
+                <button title="Ver Detalle / Editar" class="boton-ico" data-action="gastarHeroico"><i class="fas fa-solid fa-pen-to-square"></i> </button>
+                <button title="Enviar al Chat" class="boton-ico" data-action="gastarHeroico"><i class="fas fa-solid fa-comment"></i> </button>
+                <button title="Borrar" class="boton-ico mrg-l10" data-action="gastarHeroico"><i class="fas fa-solid fa-trash"></i> </button>
+            </li>
+        </div>
+    </div>
+</section>
+<section class="tab talentos div-panel txt-fill" data-group="primary" data-tab="talentos" role="tabpanel" data-application-part="talentos">
+<div class="tab-content" id="TALENTOS">
+    TALENTOS
+</div>
+</section></section>
+</section>
+</body>
+</html>

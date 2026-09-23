@@ -1,0 +1,23 @@
+<div class="form-group mrg-xl">
+  <label class="label-item w-120">{{localize "Ad6.Etiquetas.costo"}}</label>
+  <input  class="text-item w-300" type="text" name="system.costo" value="{{system.costo}}"/>
+</div>
+<div class="form-group mrg-xl">
+  <label class="label-item w-120">{{localize "Ad6.Etiquetas.beneficio"}}</label>
+  <input   class="text-item w-300" type="text" name="system.beneficio" value="{{system.beneficio}}"/>
+</div>
+<div class="form-group mrg-xl">
+  <label class="label-item w-120">{{localize "Ad6.Etiquetas.valor"}}</label>
+  <input class="text-item w-60 tx-cnt" type = "number" name="system.valor" value="{{system.valor}}"/>
+</div>
+<div class="form-group mrg-xl">
+  <label class="label-item w-120">{{localize "Ad6.Etiquetas.marcado"}}</label>
+  <input class="text-item" type = "checkbox" name="system.marcado" {{#if system.marcado}}checked{{/if}}/>
+</div>
+<div class="form-group  mrg-xl">
+    <prose-mirror target="system.description" name="system.descripcion" value="{{system.descripcion}}" toggled="true">
+      {{{descripcionRica}}} {{!--the enriched text--}}
+    </prose-mirror>
+</div>  
+
+ 
