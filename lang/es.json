@@ -456,6 +456,11 @@
             ,"danoFinalAplicada": "Daño final aplicado"
             ,"disponibles": "disponibles"
             ,"fuentes": "fuentes"
+            ,"infPiloto": "Piloto {nombre}"
+            ,"infTenienteBasico": "Teniente {nombre} en vehículo básico"
+            ,"infTenienteNoBasico": "Teniente {nombre} en vehículo no básico"
+            ,"infNoPiloto": "Vehículo sin piloto"
+            ,"infMainSinSistemas": "Principal {nombre} en vehículo básico sin sistemas"
         }
         ,"Log":
         {
@@ -546,6 +551,7 @@
             ,"enjambreSinBajas": "✔ Sin bajas: el daño no completa el costo de ninguna unidad."
             ,"enjambreSinPermiso": "[aviso] Este cliente no tiene permiso para escribir la formación de {nombre}; el resultado queda en el log."
             ,"enjambreUnidadesTotales": "Unidades del enjambre: {total} (system.unidades actualizado)."
+            
         }
         ,"Especialidades":
         {

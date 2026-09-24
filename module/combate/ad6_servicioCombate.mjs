@@ -1903,7 +1903,7 @@ function _decisionAplicacionVehiculo(vehiculo)
 
   if (!piloto)
   {
-    return { modo: "aplicar", motivo: "Vehículo sin piloto" };
+    return { modo: "aplicar", motivo: t("Ad6.Combate.infNoPiloto",{})}; //"Vehículo sin piloto" };
   }
   if (piloto.type === "principal")
   {
@@ -1913,21 +1913,21 @@ function _decisionAplicacionVehiculo(vehiculo)
     // podría aplicar hardware.
     if (sinSistemas)
     {
-      return { modo: "aplicar", motivo: `Principal ${nombrePiloto} en vehículo básico sin sistemas` };
+      return { modo: "aplicar", motivo: t("Ad6.Combate.infMainSinSistemas",{nombre:nombrePiloto})}; //`Principal ${nombrePiloto} en vehículo básico sin sistemas` };
     }
     // Usamos el NOMBRE del piloto, no su tipo, para que el aviso sea claro.
-    return { modo: "informar", motivo: `Piloto ${nombrePiloto}` };
+    return { modo: "informar", motivo: t("Ad6.Combate.infPiloto",{nombre:nombrePiloto})}; // `Piloto ${nombrePiloto}` };
   }
   if (piloto.type === "teniente")
   {
     if (esBasico)
     {
-      return { modo: "aplicar", motivo: `Teniente ${nombrePiloto} en vehículo básico` };
+      return { modo: "aplicar", motivo: t("Ad6.Combate.infTenienteBasico",{nombre:nombrePiloto})}; //`Teniente ${nombrePiloto} en vehículo básico` };
     }
-    return { modo: "informar", motivo: `Teniente ${nombrePiloto} en vehículo no básico` };
+    return { modo: "informar", motivo: t("Ad6.Combate.infTenienteNoBasico",{nombre:nombrePiloto})}; //`Teniente ${nombrePiloto} en vehículo no básico` };
   }
   // Cualquier otro tipo de piloto: por defecto, no aplicamos automáticamente.
-  return { modo: "informar", motivo: `Piloto ${nombrePiloto}` };
+  return { modo: "informar", motivo:  t("Ad6.Combate.infPiloto",{nombre:nombrePiloto})}; //`Piloto ${nombrePiloto}` };
 }
 
 /**

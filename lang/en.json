@@ -456,6 +456,11 @@
             ,"danoFinalAplicada": "Final Damage Applied"
             ,"disponibles": "avalialbes"
             ,"fuentes": "sources"
+            ,"infPiloto": "Pilot {nombre}"
+            ,"infTenienteBasico": "Lieutenant {nombre} in basic vehicle"
+            ,"infTenienteNoBasico": "Lieutenant {nombre} in non-basic vehicle"
+            ,"infNoPiloto": "Vehicle without pilot"
+            ,"infMainSinSistemas": "Main {nombre} in basic vehicle without systems"
         }
         ,"Log":
         {
