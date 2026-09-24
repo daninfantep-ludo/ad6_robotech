@@ -44,12 +44,21 @@ const ICONO_SUPERFASE = {
   ,cinematica:  "fa-film"
 };
 
-// Texto/etiqueta por macrofase (para el title del icono).
-const NOMBRE_SUPERFASE = {
-   soporte:     "Soporte"
-  ,operaciones: "Operaciones"
-  ,cinematica:  "Cinemática"
-};
+/**
+ * Nombre VISIBLE (localizado) de una macrofase. Reutiliza las claves
+ * Ad6.SuperFase.* que el sistema ya usa en las plantillas (p.ej.
+ * parcialTiradaBoton.hbs), de modo que hay UNA sola fuente de verdad para los
+ * textos y se traducen solos según el idioma del usuario. Si el valor viene
+ * vacío o no tiene traducción, cae al valor crudo.
+ * @param {string} superFase  "soporte" | "operaciones" | "cinematica" | ...
+ * @returns {string}
+ */
+function _nombreSuperFase(superFase)
+{
+  if (!superFase) return "";
+  const clave = "Ad6.SuperFase." + superFase;
+  return game.i18n.has(clave) ? game.i18n.localize(clave) : superFase;
+}
 
 /**
  * Debe llamarse UNA vez al inicializar el sistema (init/ready).
@@ -179,7 +188,7 @@ function _decorarFilaDeFase(fila, combatant)
     // actual (que tras acelerar apunta al destino).
     const superIcono = datos.superFaseOriginal ?? datos.superFase;
     const icono = ICONO_SUPERFASE[superIcono] ?? "fa-circle-question";
-    const nombre = NOMBRE_SUPERFASE[superIcono] ?? superIcono ?? "";
+    const nombre = _nombreSuperFase(superIcono);
 
     // Solo repintamos si aún no está nuestro icono (evita parpadeo/flicker).
     if (!celdaIniciativa.querySelector(".ad6-ico-macrofase"))
@@ -277,22 +286,22 @@ function _decorarFilaDeFase(fila, combatant)
     // Atacar (fa-burst).
     if (_botonAtaque(tirada))
     {
-      cont.appendChild(_boton("ad6-fase-btn atacar", "fa-solid fa-burst fa-fade ad6-ico-ataque",
-        "Atacar", () => ServicioCombate.invocarAtaque(actor, slot)));
+        cont.appendChild(_boton("ad6-fase-btn atacar", "fa-solid fa-burst fa-fade ad6-ico-ataque",
+        game.i18n.localize("Ad6.Etiquetas.atacar"), () => ServicioCombate.invocarAtaque(actor, slot)));
     }
 
     // Fuego concentrado (fa-arrows-to-circle).
     if (_botonAtaque(tirada) && _tieneArma(tirada))
     {
       cont.appendChild(_boton("ad6-fase-btn fuego", "fa-solid fa-arrows-to-circle",
-        "Fuego concentrado", () => ServicioCombate.invocarFuegoConcentrado(actor, slot)));
+        game.i18n.localize("Ad6.Etiquetas.fuegoConcentrado"), () => ServicioCombate.invocarFuegoConcentrado(actor, slot)));
     }
 
     // Prestar defensa (fa-shield-heart).
     if (_botonDefensa(tirada))
     {
       cont.appendChild(_boton("ad6-fase-btn defensa", "fa-solid fa-shield-heart",
-        "Prestar defensa", () => ServicioCombate.invocarPrestarDefensa(actor, slot)));
+        game.i18n.localize("Ad6.Etiquetas.prestarDefensa"), () => ServicioCombate.invocarPrestarDefensa(actor, slot)));
     }
 
     // Acelerar / Apurar (Push): sube la acción una macrofase
@@ -304,8 +313,12 @@ function _decorarFilaDeFase(fila, combatant)
     {
       const destino = ServicioCombate.superFaseAceleradaDe(tirada);
       const coste = ServicioCombate.costeAcelerar(tirada);
+      const nombreBoton = game.i18n.localize("Ad6.Etiquetas.acelerarA") + 
+        _nombreSuperFase(destino) + " (" + game.i18n.localize("Ad6.Etiquetas.costo") + " " + coste +  " "+
+        game.i18n.localize("Ad6.Etiquetas.fatiga") + ")";
       cont.appendChild(_boton("ad6-fase-btn acelerar", "fa-regular fa-circle-up",
-        `Acelerar a ${NOMBRE_SUPERFASE[destino] ?? destino} (coste ${coste} fatiga)`,
+        //`Acelerar a ${_nombreSuperFase(destino)} [coste ${coste} fatiga]`,
+        nombreBoton,
         () => ServicioCombate.acelerarAccion(actor, slot)));
     }
   }
