@@ -47,4 +47,46 @@ export class Ad6_HojaActorConflicto extends Ad6_HojaActor
     ,notas: {
       template: "systems/ad6_robotech/templates/actor/parcialNotas.hbs"
     }};
+
+  /**
+   * Sincroniza la cantidad de DADOS del actor con el VALOR del conflicto.
+   *
+   * Regla: cada vez que cambia system.valor en el panel de Vitales, system.dados
+   * (que es lo que muestra el parcial de Tirada) pasa a valer EXACTAMENTE lo mismo.
+   *
+   * Se engancha en _onChangeForm (se dispara con el cambio de cualquier campo del
+   * formulario, gracias a submitOnChange). Se deja que el flujo normal (super)
+   * persista system.valor y, a continuación, se escribe system.dados con ese
+   * mismo valor. Así la sincronización queda AISLADA a esta hoja y no afecta a
+   * ningún otro tipo de actor.
+   *
+   * @override
+   */
+  _onChangeForm(formConfig, event) {
+    const target = event?.target;
+
+    // ¿Es el campo "valor" del conflicto? (input name="system.valor")
+    const esValor = target?.name === "system.valor";
+
+    if (esValor) {
+      // Normalizamos a número (el input llega como string; vacío -> null).
+      const crudo = target.value;
+      const nuevo = (crudo === "" || crudo === null || crudo === undefined)
+        ? null
+        : Number(crudo);
+
+      // Guardamos valor + dados en UNA sola operación (un único re-render) y
+      // evitamos el submit nativo de este campo, que haría un update aparte.
+      // Importante: NO llamamos a super() en este caso para no duplicar el
+      // guardado de system.valor.
+      this.actor.update({
+         "system.valor": nuevo
+        ,"system.dados": nuevo
+      });
+      return;
+    }
+
+    // Cualquier otro campo: comportamiento normal del formulario.
+    return super._onChangeForm(formConfig, event);
+  }
 }
