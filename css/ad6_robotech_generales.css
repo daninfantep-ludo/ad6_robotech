@@ -1606,3 +1606,90 @@ li.combatant.ad6-fila-fase.ad6-fase-sin-exitos .ad6-ico-macrofase {
   opacity: 1;
   filter: none;
 }
+
+/* ==========================================================================
+   HOJA DE ACTOR "CONFLICTO"
+   ==========================================================================
+   La hoja de conflicto (Ad6_HojaActorConflicto) incluye el partial compartido
+   parcialTirada.hbs dentro de un wrapper propio (conflictoTirada.hbs). Ese
+   partial lleva en su <section> la clase "flex-1-1-0" (flex: 1 1 0), que en las
+   hojas de vehículo/principal hace que el panel de tirada RELLENE el alto
+   sobrante. Aquí lo queremos AJUSTADO a su contenido, así que neutralizamos su
+   crecimiento SOLO dentro de esta hoja (scoped a .ad6-conflicto). El CSS global
+   y el partial NO se modifican: el resto de pantallas no se ven afectadas. */
+.ad6-conflicto .ad6-conflicto-tirada {
+  /* El wrapper no crece; se ajusta a su contenido. */
+  flex: 0 0 auto;
+}
+
+.ad6-conflicto .ad6-conflicto-tirada #TIRADA {
+  /* Anula el "flex: 1 1 0" del partial: el panel de tirada se ajusta a su
+     contenido en lugar de estirarse a lo alto. */
+  flex: 0 0 auto;
+}
+
+/* --------------------------------------------------------------------------
+   La hoja de conflicto dispone sus PARTS en COLUMNA dentro de la ventana:
+   conflictoVitales y tirada toman su alto natural y NOTAS absorbe el resto.
+   Se hace SOLO en esta hoja (scoped a .ad6-conflicto) porque el resto de hojas
+   del sistema NO usan layout flex en su .window-content y no queremos alterar
+   su comportamiento. */
+.ad6-conflicto .window-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  /* Sin "overflow:auto" aquí: el scroll lo gestiona la propia zona de notas. */
+  overflow: hidden;
+}
+
+/* Los dos primeros paneles NO crecen: alto ajustado a su contenido. */
+.ad6-conflicto .window-content > #VITALES,
+.ad6-conflicto .window-content > .ad6-conflicto-tirada {
+  flex: 0 0 auto;
+}
+
+/* NOTAS ocupa TODO el espacio vertical restante. */
+.ad6-conflicto .ad6-panel-notas {
+  flex: 1 1 auto;
+  min-height: 0;            /* permite encogerse dentro del flex (scroll interno) */
+  display: flex;
+  flex-direction: column;
+}
+
+/* El cuerpo de notas (el div .tab-content) crece dentro del panel. */
+.ad6-conflicto .ad6-panel-notas .ad6-panel-notas-cuerpo {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* El editor (prose-mirror) se estira a todo el alto disponible y su área
+   editable interna ocupa el 100%. */
+.ad6-conflicto .ad6-panel-notas .ad6-panel-notas-cuerpo > prose-mirror {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Cadena de contenedores internos del prose-mirror: todos en columna flex para
+   que el área editable final pueda estirarse hasta llenar el editor. Se cubren
+   varios nombres de clase porque la estructura interna de prose-mirror puede
+   variar entre versiones de Foundry. */
+.ad6-conflicto .ad6-panel-notas prose-mirror .editor-container,
+.ad6-conflicto .ad6-panel-notas prose-mirror .editor-content,
+.ad6-conflicto .ad6-panel-notas prose-mirror .prosemirror,
+.ad6-conflicto .ad6-panel-notas prose-mirror .ProseMirror {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.ad6-conflicto .ad6-panel-notas prose-mirror .ProseMirror {
+  /* El área editable final sí hace scroll cuando el texto excede el alto. */
+  overflow-y: auto;
+}

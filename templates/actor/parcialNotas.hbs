@@ -1,0 +1,13 @@
+<section id="NOTAS" class="div-panel tx ad6-panel-notas">
+
+    <header class="div-panel-titulo cnt-horizontal">
+        <span class="flex-0-1-auto">{{localize "Ad6.Pestanas.notas"}}</span>
+    </header>
+    <!-- NOTA: el id del contenedor interno NO puede repetir "NOTAS" (la <section>
+         ya lo usa); para el CSS nos basta con la clase .ad6-panel-notas-cuerpo. -->
+    <div class="tab-content txt-fill flx ad6-panel-notas-cuerpo">
+        <prose-mirror name="system.notas" value="{{system.notas}}" toggled="true" class="txt-fill">
+        {{{system.notas}}}
+        </prose-mirror>
+    </div>
+</section>

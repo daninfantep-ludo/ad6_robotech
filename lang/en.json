@@ -270,6 +270,8 @@
             ,"roll": "Roll"
             ,"elemento": "Element"
             ,"inicialBoton": "Initial Button"
+            ,"temporizado": "Timed conflict?"
+            ,"turnos": "Beats"
 
 
          }

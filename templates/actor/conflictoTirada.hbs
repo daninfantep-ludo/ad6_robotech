@@ -1,0 +1,16 @@
+{{!--
+    Envuelve parcialTirada.hbs para la hoja de CONFLICTO.
+
+    parcialTirada.hbs lleva en su <section> la clase "flex-1-1-0" (flex: 1 1 0),
+    que en las hojas de vehículo/principal RELLENA el espacio vertical sobrante.
+    En la hoja de conflicto queremos que el panel de tirada se AJUSTE a su
+    contenido, sin estirarse.
+
+    Solución: un contenedor propio que (a) apila el partial y (b) permite anular
+    el "flex-grow" del panel SOLO en esta hoja mediante una regla CSS scopada a
+    ".ad6-conflicto" (ver ad6_robotech_generales.css). Ni el partial ni el CSS
+    global se tocan, así que el resto de pantallas no se ven afectadas.
+--}}
+<div class="ad6-conflicto-tirada">
+    {{> parcialTirada}}
+</div>

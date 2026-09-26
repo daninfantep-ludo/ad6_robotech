@@ -34,7 +34,7 @@ export class Ad6_Actor extends foundry.abstract.TypeDataModel {
         ,fase: new fields.StringField({initial: "ninguna"})
         ,tirada: new fields.StringField({initial: "0"})
         ,notas: new fields.StringField()
-                ,tirada1: new fields.SchemaField(Ad6_Tirada())
+        ,tirada1: new fields.SchemaField(Ad6_Tirada())
         ,tirada2: new fields.SchemaField(Ad6_Tirada())
         ,tirada3: new fields.SchemaField(Ad6_Tirada())
         }
@@ -162,7 +162,9 @@ export class Ad6_ActorConflicto extends Ad6_Actor{
         return {
         ...commonData
         ,armadura: new fields.NumberField()
-        ,descripcion: new fields.StringField()
+        ,valor: new fields.NumberField()
+        ,temporizado: new fields.BooleanField()
+        ,tiempoRestante: new fields.NumberField()
         }
     }    
 }
