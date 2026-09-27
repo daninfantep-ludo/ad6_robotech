@@ -322,6 +322,7 @@ export class Ad6_AppCombate extends HandlebarsApplicationMixin(ApplicationV2)
              indice:       i
             ,actorNombre:  f.actorNombre
             ,propia:       f.propia === true
+            ,agrupada:     f.fuente === "conflicto"
             ,disponible:   Number(f.disponible ?? 0)
             ,exitos:       Number(f.exitosDefensa ?? 0)
           }))
@@ -339,15 +340,35 @@ export class Ad6_AppCombate extends HandlebarsApplicationMixin(ApplicationV2)
       // plantilla pueda decidir con o SIN entrada de defensa (defensa en blanco).
       context.esperandoAtaque   = !enc.ataqueConfirmado;
       context.defensaConfirmada = def?.confirmado === true;
+      // AGRUPACIÓN DE CONFLICTO: cuando un conflicto ataca a VARIOS objetivos,
+      // la defensa se agrupa en UN principal (al azar): TODOS los éxitos van
+      // tomados y NO se reparte a mano, pero el principal SÍ debe CONFIRMAR. Lo
+      // detectamos porque ALGÚN defensor lleva las marcas de agrupación.
+      // Con UN único objetivo NO hay agrupación: el flujo es normal (reparte y
+      // confirma).
+      const hayAgrupacionConflicto = (enc.esConflicto === true)
+        && enc.objetivos.some(o => {
+          const d = enc.defensas?.[o.actorId];
+          return d?.esPrincipalConflicto === true || d?.esSecundarioConflicto === true;
+        });
+      // El defensor es el PRINCIPAL del conflicto agrupado (el único que ve
+      // ventana y confirma en ese caso).
+      const esPrincipalConflicto = def?.esPrincipalConflicto === true;
+      context.esConflicto = hayAgrupacionConflicto;
 
       context.defensa = def ? {
          nombre:      def.nombre
         ,img:         def.img
         ,confirmado:  def.confirmado
         // El defensor SOLO puede repartir sus éxitos una vez el atacante ha
-        // confirmado su ataque (antes no sabemos qué hay que defender).
+        // confirmado su ataque (antes no sabemos qué hay que defender). En un
+        // conflicto AGRUPADO NO se reparte nunca: los éxitos van tomados enteros.
         ,esperandoAtaque: !enc.ataqueConfirmado
-        ,editable:    enc.ataqueConfirmado === true && def.confirmado === false
+        ,editable:    (enc.ataqueConfirmado === true && def.confirmado === false && hayAgrupacionConflicto !== true)
+        // En un conflicto agrupado, el principal conserva el botón de CONFIRMAR
+        // (la confirmación es un acto suyo). Marca para la plantilla.
+        ,esPrincipalConflicto
+        ,agrupado:    hayAgrupacionConflicto
         // Una fila por FUENTE (propia + prestadas), con su campo de input.
         // Aplanamos "editable" DENTRO de cada fuente para no depender de rutas
         // relativas ("../") dentro del {{#each}} en la plantilla.
@@ -355,10 +376,13 @@ export class Ad6_AppCombate extends HandlebarsApplicationMixin(ApplicationV2)
            indice:       i
           ,actorNombre:  f.actorNombre
           ,propia:       f.propia === true
+          // En conflicto, las fuentes de los objetivos agrupados no son "propias"
+          // sino aportadas; las marcamos para que la plantilla las etiquete bien.
+          ,agrupada:     f.fuente === "conflicto"
           ,disponible:   Number(f.disponible ?? 0)
           ,exitos:       Number(f.exitosDefensa ?? 0)
           ,campo:        `exitos-defensa-${i}`
-          ,editable:     (enc.ataqueConfirmado === true && def.confirmado === false)
+          ,editable:     (enc.ataqueConfirmado === true && def.confirmado === false && hayAgrupacionConflicto !== true)
         }))
         ,totalDisponible: (def.fuentes ?? []).reduce((s, f) => s + Number(f.disponible ?? 0), 0)
         ,totalTomado:     (def.fuentes ?? []).reduce((s, f) => s + Number(f.exitosDefensa ?? 0), 0)

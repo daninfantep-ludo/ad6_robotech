@@ -136,7 +136,7 @@
                 <div class="ad6-combate-arma">
                     <div class="ad6-combate-arma-datos">
                         {{this.actorNombre}}
-                        {{#unless this.propia}}<span class="tx-pq">{{localize "Ad6.Combate.defensaPrestada"}}</span>{{/unless}}
+                        {{#if this.agrupada}}<span class="tx-pq">{{localize "Ad6.Combate.defensaAgrupada"}}</span>{{else}}{{#unless this.propia}}<span class="tx-pq">{{localize "Ad6.Combate.defensaPrestada"}}</span>{{/unless}}{{/if}}
                         — {{localize "Ad6.Combate.disponibles"}}: <b>{{this.disponible}}</b>
                     </div>
                     {{#if this.editable}}
@@ -202,7 +202,7 @@
                 {{localize "Ad6.Combate.tomado"}}: <b>{{this.total}}</b>
                 {{#if this.fuentes.length}}
                     — {{localize "Ad6.Combate.fuentes"}}:
-                    {{#each this.fuentes}}{{#unless @first}}, {{/unless}}{{this.actorNombre}} <b>{{this.exitos}}</b>/{{this.disponible}}{{#unless this.propia}} {{localize "Ad6.Combate.prestada"}}{{/unless}}{{/each}}
+                    {{#each this.fuentes}}{{#unless @first}}, {{/unless}}{{this.actorNombre}} <b>{{this.exitos}}</b>/{{this.disponible}}{{#if this.agrupada}} {{localize "Ad6.Combate.agrupada"}}{{else}}{{#unless this.propia}} {{localize "Ad6.Combate.prestada"}}{{/unless}}{{/if}}{{/each}}
                 {{else}}
                     — {{localize "Ad6.Combate.sinFuentesDefensa"}}
                 {{/if}}

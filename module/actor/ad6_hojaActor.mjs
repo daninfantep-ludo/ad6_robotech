@@ -563,7 +563,11 @@ await item.update({[campo]: valor});
 
         // Sinergia: se calcula AHORA (al lanzar) y se congela en el chat.
         // Solo un principal (o vehículo con piloto principal) con 2+ habilidades.
-        const sinergia = Ad6_HojaActor._calcularSinergia(this.actor);
+        // EXCEPCIÓN: el actor "conflicto" SIEMPRE cuenta como sinergia: ataca
+        // siempre repartiendo/comparando éxitos y no tiene items ni arma.
+        const sinergia = (this.actor.type === "conflicto")
+          ? true
+          : Ad6_HojaActor._calcularSinergia(this.actor);
 
         let datosChat ={
        tipo: game.i18n.localize("Ad6.TipoTirada." + this.actor.system.tirada)
@@ -889,7 +893,13 @@ await item.update({[campo]: valor});
                   || (guardada.fase === "operacionesRedirigir")
                   || (guardada.superFase === "operaciones" && guardada.sinergia === true);
 
-    if (esAtaque)
+    // EXCEPCIÓN CONFLICTO: el actor "conflicto" NO tiene items ni arma; su
+    // ataque se resuelve por COMPARACIÓN DE ÉXITOS (ver ad6_servicioCombate).
+    // Por eso se permite fijar su tirada de ataque SIN arma: se salta la
+    // validación de "arma válida" (que sólo aplica al resto de actores).
+    const esConflicto = (this.actor.type === "conflicto");
+
+    if (esAtaque && !esConflicto)
     {
             // Candidatos: los items del actor y, si es un principal con vehículo
       // instalado, también los del vehículo (el arma puede venir de ahí).

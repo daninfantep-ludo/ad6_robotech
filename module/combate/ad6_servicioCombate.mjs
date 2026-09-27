@@ -422,7 +422,7 @@ function _usuarioControlaActor(actor)
  */
 export async function crearEncuentro(atacante, slot, tirada)
 {
-  // Normalizamos SIEMPRE el atacante al actor del mundo (independiente de
+    // Normalizamos SIEMPRE el atacante al actor del mundo (independiente de
   // tokens: si la hoja se abrió desde un token, esto lo resuelve).
   const actorAtacante = _normalizarActorDelMundo(atacante);
   if (!actorAtacante) return null;
@@ -433,6 +433,14 @@ export async function crearEncuentro(atacante, slot, tirada)
   // Las armas "prestadas" para el fuego concentrado se añaden después con
   // prestarArma().
   const armaPrincipal = _refArmaDesdeTirada(actorAtacante, slot, tirada);
+
+  // CONFLICTO: el actor "conflicto" NO tiene items ni arma; ataca SIEMPRE por
+  // COMPARACIÓN DE ÉXITOS (su tirada contra la defensa del objetivo), restando
+  // a la defensa su propia armadura. Se marca el encuentro como "esConflicto" y
+  // se guarda esa armadura. Sus éxitos son su "daño" a comparar.
+  const esConflicto = (actorAtacante.type === "conflicto");
+  const conflictoArmadura = esConflicto ? (Number(actorAtacante.system?.armadura) || 0) : 0;
+  const exitosConflicto = esConflicto ? Number(tirada?.exitos ?? 0) : 0;
 
   const encuentro = {
      id:                    id
@@ -445,6 +453,10 @@ export async function crearEncuentro(atacante, slot, tirada)
     ,faseOrigen:            faseDeAccion(tirada)
     ,superFase:             tirada?.superFase ?? "ninguna"
     ,sinergia:              tirada?.sinergia === true
+    // Encuentro de CONFLICTO: activa la RESOLUCIÓN ESPECIAL por comparación de
+    // éxitos (resta la armadura del conflicto a la defensa antes de comparar).
+    ,esConflicto:           esConflicto
+    ,conflictoArmadura:     conflictoArmadura
     ,armas:                 [armaPrincipal]
     ,ataqueConfirmado:      false
     ,objetivos:             objetivosIniciales().map(_ref)
@@ -453,11 +465,23 @@ export async function crearEncuentro(atacante, slot, tirada)
     ,estado:                "abierto"
   };
 
-  // Pre-cargamos la línea de defensa de cada objetivo (con su fuente de éxitos).
+      // El conflicto ataca con TODOS sus éxitos (no reparte): los fijamos en su
+  // arma principal una vez construido el encuentro.
+  if (esConflicto && encuentro.armas[0])
+  {
+    encuentro.armas[0].exitosAtaque = exitosConflicto;
+  }
+
+    // Pre-cargamos la línea de defensa de cada objetivo (con su fuente de éxitos).
   for (const obj of encuentro.objetivos)
   {
     _inicializarDefensa(encuentro, obj.actorUuid);
   }
+
+  // OJO: la AGRUPACIÓN de defensas del conflicto NO se hace aquí. El conflicto
+  // puede seguir añadiendo objetivos en su ventana y la agrupación debe
+  // producirse cuando CONFIRMA el ataque (ver confirmarAtaque -> _agrupar...).
+  // Antes de confirmar, TODOS los objetivos se comportan con normalidad.
 
   encuentros()[id] = encuentro;
 
@@ -634,7 +658,7 @@ function _inicializarDefensa(encuentro, defensorUuid)
   const previa = encuentro.defensas[defensor.id];
   const prestadas = (previa?.fuentes ?? []).filter(f => f.propia !== true);
 
-  const propia = _refFuenteDefensa(defensor, true);
+    const propia = _refFuenteDefensa(defensor, true);
   const fuentes = [];
   if (propia) fuentes.push(propia);
   fuentes.push(...prestadas);
@@ -646,6 +670,11 @@ function _inicializarDefensa(encuentro, defensorUuid)
     ,img:              defensor.img
     ,fuentes:          fuentes
     ,confirmado:       previa?.confirmado === true
+    // PRESERVAMOS los marcadores de conflicto agrupado si la entrada ya los
+    // tenía: la re-inicialización no debe degradar al principal ni reactivar a
+    // un secundario (ambos pierden esas marcas al recrear el objeto desde cero).
+    ,esPrincipalConflicto:  previa?.esPrincipalConflicto === true
+    ,esSecundarioConflicto: previa?.esSecundarioConflicto === true
   };
 }
 
@@ -669,10 +698,139 @@ function _refFuenteDefensa(dueno, propia)
     ,img:           dueno.img
     ,slot:          disp.slot             // "tirada1" | "tirada2" | "tirada3"
     ,fuente:        disp.fuente           // "operacionesDefender" | "operacionesSinergia"
-    ,disponible:    disp.maximo           // máximo que aporta esta fuente
+        ,disponible:    disp.maximo           // máximo que aporta esta fuente
     ,exitosDefensa: 0                     // lo que el defensor toma de ella
     ,propia:        propia === true
   };
+}
+
+/**
+ * AGRUPA las defensas de un encuentro de CONFLICTO con VARIOS objetivos.
+ *
+ * Modelo de negocio: el conflicto no se resuelve objetivo a objetivo. Se elige
+ * UN objetivo "principal" (AL AZAR) cuya defensa agrupa la suya propia MÁS la de
+ * los demás objetivos, que actúan como si hubieran pulsado "prestar defensa"
+ * hacia él. En el conflicto la defensa NO se reparte: TODOS los éxitos (los del
+ * principal y los de los secundarios) van TOMADOS.
+ *
+ * Efectos:
+ *   - Elige UN principal AL AZAR y lo marca con `esPrincipalConflicto: true`
+ *     (el único que tendrá ventana de defensor y podrá pulsar "confirmar").
+ *   - Marca a los demás con `esSecundarioConflicto: true` (sin ventana propia).
+ *   - Pone a TOMADO todos los éxitos disponibles del PRINCIPAL (su fuente propia).
+ *   - Añade al principal UNA FUENTE por cada objetivo secundario, con
+ *     `fuente: "conflicto"`, `disponible = exitosDefensa = todos sus éxitos`.
+ *
+ * IDEMPOTENTE: antes de agrupar LIMPIA cualquier agrupación previa (marcas y
+ * fuentes "conflicto") y refresca el disponible de cada defensor, de modo que
+ * puede volver a llamarse (p.ej. al confirmar el ataque tras añadir objetivos)
+ * sin duplicar nada.
+ *
+ * NO marca a nadie como confirmado: la confirmación es un acto del defensor
+ * principal (se pulsa el botón).
+ *
+ * @param {object} enc  Encuentro (esConflicto === true).
+ */
+function _agruparDefensasConflicto(enc)
+{
+  const objetivos = enc?.objetivos ?? [];
+  if (objetivos.length === 0) return;
+
+  // --- 1) LIMPIEZA de cualquier agrupación previa (idempotencia) ---
+  // Quitamos las fuentes "conflicto" que se hubieran añadido antes y las marcas
+  // de principal/secundario, para reconstruir todo desde cero.
+  for (const obj of objetivos)
+  {
+    const d = _defensaDe(enc, obj.actorUuid);
+    if (!d) continue;
+    d.esPrincipalConflicto  = false;
+    d.esSecundarioConflicto = false;
+    d.fuentes = (d.fuentes ?? []).filter(f => f.fuente !== "conflicto");
+  }
+
+  // --- 2) Elección del PRINCIPAL: uno AL AZAR ---
+  // Obtiene una entrada de objetivos al azar (no se favorece sistemáticamente
+  // al primero). El principal debe tener una defensa inicializada.
+  const elegido = objetivos[Math.floor(Math.random() * objetivos.length)];
+  const principal = _defensaDe(enc, elegido.actorUuid);
+  if (!principal) return;
+
+  principal.esPrincipalConflicto = true;
+  _log(enc, t("Ad6.Log.conflictoPrincipalTitulo", { principal: principal.nombre }));
+
+  // --- 3) PRINCIPAL: TODOS sus éxitos propios van TOMADOS ---
+    // Refrescamos su disponible al día y ponemos su(s) fuente(s) propias al máximo.
+  _refrescarDisponibleDefensa(enc, elegido.actorUuid);
+  for (const f of principal.fuentes)
+  {
+    if (f.propia === true)
+    {
+      f.exitosDefensa = Number(f.disponible ?? 0);
+    }
+  }
+
+  // --- 4) SECUNDARIOS: auto-prestan TODOS sus éxitos al principal ---
+  for (const objRef of objetivos)
+  {
+    if (objRef.actorUuid === elegido.actorUuid) continue;
+
+    const defSec = _defensaDe(enc, objRef.actorUuid);
+    if (!defSec) continue;
+
+    // Refrescamos su disponible (por si tira defensa tarde, etc.).
+    _refrescarDisponibleDefensa(enc, objRef.actorUuid);
+
+    const disponibleTotal = _totalDisponibleDefensa(defSec);
+    defSec.esSecundarioConflicto = true;
+
+    if (disponibleTotal <= 0)
+    {
+      _logSangrado(enc, t("Ad6.Log.conflictoSinDefensaSecundario", {
+         defensor: defSec.nombre
+        ,principal: principal.nombre
+      }), null, 1);
+      continue;
+    }
+
+    // Añadimos al principal una fuente por este defensor, con sus éxitos ya
+    // tomados. Reutilizamos la mejor fuente disponible (para conservar
+    // slot/fuente y poder CONSUMIR sus éxitos al confirmar).
+    const mejor = _mejorFuenteDefensa(defSec);
+    principal.fuentes.push({
+       actorUuid:     defSec.actorUuid
+      ,actorId:       defSec.actorId
+      ,actorNombre:   defSec.nombre
+      ,img:           defSec.img
+      ,slot:          mejor?.slot ?? null
+      ,fuente:        "conflicto"
+      ,disponible:    disponibleTotal
+      ,exitosDefensa: disponibleTotal   // TODOS tomados (defensa entera aportada)
+      ,propia:        false
+    });
+
+    _logSangrado(enc, t("Ad6.Log.conflictoDefensasAgrupadas", {
+       defensor: defSec.nombre
+      ,principal: principal.nombre
+      ,exitos: disponibleTotal
+    }), null, 1);
+  }
+}
+
+/**
+ * Devuelve la fuente de mayor "disponible" de una defensa (la que aporta los
+ * éxitos al prestar defensa). En conflicto se aporta la defensa ENTERA, así que
+ * solo necesitamos de ella el `slot`/`fuente` para poder consumir al confirmar.
+ * @param {object} def
+ * @returns {object|null}
+ */
+function _mejorFuenteDefensa(def)
+{
+  let mejor = null;
+  for (const f of (def?.fuentes ?? []))
+  {
+    if (!mejor || Number(f.disponible ?? 0) > Number(mejor.disponible ?? 0)) mejor = f;
+  }
+  return mejor;
 }
 
 /**
@@ -812,11 +970,13 @@ export function defensoresEnConflicto(excluirUuid = null)
   {
     // Si el ataque ya está confirmado y ese defensor ya confirmó, no tiene
     // sentido prestarle defensa a posteriori.
-    for (const obj of (enc.objetivos ?? []))
+        for (const obj of (enc.objetivos ?? []))
     {
       if (excluirUuid && obj.actorUuid === excluirUuid) continue;
       const def = _defensaDe(enc, obj.actorUuid);
       if (!def || def.confirmado === true) continue;
+      // Los secundarios de conflicto NO se prestan a mano: ya están agrupados.
+      if (_esSecundarioConflicto(enc, def)) continue;
       res.push({
          encuentroId:     enc.id
         ,defensorUuid:    obj.actorUuid
@@ -892,7 +1052,7 @@ export async function refrescarDefensaDeActor(actor)
  */
 export async function anadirObjetivo(encuentroId, actor)
 {
-  const enc = encuentros()[encuentroId];
+    const enc = encuentros()[encuentroId];
   if (!enc || !actor) return false;
 
   // Normalizamos SIEMPRE al actor del mundo (independiente de tokens).
@@ -915,7 +1075,7 @@ export async function anadirObjetivo(encuentroId, actor)
 /** Quita un objetivo del encuentro (y cierra su ventana de defensor). */
 export async function quitarObjetivo(encuentroId, actorUuid)
 {
-  const enc = encuentros()[encuentroId];
+    const enc = encuentros()[encuentroId];
   if (!enc) return false;
   const antes = enc.objetivos.length;
   enc.objetivos = enc.objetivos.filter(o => o.actorUuid !== actorUuid);
@@ -1086,11 +1246,21 @@ export async function confirmarAtaque(encuentroId)
     _log(enc, t("Ad6.Log.ataqueUsa", { atacante: enc.atacanteNombre, exitos: arma.exitosAtaque ?? 0, arma: arma.nombre || "—", dueno: arma.actorNombre }));
   }
 
-  // Refrescamos los disponibles de cada defensor: su tirada pudo cambiar entre
+    // Refrescamos los disponibles de cada defensor: su tirada pudo cambiar entre
   // que se abrió el encuentro y ahora (agrupaciones, gastos, etc.).
   for (const obj of enc.objetivos)
   {
     _refrescarDisponibleDefensa(enc, obj.actorUuid);
+  }
+
+  // CONFLICTO: al CONFIRMAR el ataque se AGRUPAN las defensas. Se elige UN
+  // objetivo principal AL AZAR y los demás auto-prestan TODOS sus éxitos a él.
+  // A partir de aquí el conflicto se resuelve contra UNA única defensa agregada.
+  // Hacerlo AQUÍ (y no al crear) permite que el conflicto añada/quite objetivos
+  // hasta el último momento y que la agrupación refleje el estado definitivo.
+  if (enc.esConflicto === true && enc.objetivos.length > 1)
+  {
+    _agruparDefensasConflicto(enc);
   }
 
   enc.ataqueConfirmado = true;
@@ -1141,11 +1311,18 @@ function _refrescarDisponibleDefensaDeActor(enc, defensorUuid, defensor)
     if (nuevaPropia) def.fuentes.unshift(nuevaPropia);
   }
 
-  // Refrescamos CADA fuente por separado: la propia (la del defensor) y las
+    // Refrescamos CADA fuente por separado: la propia (la del defensor) y las
   // prestadas (re-resolviendo a su dueño). Recalculamos "disponible" y
   // recortamos lo tomado si ya no cabe en el nuevo máximo.
+  //
+  // EXCEPCIÓN: las fuentes AUTO-PRESTADAS de un conflicto agrupado
+  // (`fuente === "conflicto"`) representan una aportación YA CONGELADA (todos
+  // los éxitos del secundario, tomados). NO se recalculan: se dejan tal cual,
+  // para que la defensa agregada del principal no se deforme.
   for (const f of def.fuentes)
   {
+    if (f.fuente === "conflicto") continue;
+
     const dueno = f.propia
       ? defensor
       : _normalizarActorDelMundo(fromUuidSync(f.actorUuid));
@@ -1234,13 +1411,34 @@ export async function confirmarDefensa(encuentroId, defensorUuid)
 function _evaluarResolucion(enc)
 {
   
-  if (!enc.ataqueConfirmado) return;
-  const defensores = enc.objetivos.map(o => _defensaDe(enc, o.actorUuid)).filter(Boolean);
-  if (defensores.length === 0) return;
-  if (!defensores.every(d => d.confirmado)) return;
+    if (!enc.ataqueConfirmado) return;
+    // Para "está todo confirmado" solo cuentan los defensores CONFIRMABLES: los
+    // secundarios de conflicto NO tienen ventana ni confirmación propia (su
+    // defensa se gestiona desde el principal), así que no bloquean la resolución.
+    const defensores = enc.objetivos
+      .map(o => _defensaDe(enc, o.actorUuid))
+      .filter(d => d && !_esSecundarioConflicto(enc, d));
+    if (defensores.length === 0) return;
+    if (!defensores.every(d => d.confirmado)) return;
 
   enc.estado = "resuelto";
   _log(enc, t("Ad6.Log.resolucionTitulo"));
+
+    // CONFLICTO: la resolución NO calcula daño L/M/N. Se compara, por objetivo,
+  // el número de éxitos del conflicto contra la defensa efectiva del objetivo
+  // (sus éxitos de defensa MENOS la armadura del conflicto). Ver la función.
+  if (enc.esConflicto === true)
+  {
+    // Con VARIOS objetivos, la defensa está AGRUPADA en el principal (los demás
+    // se auto-prestaron a él). Se resuelve SOLO contra el principal, que ya
+    // acumula todas las fuentes. Con UN solo objetivo, ese es el principal.
+    const principal = _principalDeConflicto(enc);
+    if (principal)
+    {
+      _resolverEnfrentamientoConflicto(enc, principal.objetivo, principal.def);
+    }
+    return;
+  }
 
   // Datos de las armas que aportan datos al ataque (daño en texto + atributos
   // de energía/melee/ligero/área/penetración por arma). Se usan para el cálculo
@@ -1272,6 +1470,206 @@ function _evaluarResolucion(enc)
     // Llamada a la lógica de daño de ESTE objetivo (defensor), que reparte la
     // defensa, calcula el daño base, la armadura efectiva y aplica/informa.
     _resolverDanoDeObjetivo(enc, o, d, armasAtaque);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Resolución ESPECIAL para encuentros de CONFLICTO
+// ---------------------------------------------------------------------------
+
+/**
+ * Devuelve el OBJETIVO PRINCIPAL de un encuentro de conflicto y su defensa, o
+ * null. Reglas:
+ *   - Si el encuentro fue AGRUPADO (varios objetivos), el principal es el que
+ *     lleva `esPrincipalConflicto: true` (el primero) y su defensa ya acumula
+ *     todas las fuentes.
+ *   - Si el encuentro tiene UN solo objetivo, ese es el principal (aunque no
+ *     lleve el flag; lo tratamos como tal).
+ * @param {object} enc
+ * @returns {{ objetivo:object, def:object }|null}
+ */
+function _principalDeConflicto(enc)
+{
+  const objetivos = enc?.objetivos ?? [];
+  if (objetivos.length === 0) return null;
+
+  // Buscamos el marcado como principal; si no hay mark (un solo objetivo),
+  // el primero.
+  let objetivo = objetivos.find(o => _defensaDe(enc, o.actorUuid)?.esPrincipalConflicto === true);
+  if (!objetivo) objetivo = objetivos[0];
+
+  const def = _defensaDe(enc, objetivo.actorUuid);
+  if (!def) return null;
+  return { objetivo, def };
+}
+
+/**
+ * ¿Es este defensor un SECUNDARIO de conflicto (auto-prestado al principal)?
+ * Los secundarios NO tienen ventana propia ni confirmación: su defensa se
+ * gestiona desde el principal.
+ */
+function _esSecundarioConflicto(enc, def)
+{
+  return def?.esSecundarioConflicto === true;
+}
+
+/**
+ * Resuelve el enfrentamiento de UN objetivo en un encuentro de CONFLICTO
+ * (un actor "conflicto" atacando). NO hay daño L/M/N: se COMPARAN ÉXITOS.
+ *
+ * Mecánica:
+ *   1) exitosConflicto = suma de los éxitos de ataque del encuentro.
+ *   2) exitosDefensor  = éxitos de defensa tomados por el objetivo (su defensa
+ *      agregada cuando el encuentro fue agrupado).
+ *   3) Se compara:
+ *        - exitosDefensor >= exitosConflicto -> GANA EL DEFENSOR. La DIFERENCIA
+ *          (exitosDefensor - exitosConflicto) se aplica AL CONFLICTO, pero antes
+ *          se le RESTA la ARMADURA DEL CONFLICTO (la armadura es del conflicto:
+ *          solo reduce el daño que el defensor le hace, nunca el que él reparte).
+ *          diferenciaFinal = max(0, (exitosDefensor - exitosConflicto) - armadura).
+ *          Se resta automáticamente del system.valor del conflicto (si este
+ *          cliente puede escribir) y, en todo caso, se informa en el log.
+ *        - exitosDefensor <  exitosConflicto -> GANA EL CONFLICTO. La DIFERENCIA
+ *          (exitosConflicto - exitosDefensor) se aplica AL OBJETIVO. La armadura
+ *          del conflicto NO interviene aquí (es del atacante). Solo se INFORMA
+ *          en el log (no se toca ningún documento del objetivo).
+ *
+ * @param {object} enc       Encuentro (esConflicto === true).
+ * @param {object} objetivo  Entrada de objetivos ({ actorUuid, nombre, ... }).
+ * @param {object} def       Entrada de defensa del objetivo.
+ */
+function _resolverEnfrentamientoConflicto(enc, objetivo, def)
+{
+  const exitosConflicto = _totalExitosAtaque(enc);
+  const exitosDefensor  = _totalExitosDefensa(def);
+  const armadura        = Number(enc.conflictoArmadura ?? 0) || 0;
+
+  // La "defensa efectiva" es la defensa TAL CUAL: la armadura es del conflicto y
+  // NO reduce la defensa del enemigo. Solo entra si el defensor se impone.
+  const defensaEfectiva = exitosDefensor;
+
+  _log(enc, t("Ad6.Log.conflictoCabecera", { atacante: enc.atacanteNombre, defensor: def.nombre }));
+  _logSangrado(enc, t("Ad6.Log.conflictoDatos", {
+     exitosConflicto
+    ,exitosDefensor
+    ,armadura
+    ,defensaEfectiva
+  }), null, 1);
+
+  if (defensaEfectiva >= exitosConflicto)
+  {
+    // GANA EL DEFENSOR: la diferencia se aplica al CONFLICTO, y la armadura del
+    // conflicto la reduce (aplicada UNA vez; no se consume).
+    const bruto = defensaEfectiva - exitosConflicto;
+    const diferencia = Math.max(0, bruto - armadura);
+    _logNivel(enc, "aplicar", t("Ad6.Log.conflictoGanaDefensor", {
+       defensor: def.nombre
+      ,atacante: enc.atacanteNombre
+      ,diferencia
+    }));
+
+    // Restamos esa diferencia al system.valor del conflicto (si hay diferencia
+    // y este cliente puede editar el actor del mundo del conflicto).
+    if (diferencia > 0)
+    {
+      _aplicarValorAlConflicto(enc, diferencia);
+    }
+    return;
+  }
+
+  // GANA EL CONFLICTO: la diferencia se aplica al OBJETIVO (solo informar). La
+  // armadura del conflicto NO interviene. Se listan TODOS los defensores que
+  // aportaron a la defensa agregada (el principal + los secundarios agrupados).
+  const diferencia = exitosConflicto - defensaEfectiva;
+  const defensores = _nombresDefensoresConflicto(enc, def);
+  _logNivel(enc, "aplicar", t("Ad6.Log.conflictoGanaAtacante", {
+     atacante: enc.atacanteNombre
+    ,defensor: defensores
+    ,diferencia
+  }));
+}
+
+/**
+ * Devuelve la lista de NOMBRES de los defensores que aportaron a la defensa
+ * agregada de un conflicto: el principal (con sus fuentes propias) más cada
+ * secundario/defensor prestado que figure como fuente. Se listan separados por
+ * comas y sin duplicar. Si no se puede deducir, cae al nombre del propio defensor.
+ *
+ * @param {object} enc
+ * @param {object} def  Entrada de defensa (principal).
+ * @returns {string}
+ */
+function _nombresDefensoresConflicto(enc, def)
+{
+  const nombres = [];
+  const meter = (n) => { if (n && !nombres.includes(n)) nombres.push(n); };
+
+  // Si el encuentro fue AGRUPADO, TODOS los objetivos forman la defensa (el
+  // principal más los secundarios, aporten o no éxitos). Los listamos por su
+  // nombre, en el orden en que figuran como objetivos.
+  const agrupado = (enc?.objetivos ?? []).some(o => {
+    const d = _defensaDe(enc, o.actorUuid);
+    return d?.esPrincipalConflicto === true || d?.esSecundarioConflicto === true;
+  });
+
+  if (agrupado)
+  {
+    for (const o of (enc?.objetivos ?? [])) meter(o.nombre);
+    if (nombres.length > 0) return nombres.join(", ");
+  }
+
+  // Sin agrupación (un solo defensor), o fallback: el propio defensor más las
+  // fuentes "conflicto" que aportaran.
+  meter(def?.nombre);
+  for (const f of (def?.fuentes ?? []))
+  {
+    if (f.fuente === "conflicto") meter(f.actorNombre);
+  }
+
+  return nombres.join(", ");
+}
+
+/**
+ * Resta una cantidad al system.valor del actor CONFLICTO (nunca por debajo de
+ * 0), tras lo cual comprueba si ha quedado a 0 para avisarlo en el log.
+ *
+ * Side-effect: escribe en el DOCUMENTO del conflicto si este cliente puede
+ * (su dueño o el GM). Si no puede, deja el aviso en el log.
+ *
+ * @param {object} enc        Encuentro.
+ * @param {number} diferencia cantidad a restar (positiva).
+ */
+function _aplicarValorAlConflicto(enc, diferencia)
+{
+  const conflicto = _normalizarActorDelMundo(fromUuidSync(enc.atacanteUuid));
+  if (!conflicto)
+  {
+    _logSangrado(enc, t("Ad6.Log.conflictoNoResuelto"), null, 1);
+    return;
+  }
+
+    const valorActual = Number(conflicto.system?.valor ?? 0) || 0;
+  const valorNuevo = Math.max(0, valorActual - diferencia);
+
+  const puedeEscribir = conflicto.isOwner || game.user.isGM;
+  if (puedeEscribir)
+  {
+    // Escribimos valor Y dados JUNTOS en un único update: en el conflicto,
+    // system.dados (lo que muestra la tirada) SIEMPRE va sincronizado con
+    // system.valor. La hoja lo hace en su _onChangeForm; aquí, al escribir
+    // desde el servicio (sin pasar por el formulario), hay que replicarlo.
+    conflicto.update({
+       "system.valor": valorNuevo
+      ,"system.dados": valorNuevo
+    });
+    if (valorNuevo <= 0)
+    {
+      _logNivel(enc, "destruido", t("Ad6.Log.conflictoDerrotado", { atacante: conflicto.name }));
+    }
+  }
+  else
+  {
+    _logSangrado(enc, t("Ad6.Log.conflictoSinPermiso", { nombre: conflicto.name, valor: valorNuevo }), null, 1);
   }
 }
 
@@ -2331,11 +2729,15 @@ function _revisarVentanas(encuentroId)
     Ad6_AppCombate.abrirORefrescar(encuentroId, "atacante", enc.atacanteUuid, enc);
   }
 
-  // Ventanas de defensor (una por cada objetivo que este cliente controle).
+    // Ventanas de defensor (una por cada objetivo que este cliente controle).
   for (const obj of enc.objetivos)
   {
     const defensor = _normalizarActorDelMundo(fromUuidSync(obj.actorUuid));
     if (!defensor) continue;
+    // En conflicto con varios objetivos, los SECUNDARIOS NO tienen ventana
+    // propia: su defensa se gestiona desde el principal (auto-prestada).
+    const def = _defensaDe(enc, obj.actorUuid);
+    if (_esSecundarioConflicto(enc, def)) continue;
     if (_usuarioControlaActor(defensor))
     {
       const clave = Ad6_AppCombate.claveVentana(encuentroId, "defensor", obj.actorUuid);
