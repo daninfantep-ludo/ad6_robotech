@@ -55,10 +55,10 @@ export class Ad6_HojaActorConflicto extends Ad6_HojaActor
    * (que es lo que muestra el parcial de Tirada) pasa a valer EXACTAMENTE lo mismo.
    *
    * Se engancha en _onChangeForm (se dispara con el cambio de cualquier campo del
-   * formulario, gracias a submitOnChange). Se deja que el flujo normal (super)
-   * persista system.valor y, a continuación, se escribe system.dados con ese
-   * mismo valor. Así la sincronización queda AISLADA a esta hoja y no afecta a
-   * ningún otro tipo de actor.
+   * formulario, gracias a submitOnChange). Para el campo "system.valor" NO se
+   * delega en super: se escribe valor y dados en un ÚNICO update (un solo
+   * re-render). La sincronización queda AISLADA a esta hoja y no afecta a ningún
+   * otro tipo de actor.
    *
    * @override
    */
