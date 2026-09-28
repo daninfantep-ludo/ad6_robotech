@@ -161,10 +161,12 @@ export class Ad6_ActorConflicto extends Ad6_Actor{
     const commonData = super.defineSchema();
         return {
         ...commonData
-        ,armadura: new fields.NumberField()
-        ,valor: new fields.NumberField()
-        ,temporizado: new fields.BooleanField()
-        ,tiempoRestante: new fields.NumberField()
+        ,armadura: new fields.NumberField({initial: 0})
+        ,valor: new fields.NumberField({initial: 0})
+        ,temporizado: new fields.BooleanField({initial: false})
+        ,tiempoRestante: new fields.NumberField({initial: 0})
+        ,visible: new fields.BooleanField({initial: false})
+        ,visibleTemporizador : new fields.BooleanField({initial: false})
         }
     }    
 }

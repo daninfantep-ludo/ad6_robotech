@@ -19,6 +19,7 @@ import * as ServicioIniciativa from "./combate/ad6_servicioIniciativa.mjs";
 import * as ServicioFases from "./combate/ad6_servicioFases.mjs";
 import * as TrackerFases from "./combate/ad6_trackerFases.mjs";
 import * as ReglasTurno from "./combate/ad6_reglasTurno.mjs";
+import * as VisualConflicto from "./combate/ad6_appVisualConflicto.mjs";
 import * as RepresentacionEnjambre from "./token/ad6_representacionEnjambre.mjs";
 
 
@@ -420,6 +421,11 @@ Hooks.on("renderChatLog", (app, html) => {
       // asalto solo avanza con los botones de asalto. Se parchean únicamente
       // nextTurn/previousTurn del documento Combat (no nextRound/previousRound).
       ReglasTurno.inicializarReglasTurno();
+
+      // Arrancamos la VENTANA de VISUAL DE CONFLICTOS: mantiene abierta/refrescada
+      // la ventana compartida que lista los conflictos presentes en el combate
+      // (el GM los ve todos; cada jugador solo los que tienen system.visible).
+      VisualConflicto.inicializarVisualConflicto();
 
    // Arrancamos la representación gráfica de los ENJAMBRES en el canvas: en
    // lugar del token por defecto, pinta una imagen-token por cada unidad de la

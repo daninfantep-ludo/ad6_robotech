@@ -6,9 +6,19 @@
     <div class="cnt-horizontal">
         {{> parcialRetrato}}
         <div id="columna-izquierda-vitales">
-            <div>
+            <div class="flx cnt-horizontal vam">
                 <label class="w-80">{{localize "Ad6.Etiquetas.nombre"}}</label>
-                <input type="text" name="name" value="{{actor.name}}" class="tx mrg w-300" ></input>
+                <input type="text" name="name" value="{{actor.name}}" class="tx mrg w-200" ></input>
+                <div class="cnt-horizontal vam">
+                <button type="button" class="boton-ico" data-action="toggleVisibleConflicto"
+                        title="{{localize "Ad6.Etiquetas.conflictoVisible"}}">
+                    {{#if system.visible}}
+                    <i class="fa-regular fa-eye" ></i>
+                    {{else}}
+                    <i class="fa-regular fa-eye-slash"></i>
+                    {{/if}}
+                </button>
+                </div>
             </div>
             <div class="cnt-horizontal">
               <div id="HEX" class="flx fd-column mrg-r10">            
@@ -35,7 +45,19 @@
                   <div class="hex-input hex-boton-estres">
                       <input type="number" name="system.tiempoRestante" value="{{system.tiempoRestante}}" class="hex-input-numero" step="1" min="0"/>
                   </div>
-              </div>              
+              </div>         
+              <div id="VISIBLE">
+                <div style="height:20px;" class="tx-pq"></div>
+                <div class="cnt-horizontal vam"><br/>&nbsp;
+                <button type="button" class="boton-ico" data-action="toggleVisibleTiempo"
+                        title="{{localize "Ad6.Etiquetas.tiempoVisible"}}">
+                    {{#if system.visibleTemporizador}}
+                    <i class="fa-regular fa-eye" style="color: var(--color-estres)"></i>
+                    {{else}}
+                    <i class="fa-regular fa-eye-slash" style="color: var(--color-estres)"></i>
+                    {{/if}}
+                </button>
+                </div>
             </div>
         </div>
     </div> 

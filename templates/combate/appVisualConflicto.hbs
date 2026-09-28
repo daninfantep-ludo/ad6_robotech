@@ -1,0 +1,71 @@
+{{!--
+    Plantilla de la ventana de VISUAL DE CONFLICTOS (Ad6_AppVisualConflicto).
+    Lista los conflictos presentes en el combate que este usuario debe ver:
+      - GM: todos los conflictos.
+      - Jugador: solo los que tienen system.visible === true.
+
+    Por cada conflicto: retrato + nombre siempre; reloj + tiempo restante solo
+    si está temporizado y su temporizador es visible. El GM, además, ve los
+    botones de ojo (visible / temporizador visible) y puede abrir la hoja con
+    doble click en el retrato.
+--}}
+<div class="ad6-conflictos-cuerpo tx">
+
+    {{#if vacio}}
+    <div class="ad6-combate-caja">
+        <span class="tx-pq">{{localize "Ad6.Conflictos.sinConflictos"}}</span>
+    </div>
+    {{else}}
+
+    <div class="ad6-conflictos-lista">
+        {{#each conflictos}}
+        <div class="ad6-conflicto-fila">
+
+            {{!-- Retrato: doble click abre la hoja (solo GM). La acción no
+                 depende de esGM en el handler, pero solo la activamos aquí. --}}
+            <img class="ad6-conflicto-retrato{{#if ../esGM}} ad6-conflicto-retrato-clicable{{/if}}"
+                 src="{{this.img}}" alt="{{this.nombre}}"
+                 {{#if ../esGM}}data-action="abrirConflicto" data-uuid="{{this.uuid}}"
+                 title="{{localize "Ad6.Conflictos.abrirFicha"}}"{{/if}}/>
+
+            <div class="ad6-conflicto-datos">
+                <div class="ad6-conflicto-nombre">{{this.nombre}}</div>
+
+                {{#if mostrarTiempo}}
+                <div class="ad6-conflicto-tiempo">
+                    <i class="fas fa-solid fa-clock" style="color: var(--color-estres)"></i>
+                    <b>{{this.tiempoRestante}}</b> <span class="tx-pq">{{localize "Ad6.Etiquetas.turnos"}}</span>
+                </div>
+                {{/if}}
+            </div>
+
+            {{!-- Botones de GM: ojo de visible y ojo del temporizador. --}}
+            {{#if ../esGM}}
+            <div class="ad6-conflicto-botones">
+                <button type="button" class="boton-ico"
+                        data-action="toggleVisible" data-uuid="{{this.uuid}}"
+                        title="{{localize "Ad6.Etiquetas.conflictoVisible"}}">
+                    {{#if this.ojoVisible}}
+                    <i class="fa-regular fa-eye"></i>
+                    {{else}}
+                    <i class="fa-regular fa-eye-slash"></i>
+                    {{/if}}
+                </button>
+                <button type="button" class="boton-ico"
+                        data-action="toggleVisibleTiempo" data-uuid="{{this.uuid}}"
+                        title="{{localize "Ad6.Etiquetas.tiempoVisible"}}">
+                    {{#if this.ojoTiempo}}
+                    <i class="fa-regular fa-eye" style="color: var(--color-estres)"></i>
+                    {{else}}
+                    <i class="fa-regular fa-eye-slash" style="color: var(--color-estres)"></i>
+                    {{/if}}
+                </button>
+            </div>
+            {{/if}}
+
+        </div>
+        {{/each}}
+    </div>
+
+    {{/if}}
+</div>

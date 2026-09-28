@@ -26,10 +26,12 @@ export class Ad6_AppCombate extends HandlebarsApplicationMixin(ApplicationV2)
      tag: "div"
     ,classes: ["ad6", "combate"]
     ,window: {
-       // Prefijo "i18n:": ApplicationV2 localiza el título ÉL MISMO al abrir
-       // la ventana (en tiempo de uso). NO usar game.i18n.localize() aquí,
-       // porque DEFAULT_OPTIONS es estático y se evalúa al IMPORTAR el módulo.
-       title: "i18n:Ad6.Mensajes.ventana.combate"
+       // Valor SOLO de relleno: ApplicationV2 NO procesa el prefijo "i18n:" en
+       // el título, y DEFAULT_OPTIONS es estático (se evalúa al IMPORTAR el
+       // módulo, cuando game.i18n aún no está listo). El texto real lo fijan,
+       // en tiempo de uso, el constructor (options.window.title) y el getter
+       // "get title()" de esta clase (ver más abajo).
+       title: "Ad6.Mensajes.ventana.combate"
       ,resizable: true
       ,minimizable: true
       // Solo MINIMIZAR: quitamos la "X" para que esta ventana no se pueda cerrar
@@ -68,8 +70,9 @@ export class Ad6_AppCombate extends HandlebarsApplicationMixin(ApplicationV2)
     // calculamos el título de la ventana a partir del rol y el actor.
     const snapshot = options.snapshot ?? Servicio.obtenerEncuentro(options.encuentroId);
 
-    // ApplicationV2 lee el título de options.window.title; lo fijamos ya para
-    // que la ventana nazca con el título correcto.
+    // Fijamos el título YA (localizado en tiempo de uso) para que la ventana
+    // nazca con el texto correcto. NO dependemos del valor estático de
+    // DEFAULT_OPTIONS (que además no se localiza solo).
     options.window = options.window ?? {};
     options.window.title = Ad6_AppCombate.tituloDeVentana(options.rol, options.actorUuid, snapshot);
 

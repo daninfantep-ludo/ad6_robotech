@@ -271,6 +271,8 @@
             ,"elemento": "Element"
             ,"inicialBoton": "Initial Button"
             ,"temporizado": "Timed conflict?"
+            ,"conflictoVisible": "Visible Conflict"
+            ,"tiempoVisible": "Visible Timer"
             ,"turnos": "Beats"
 
 
@@ -368,6 +370,7 @@
             ,"ventana.asistencia": "Assist"
             ,"ventana.atacante": "Attacker: {nombre}"
             ,"ventana.defensor": "Defender: {nombre}"
+            ,"ventana.conflictos": "Conflicts"
             ,"ventanaCombate.copiarLog": "Log copied to clipboard."
             ,"ventanaCombate.errorCopiarLog": "Log couldn't be copied to clipboard."
             ,"fuegoConcentrado.titulo": "Concentrated Fire"
@@ -465,6 +468,11 @@
             ,"infTenienteNoBasico": "Lieutenant {nombre} in non-basic vehicle"
             ,"infNoPiloto": "Vehicle without pilot"
             ,"infMainSinSistemas": "Main {nombre} in basic vehicle without systems"
+        }
+        ,"Conflictos":
+        {
+             "sinConflictos": "There are no conflicts present in the combat."
+            ,"abrirFicha": "Double click to open the sheet (GM)"
         }
         ,"Log":
         {

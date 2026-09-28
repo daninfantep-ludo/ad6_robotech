@@ -271,6 +271,8 @@
             ,"elemento": "Elemento"
             ,"inicialBoton": "Inicial Botón"
             ,"temporizado": "¿Conflicto temporizado?"
+            ,"conflictoVisible": "Conflicto Visible"
+            ,"tiempoVisible": "Temporizador Visible"
             ,"turnos": "Turnos"
 
          }
@@ -367,6 +369,7 @@
             ,"ventana.asistencia": "Asistencia"
             ,"ventana.atacante": "Atacante: {nombre}"
             ,"ventana.defensor": "Defensor: {nombre}"
+            ,"ventana.conflictos": "Conflictos"
             ,"ventanaCombate.copiarLog": "Log copiado al portapapeles."
             ,"ventanaCombate.errorCopiarLog": "No se pudo copiar el log al portapapeles."
             ,"fuegoConcentrado.titulo": "Fuego concentrado"
@@ -464,6 +467,11 @@
             ,"infTenienteNoBasico": "Teniente {nombre} en vehículo no básico"
             ,"infNoPiloto": "Vehículo sin piloto"
             ,"infMainSinSistemas": "Principal {nombre} en vehículo básico sin sistemas"
+        }
+        ,"Conflictos":
+        {
+             "sinConflictos": "No hay conflictos presentes en el combate."
+            ,"abrirFicha": "Doble click para abrir la ficha (GM)"
         }
         ,"Log":
         {

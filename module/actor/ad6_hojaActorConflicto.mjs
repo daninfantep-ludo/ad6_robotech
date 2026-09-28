@@ -32,6 +32,12 @@ export class Ad6_HojaActorConflicto extends Ad6_HojaActor
       submitOnChange: true,
       closeOnSubmit: false
     }
+    // Acción del botón de VISIBILIDAD: alterna system.visible y re-renderiza
+    // (el update del documento dispara el re-render de la hoja).
+    ,actions: {
+      toggleVisibleConflicto: this._onToggleVisibleConflicto
+      ,toggleVisibleTiempo: this._onToggleVisibleTiempo
+    }
   };
 
   /** @override */
@@ -69,10 +75,11 @@ export class Ad6_HojaActorConflicto extends Ad6_HojaActor
     const esValor = target?.name === "system.valor";
 
     if (esValor) {
-      // Normalizamos a número (el input llega como string; vacío -> null).
+      // Normalizamos a número (el input llega como string; vacío -> 0). El
+      // campo system.valor es un NumberField, así que nunca debe quedar null.
       const crudo = target.value;
       const nuevo = (crudo === "" || crudo === null || crudo === undefined)
-        ? null
+        ? 0
         : Number(crudo);
 
       // Guardamos valor + dados en UNA sola operación (un único re-render) y
@@ -89,4 +96,14 @@ export class Ad6_HojaActorConflicto extends Ad6_HojaActor
     // Cualquier otro campo: comportamiento normal del formulario.
     return super._onChangeForm(formConfig, event);
   }
+
+  static async _onToggleVisibleConflicto(event, target) {
+    const nuevo = this.actor.system.visible !== true;
+    await this.actor.update({ "system.visible": nuevo });
+  }
+  static async _onToggleVisibleTiempo(event, target) {
+    const nuevo = this.actor.system.visibleTemporizador !== true;
+    await this.actor.update({ "system.visibleTemporizador": nuevo });
+  }
 }
+

@@ -294,10 +294,14 @@ function _actorDeObjetivo(tok)
  *   - "Actor.<id>"                        -> se queda igual.
  *   - "Scene.<s>.Token.<t>.Actor.<id>"    -> "Actor.<id>" (actor del mundo).
  * Devuelve el Actor del mundo o null si no se puede resolver.
+ *
+ * Se EXPORTA (con guion bajo) porque otros módulos (p.ej. la ventana de
+ * VisualConflicto) necesitan el MISMO criterio de resolución para no duplicar
+ * la delicada lógica de normalización de uuid de token -> actor del mundo.
  * @param {Actor|object} ref
  * @returns {Actor|null}
  */
-function _normalizarActorDelMundo(ref)
+export function _normalizarActorDelMundo(ref)
 {
   if (!ref) return null;
   const uuid = ref.uuid ?? "";
@@ -2729,15 +2733,11 @@ function _revisarVentanas(encuentroId)
     Ad6_AppCombate.abrirORefrescar(encuentroId, "atacante", enc.atacanteUuid, enc);
   }
 
-    // Ventanas de defensor (una por cada objetivo que este cliente controle).
+  // Ventanas de defensor (una por cada objetivo que este cliente controle).
   for (const obj of enc.objetivos)
   {
     const defensor = _normalizarActorDelMundo(fromUuidSync(obj.actorUuid));
     if (!defensor) continue;
-    // En conflicto con varios objetivos, los SECUNDARIOS NO tienen ventana
-    // propia: su defensa se gestiona desde el principal (auto-prestada).
-    const def = _defensaDe(enc, obj.actorUuid);
-    if (_esSecundarioConflicto(enc, def)) continue;
     if (_usuarioControlaActor(defensor))
     {
       const clave = Ad6_AppCombate.claveVentana(encuentroId, "defensor", obj.actorUuid);
