@@ -1,6 +1,6 @@
 {
     "id": "ad6_robotech",
-    "title": "Robotech Advantage6",
+    "title": "Robotech Ad6",
     "description": "The Robotech Advantage6 for FoundryVTT! Release v1.2.0 - ApplicationV2",
     "authors": [
       {
@@ -12,7 +12,7 @@
       }
     ],
     "url": "https://github.com/daninfantep-ludo/ad6_robotech",
-    "version": "1.2.0",
+    "version": "1.2.5",
     "compatibility": {
       "minimum": 14,
       "verified": "14.367"
@@ -29,6 +29,13 @@
         "lang": "es",
         "name": "Spanish",
         "path": "lang/es.json"
+      }
+    ],
+    "media": [
+      {
+        "type": "setup",
+        "url": "systems/ad6_robotech/img/fondo-sistema.webp",
+        "thumbnail": "systems/ad6_robotech/img/fondo-sistema-mini.webp"
       }
     ],
     "documentTypes": {
@@ -56,6 +63,6 @@
     "packs": [],
     "packFolders": []
     ,"manifest": "https://github.com/daninfantep-ludo/ad6_robotech/releases/latest/download/system.json"
-    ,"download": "https://github.com/daninfantep-ludo/ad6_robotech/archive/refs/tags/v1.2.0.zip"
+    ,"download": "https://github.com/daninfantep-ludo/ad6_robotech/archive/refs/tags/v1.2.5.zip"
   }
   
