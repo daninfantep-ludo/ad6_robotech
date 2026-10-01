@@ -553,11 +553,96 @@ export class Ad6_HojaActorVehiculo extends Ad6_HojaActorTeniente
   }
 
   static async _onBorrarPiloto(event, target) {
+    // Si el piloto actual es de carrera TRIUNVIRATO: la estructura del vehículo
+    // (actual y máxima) se DIVIDE por 3 ANTES de retirar el piloto. El helper
+    // comprueba además que el vehículo NO sea de escala N (solo M/L).
+    const idPilotoActual = this.actor.system.nombrePiloto;
+    if (idPilotoActual && idPilotoActual !== "undefined") {
+      const pilotoActual = game.actors.get(idPilotoActual);
+      if (pilotoActual) await this._aplicarEstructuraTriunvirato(pilotoActual, "dividir");
+    }
+
     //await this.actor.update({"system.nombrePiloto": ""});
     this.agregarUpdates("system.nombrePiloto", "");    
-    this.agregarUpdates("name", this.actor.system.nombreAnterior);
+    // Restaura el nombre PURO del vehículo y vacía el nombreAnterior para dejar
+    // el estado limpio (una reasignación futura volverá a tomar "name" como base).
+    // El "|| this.actor.name" es red de seguridad ante datos antiguos vacíos.
+    this.agregarUpdates("name", this.actor.system.nombreAnterior || this.actor.name);
+    this.agregarUpdates("system.nombreAnterior", "");
     this.actualizar();
     this.render();
+  }
+
+  // Ajusta la estructura del VEHÍCULO (máximo y restante) cuando entra/sale un
+  // piloto de carrera TRIUNVIRATO.
+  //   - operacion = "multiplicar" : × 3 (al INCORPORAR el piloto)
+  //   - operacion = "dividir"     : ÷ 3 (al RETIRARLO, redondeado)
+  // AMBOS casos escriben SIEMPRE las MISMAS claves (estructura.maximo/restante)
+  // en el buffer de updates. Por eso NO deben llamarse dos veces seguidas sin
+  // un actualizar() entre medias: la segunda leería el valor viejo y pisaría a
+  // la primera. Para el reemplazo de piloto se usa el helper
+  // _ajustarEstructuraPorReemplazo, que combina ambos efectos en un solo paso.
+  // Requisitos (si falla cualquiera, NO toca nada):
+  //   1) debe existir un piloto con system.carrera === "triunvirato"
+  //   2) el vehículo NO debe ser de escala N (solo aplica a M y L; p. ej. mechas)
+  // Los campos de system.estructura son STRING (Ad6_Indicador), por eso se
+  // convierten a Number para operar y vuelven a String al guardarlos.
+  async _aplicarEstructuraTriunvirato(piloto, operacion) {
+    // 1) debe haber piloto y ser de carrera triunvirato
+    if (!piloto || piloto.system?.carrera !== "triunvirato") return;
+    // 2) solo vehículos de escala M o L (no N)
+    if (this.actor.system?.escalaPrincipal === "N") return;
+
+    const maxActual = Number(this.actor.system.estructura.maximo ?? 0);
+    const resActual = Number(this.actor.system.estructura.restante ?? 0);
+
+    let maxNuevo, resNuevo;
+    if (operacion === "multiplicar") {
+      maxNuevo = maxActual * 3;
+      resNuevo = resActual * 3;
+    } else { // "dividir"
+      maxNuevo = Math.round(maxActual / 3);
+      resNuevo = Math.round(resActual / 3);
+    }
+
+    this.agregarUpdates("system.estructura.maximo", String(maxNuevo));
+    this.agregarUpdates("system.estructura.restante", String(resNuevo));
+  }
+
+  // Ajusta la estructura del vehículo en un REEMPLAZO de piloto, combinando el
+  // efecto de salida del piloto anterior y el de entrada del nuevo EN UN SOLO
+  // CÁLCULO (una única escritura), para evitar que las dos operaciones colisionen
+  // en el buffer de updates:
+  //   - si el piloto ANTERIOR era triunvirato (en vehículo M/L): ÷3
+  //   - si el piloto NUEVO es triunvirato  (en vehículo M/L): ×3 (sobre el ÷3)
+  // Casos resultantes: tv->tv = 0 ; tv->normal = ÷3 ; ninguno->tv = ×3 ;
+  // ninguno->normal / normal->normal = nada.
+  // Devuelve true si ha modificado algo.
+  async _ajustarEstructuraPorReemplazo(pilotoAnterior, pilotoNuevo) {
+    // Solo vehículos de escala M o L (no N).
+    if (this.actor.system?.escalaPrincipal === "N") return false;
+
+    const previoTriunvirato = pilotoAnterior?.system?.carrera === "triunvirato";
+    const nuevoTriunvirato  = pilotoNuevo?.system?.carrera === "triunvirato";
+    if (!previoTriunvirato && !nuevoTriunvirato) return false;
+
+    let maxActual = Number(this.actor.system.estructura.maximo ?? 0);
+    let resActual = Number(this.actor.system.estructura.restante ?? 0);
+
+    // 1) deshacer el ×3 del piloto anterior triunvirato (si lo había)
+    if (previoTriunvirato) {
+      maxActual = Math.round(maxActual / 3);
+      resActual = Math.round(resActual / 3);
+    }
+    // 2) aplicar el ×3 del nuevo piloto triunvirato (si lo es), sobre el valor ya ajustado
+    if (nuevoTriunvirato) {
+      maxActual = maxActual * 3;
+      resActual = resActual * 3;
+    }
+
+    this.agregarUpdates("system.estructura.maximo", String(maxActual));
+    this.agregarUpdates("system.estructura.restante", String(resActual));
+    return true;
   }
 
   // Alterna el estado (operativo/estropeado) de un hardware de un equipo del vehículo.
@@ -617,10 +702,28 @@ export class Ad6_HojaActorVehiculo extends Ad6_HojaActorTeniente
       return;
     }
 
+    // --- AJUSTE de estructura por TRIUNVIRATO (SALVAGUARDA incluida) ---
+    // Se combina en UN SOLO paso el efecto del piloto que sale y el que entra,
+    // para que un reemplazo tv->tv no multiplique de nuevo (neto 0) y que
+    // tv->normal deshaga el ×3 (÷3). Ver _ajustarEstructuraPorReemplazo.
+    const idPilotoAnterior = this.actor.system.nombrePiloto;
+    const pilotoAnterior = (idPilotoAnterior && idPilotoAnterior !== "undefined")
+      ? game.actors.get(idPilotoAnterior)
+      : null;
+    await this._ajustarEstructuraPorReemplazo(pilotoAnterior, actor);
+
+    // --- Nombre del actor: siempre basado en el nombre BASE (sin sufijos) ---
+    // Si YA había un piloto, el nombre base es el "nombreAnterior" guardado
+    // (nombre puro del vehículo); si NO había piloto, es el "name" actual.
+    // Así, al reemplazar un piloto NO se apilan los sufijos " [Piloto]".
+    const nombreBase = pilotoAnterior
+      ? (this.actor.system.nombreAnterior || this.actor.name)
+      : this.actor.name;
+
     this.agregarUpdates("system.nombrePiloto", actor.id);
-    this.agregarUpdates("system.nombreAnterior", this.actor.name);
+    this.agregarUpdates("system.nombreAnterior", nombreBase);
     //await this.actor.update({ name: "New Actor Name" });
-    this.agregarUpdates("name", this.actor.name + " ["+ actor.name +"]");
+    this.agregarUpdates("name", nombreBase + " ["+ actor.name +"]");
 
     if(actor.type=="teniente")
     {

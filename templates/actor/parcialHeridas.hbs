@@ -23,7 +23,8 @@
                 {{/if}}
             {{/each}}
             <div class="flx fd-column">
-                {{#if (eq system.especie "tiresio")}}
+                
+                {{#if (eq system.carrera "triunvirato")}}
                 <button type="button"  class="boton-ico-chico" data-action="clickClon" data-indice="0" title="{{system.clones.[0].nombre}} - {{system.clones.[0].heridas}} {{localize "Ad6.Etiquetas.heridas"}}">
                     <i class="fa-solid fa-person clon-{{cambiaClon system.clones.[0].heridas}}"></i>
                 </button>

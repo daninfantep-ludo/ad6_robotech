@@ -20,7 +20,8 @@
             <div>
                 <label class="w-80">{{localize "Ad6.Etiquetas.nombre"}}</label>
                 <input type="text" name="name" value="{{actor.name}}" class="tx mrg w-200" ></input>
-                {{#if (eq system.especie "tiresio")}}
+                
+                {{#if (eq system.carrera "triunvirato")}}
                 <button type="button" class="boton-ico" data-action="editarClones" title="{{localize "Ad6.Mensajes.Clon.editar"}}"><i class="fa-solid fa-person"></i></button>
                 {{/if}}
             </div>
