@@ -1,9 +1,4 @@
-Features
-<ul>
-<li>26.- Conclict actor implemented, for narrative conflicts</li>
-<li>27.- Special combat flow for conflicts. The Conflict always attack, the players enganges with sinery or defense. </li>
-</ul>
-Past General Features
+General Features (not in a particular order)
 <ul>
  <li>1.- Different actor types: Main (PC/Villan), Lieutenant (foot), Swarm and Vehicle.</li>
  <li>2.- Main and Lieutenants can pilot vehicles, copying their skills, talents and elements and personal (not physical) equipment suites, as long as the player is owner of the actors. If the actor lacks of proficiency a red marker is show to remind that.</li>
@@ -30,5 +25,8 @@ Past General Features
 <li>23.- Implemented the different value per wound given species (zents, spherians, or zents with built though)</li>
 <li>24.- Armors have resistances (energy, non melee, light damage, aoe damage) and weapons have damage descriptors (energy, melee)</li>
  <li>25.- Actors have config cogs, to specify built though talent, lion's roar, and vehicles being basic, using locations or using systems for full configuration</li>
-
+<li>26.- Conclict actor implemented, for narrative conflicts</li>
+<li>27.- Special combat flow for conflicts. The Conflict always attack, the players enganges with sinery or defense. </li>
+<li>28.- Tiresian characters have clones with 3 wounds each. But system doesn't allocate damage automatically (todo). Mecha piloted by tiresian doesn't triple their structure (todo). Tiressian swarms doesn't consider the upgraded wounds/structure to the calculation (todo)</li>
 </ul>
+
