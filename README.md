@@ -28,5 +28,10 @@ General Features (not in a particular order)
 <li>26.- Conclict actor implemented, for narrative conflicts</li>
 <li>27.- Special combat flow for conflicts. The Conflict always attack, the players enganges with sinery or defense. </li>
 <li>28.- Tiresian characters have clones with 3 wounds each. But system doesn't allocate damage automatically (todo). Mecha piloted by tiresian doesn't triple their structure (todo). Tiressian swarms doesn't consider the upgraded wounds/structure to the calculation (todo)</li>
+ <li>29.- Fix bug: the clone adding is bounded to triumvirate career not tiresian species</li>
+ <li>30.- When a triumvirate pilots a mecha, it structure is x3, when off or replaced /3</li>
+ <li>31.- Fix bug: Replacing pilots kept concat pilot name with vehicle name</li>
 </ul>
+Note: Not implemented special damage to on-foot triumvirates. On-foot Triumvirate swarms should't be a thing (narrative) I believe... nor triumvirate mecha swarms
+
 
