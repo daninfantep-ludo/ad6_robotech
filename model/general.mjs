@@ -243,7 +243,7 @@ export function Ad6_Clon()
 {
   return{
      nombre: new fields.StringField()
-    ,heridas: new fields.NumberField({initial:0}) /* cantidad de heridas 3 para los tiresios*/
+    ,heridas: new fields.NumberField({initial:3}) /* cantidad de heridas 3 para los tiresios*/
   };
 }
 

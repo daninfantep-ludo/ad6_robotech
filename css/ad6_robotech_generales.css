@@ -575,17 +575,63 @@ input[type="number"].con-flechas::-webkit-outer-spin-button {
 
 
 /* En la lista de objetos (sidebar), oculta el icono solo en los item */
+
 #sidebar .directory .directory-item.item .thumbnail {
   display: none !important;
 }
-
-#sidebar .directory .directory-item.item {
+#sidebar .directory .directory-item.item.entry.document.item {
   padding-left: 12px;
   min-height: unset;     
-  height: 40px;           
+ /* height: 40px;           */
   line-height: normal;    
-  padding-bottom: 6px;
+  /*padding-bottom: 6px;*/
   vertical-align:middle;
+}
+
+/* Carpetas de directorio (sidebar Y compendios): imagen de fondo.
+   - El selector correcto es la ETIQUETA <li> con las clases .directory-item.folder
+     (antes estaba ".li.directory-item.folder", que busca una CLASE "li" y no aplica).
+   - OJO con la RUTA del url(): en un CSS, las rutas relativas se resuelven respecto
+     al PROPIO ARCHIVO CSS (no a la raíz del servidor). Este CSS está en
+     systems/ad6_robotech/css/, así que "../img/..." apunta a
+     systems/ad6_robotech/img/... (igual que hace ad6_chat.css con los dados).
+   - background-image necesita url(...).
+   - no-repeat + cover para que la imagen llene la fila sin repetirse en mosaico. */
+li.directory-item.folder {
+  background-image: url("../img/fondoActores.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+
+/* En las carpetas, el nombre va sobre la imagen: le damos sombra para que se
+   lea bien sobre cualquier zona clara/oscura de la foto. */
+li.directory-item.folder .entry-name,
+li.directory-item.folder .folder-name,
+li.directory-item.folder .name {
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.95);
+}
+
+/* Lo MISMO dentro de las ventanas de COMPENDIO de OBJETOS de ESTE sistema.
+   El selector del sidebar (de arriba) NO alcanza a los compendios porque son
+   popouts (.compendium-directory.sidebar-popout), fuera de #sidebar y sin la
+   clase ".item". La clase .ad6-compendio-objetos la añade por JS el hook
+   "renderCompendium" (module/ad6_robotech.mjs) SOLO cuando el pack es de tipo
+   Item y pertenece a ad6_robotech; así no afectamos a otros sistemas ni a
+   compendios de otros tipos (Actor, JournalEntry...). */
+.compendium-directory.ad6-compendio-objetos .directory-list .directory-item.entry .thumbnail {
+  display: none !important;
+}
+
+/* Ajusta el renglón igual que en el sidebar: sin la imagen, el nombre se pega
+   a la izquierda y la fila se compacta. */
+.compendium-directory.ad6-compendio-objetos .directory-list .directory-item.entry {
+  padding-left: 12px;
+  min-height: unset;
+  height: 40px;
+  line-height: normal;
+  padding-bottom: 6px;
+  vertical-align: middle;
 }
 
 

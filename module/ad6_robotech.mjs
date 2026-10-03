@@ -65,6 +65,91 @@ Hooks.on("renderChatLog", (app, html) => {
       console.log("AD6 Robotech - Cargando Hooks Once Init")
       CONFIG.Ad6 = Ad6;
 
+      // ----------------------------------------------------------------------
+      // BANNERS PROPIOS de los COMPENDIOS de ESTE sistema
+      // ----------------------------------------------------------------------
+      // Foundry resuelve la imagen de cabecera de un pack así:
+      //   1º metadata.banner (si el pack la define explícitamente)
+      //   2º CONFIG[<tipo>].compendiumBanner (banner GLOBAL por tipo de documento)
+      // Queremos mostrar NUESTRAS imágenes SOLO en los packs de este sistema,
+      // sin tocar los banners globales ni los de otros sistemas. Para lograrlo
+      // NO modificamos CONFIG[<tipo>].compendiumBanner (eso sería global), sino
+      // que INTERCEPTAMOS el getter `banner` de CompendiumCollection y
+      // devolvemos nuestra imagen únicamente cuando el pack es de ad6_robotech.
+      CONFIG.Ad6.banners =
+      {
+         Actor: "systems/ad6_robotech/img/fondoActores.png"
+        ,Item:  "systems/ad6_robotech/img/fondoObjetos.png"
+      };
+
+      // Interceptamos el getter `banner` del PROTOTIPO de CompendiumCollection.
+      // Se hace una sola vez (guarda de idempotencia) por si init se re-ejecuta.
+      const CompendioProto = foundry.documents.collections.CompendiumCollection.prototype;
+      if (!CompendioProto.__ad6BannerParcheado)
+      {
+        const descriptorOriginal = Object.getOwnPropertyDescriptor(CompendioProto, "banner");
+        const getBannerOriginal = descriptorOriginal?.get;
+
+        Object.defineProperty(CompendioProto, "banner",
+        {
+          configurable: true,
+          enumerable: descriptorOriginal?.enumerable ?? false,
+          get()
+          {
+            // ¿Es un pack de ESTE sistema? (system-specific de ad6_robotech, o
+            // cuyo paquete sea ad6_robotech como red de seguridad).
+            const esDeMiSistema = (this.metadata?.system === "ad6_robotech")
+                               || (this.metadata?.packageName === "ad6_robotech");
+
+            // Packs ajenos: comportamiento ORIGINAL intacto.
+            if (!esDeMiSistema || !getBannerOriginal) return getBannerOriginal?.call(this);
+
+            // Un pack concreto puede sobrescribir su banner → se respeta.
+            if (this.metadata.banner !== undefined) return this.metadata.banner;
+
+            // Banner propio por tipo de documento; si no hay, cae al original.
+            const bannerPropio = CONFIG.Ad6.banners?.[this.metadata.type];
+            return bannerPropio ?? getBannerOriginal.call(this);
+          }
+        });
+
+        // Marca de idempotencia (no persistente, solo viva en la sesión).
+        Object.defineProperty(CompendioProto, "__ad6BannerParcheado",
+          { value: true, configurable: true, enumerable: false, writable: false });
+      }
+
+      // ----------------------------------------------------------------------
+      // OCULTAR la imagen de las entradas de compendios de tipo OBJETO (Item)
+      // de ESTE sistema, igual que se hace en la pestaña Items del sidebar.
+      // ----------------------------------------------------------------------
+      // La lista del sidebar general de Items ya oculta su imagen por CSS:
+      //   #sidebar .directory .directory-item.item .thumbnail { display:none }
+      // Ese selector NO alcanza a las ventanas de COMPENDIO (son popouts
+      // ".compendium-directory.sidebar-popout", fuera de #sidebar y sin la
+      // clase ".item"). Para replicar el mismo efecto ahí, marcamos la ventana
+      // del compendio con una clase propia CUANDO —y solo cuando— el pack es
+      // de tipo Item y pertenece a ad6_robotech. El CSS (ad6_robotech_generales)
+      // oculta el .thumbnail dentro de esa clase. Así NO afectamos a packs de
+      // otros sistemas ni a compendios de otros tipos (Actor, Journal...).
+      Hooks.on("renderCompendium", (app, html) =>
+      {
+        const meta = app?.collection?.metadata;
+        if (!meta) return;
+
+        const esDeMiSistema = (meta.system === "ad6_robotech")
+                           || (meta.packageName === "ad6_robotech");
+        if (!esDeMiSistema || meta.type !== "Item") return;
+
+        // El hook entrega el elemento raíz de la ventana (HTMLElement). Se
+        // normaliza por si alguna versión diera jQuery o una colección.
+        const root = (html instanceof HTMLElement)
+          ? html
+          : (app?.element ?? html?.[0] ?? null);
+        if (!root) return;
+
+        root.classList.add("ad6-compendio-objetos");
+      });
+
       // Definición de los datamodels
       CONFIG.Actor.dataModels.principal = Ad6_ActorPrincipal;
       CONFIG.Actor.dataModels.teniente = Ad6_ActorTeniente;
