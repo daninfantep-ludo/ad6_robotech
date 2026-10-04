@@ -18,7 +18,7 @@
       "verified": "14.368"
     },
     "esmodules": ["module/ad6_robotech.mjs"],
-    "styles": ["css/ad6_robotech_generales.css","css/ad6_robotech_hex_heridas.css","css/ad6_chat.css","css/ad6_tabs.css","css/ad6_cabina.css"],
+    "styles": ["css/ad6_robotech_generales.css","css/ad6_robotech_hex_heridas.css","css/ad6_chat.css","css/ad6_tabs.css","css/ad6_cabina.css","css/ad6_estados.css"],
     "languages": [
       {
         "lang": "en",  

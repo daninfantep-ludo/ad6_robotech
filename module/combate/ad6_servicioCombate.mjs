@@ -29,6 +29,7 @@
 import { Ad6_AppCombate } from './ad6_appCombate.mjs';
 import * as Calculo from './ad6_calculoDano.mjs';
 import * as CalculoEnjambre from './ad6_calculoEnjambre.mjs';
+import * as Estado from './ad6_servicioEstados.mjs';
 import { t, lit } from './ad6_log.mjs';
 import { SLOTS_TIRADA } from '../../model/funciones.mjs';
 
@@ -433,10 +434,14 @@ export async function crearEncuentro(atacante, slot, tirada)
 
   const id = foundry.utils.randomID();
 
-  // El encuentro nace con UNA sola arma: la propia del atacante (principal).
+    // El encuentro nace con UNA sola arma: la propia del atacante (principal).
   // Las armas "prestadas" para el fuego concentrado se añaden después con
   // prestarArma().
-  const armaPrincipal = _refArmaDesdeTirada(actorAtacante, slot, tirada);
+  // OJO: hay que marcar esta arma como PRINCIPAL (opts.principal = true); de lo
+  // contrario nace con exitosAtaque = 0 (el atacante tendría que repartirlos a
+  // mano) y, sobre todo, el bono por INCENDIO del defensor (que solo aplica al
+  // arma principal) NUNCA se sumaría.
+  const armaPrincipal = _refArmaDesdeTirada(actorAtacante, slot, tirada, { principal: true });
 
   // CONFLICTO: el actor "conflicto" NO tiene items ni arma; ataca SIEMPRE por
   // COMPARACIÓN DE ÉXITOS (su tirada contra la defensa del objetivo), restando
@@ -1403,16 +1408,19 @@ export async function confirmarDefensa(encuentroId, defensorUuid)
     // }
   }
 
-  def.confirmado = true;
+    def.confirmado = true;
   _log(enc, t("Ad6.Log.defensaTotal", { defensor: def.nombre, exitos: _totalExitosDefensa(def) }));
 
-  _evaluarResolucion(enc);
+  // ESPERAMOS la resolución: aplica el daño Y los estados (Corroído/Incendiado)
+  // antes de re-difundir, para que el efecto ya esté escrito en el documento del
+  // defensor cuando las ventanas se refresquen.
+  await _evaluarResolucion(enc);
   await _difundir(encuentroId);
   return true;
 }
 
 /** ¿Están confirmados ataque y TODOS los defensores? -> resolvemos. */
-function _evaluarResolucion(enc)
+async function _evaluarResolucion(enc)
 {
   
     if (!enc.ataqueConfirmado) return;
@@ -1462,18 +1470,33 @@ function _evaluarResolucion(enc)
     ,danoLigero:      Calculo.parseDano(_danoResueltoDeArma(a))?.tipo === "L"
     // ¿El arma tiene campo de ÁREA no vacío? (B1, L100, C...). Alimenta la
     // resistencia "area".
-    ,tieneArea:       String(a?.datos?.system?.area ?? "").trim() !== ""
+        ,tieneArea:       String(a?.datos?.system?.area ?? "").trim() !== ""
     ,penetracionFinal: Number(a.penetracionFinal ?? 0) || 0
+    // ESTADOS: propiedades del arma que APLICAN estados al impactar. Se leen
+    // del clon "datos" (system del arma). En fuego concentrado basta con que
+    // CUALQUIER arma las tenga (lo decide la aplicación del estado, más abajo).
+    ,corrosiva:       a?.datos?.system?.corrosiva === true
+    ,incendiaria:     a?.datos?.system?.incendiaria === true
+    // ¿Es el arma PRINCIPAL del atacante? (la suya propia, no prestada). La usa
+    // el estado INCENDIADO para sumar sus +n éxitos SOLO al arma principal.
+    ,principal:       a.principal === true
   }));
 
-  for (const o of enc.objetivos)
+        for (const o of enc.objetivos)
   {
     const d = _defensaDe(enc, o.actorUuid);
     if (!d) continue;
 
+    // BONO DE INCENDIO: si el DEFENSOR está incendiado, su nivel se suma a los
+    // éxitos del arma PRINCIPAL del atacante (opción A). Depende del defensor,
+    // así que se calcula AQUÍ, objetivo a objetivo.
+    const defensor = _normalizarActorDelMundo(fromUuidSync(o.actorUuid));
+    const armasBono = _armasConBonusIncendio(armasAtaque, Estado.nivelIncendio(defensor), enc, defensor);
+
     // Llamada a la lógica de daño de ESTE objetivo (defensor), que reparte la
-    // defensa, calcula el daño base, la armadura efectiva y aplica/informa.
-    _resolverDanoDeObjetivo(enc, o, d, armasAtaque);
+    // defensa, calcula el daño base, la armadura efectiva, aplica/informa y
+    // APLICA los estados (Corroído/Incendiado) si el arma los inflige.
+    await _resolverDanoDeObjetivo(enc, o, d, armasBono);
   }
 }
 
@@ -1682,6 +1705,82 @@ function _aplicarValorAlConflicto(enc, diferencia)
 // ---------------------------------------------------------------------------
 
 /**
+ * Aplica el estado CORROÍDO a una protección (COPIA en memoria): deja su
+ * armadura a la MITAD (floor), tanto en "restante" como en "valor".
+ *
+ * IMPORTANTE (Opción 2, acordada): NO se muta NUNCA el documento del actor.
+ * El helado vive SOLO en la copia que se pasa al cálculo puro. Cuando el efecto
+ * caduque (expiraRonda) el cálculo vuelve solo al valor entero, sin restituir
+ * nada.
+ *
+ * Se aplica al BLINDAJE / armadura realmente es la que absorbe daño; los
+ * escudos ablativos NO se tocan (van por la vía de estructura adicional).
+ *
+ * @param {object} enc        Encuentro (para el log).
+ * @param {object} proteccion Protección PLANA (copia) a helar; se muta in situ.
+ * @param {Actor}  defensor   Actor defensor (para leer su estado).
+ * @returns {boolean} true si se aplicó (para loguear).
+ */
+function _aplicarCorrosivoAProteccion(enc, proteccion, defensor)
+{
+  if (!proteccion) return false;
+  if (!Estado.estaCorroido(defensor)) return false;
+
+  const restanteAntes = Number(proteccion.restante) || 0;
+  const valorAntes    = Number(proteccion.valor) || 0;
+  if (restanteAntes <= 0 && valorAntes <= 0) return false;
+
+  const escala = Calculo.normalizarEscala(proteccion.tipo) ?? "";
+  proteccion.restante = Math.floor(restanteAntes / 2);
+  proteccion.valor    = Math.floor(valorAntes / 2);
+
+  _logSangrado(enc, t("Ad6.Log.corrosivoArmadura", {
+     base:   restanteAntes
+    ,escala
+    ,final:  proteccion.restante
+  }), null, 1);
+  return true;
+}
+
+/**
+ * Devuelve una COPIA de armasAtaque con el bono de INCENDIO del DEFENSOR sumado
+ * a los ÉXITOS del arma PRINCIPAL del atacante.
+ *
+ * REGLA (acordada): si el DEFENSOR está incendiado, su nivel se suma a los
+ * éxitos del arma principal del ATACANTE (opción A: son éxitos de ataque EXTRA,
+ * por lo que la defensa del defensor SÍ puede anularlos, pues entran en el
+ * reparto normal). Refleja que un defensor en llamas es un blanco más fácil.
+ *
+ * Solo se aplica al arma PRINCIPAL (principal === true). No muta la entrada.
+ *
+ * @param {Array}  armasAtaque Datos de armas.
+ * @param {number} nivelInc    Nivel de incendio del defensor (0..3).
+ * @param {object} enc         Encuentro (para el log).
+ * @param {Actor}  defensor    Actor defensor (para el log).
+ * @returns {Array} armas (copia) con el bono si procede.
+ */
+function _armasConBonusIncendio(armasAtaque, nivelInc, enc, defensor)
+{
+  if (!nivelInc || nivelInc <= 0) return armasAtaque;
+
+  // ¿Hay alguna arma PRINCIPAL en el ataque? El bono solo aplica a ella. Si no
+  // la hay (p.ej. un encuentro sin arma principal), NO se loguea nada, para que
+  // el log no diga "+1 éxito al arma principal" cuando no se ha sumado a nadie.
+  const hayPrincipal = (armasAtaque ?? []).some(a => a.principal === true);
+  if (!hayPrincipal) return armasAtaque;
+
+  _logSangrado(enc, t("Ad6.Log.incendiadoExitos", {
+     nivel: nivelInc
+  }), null, 1);
+
+  return (armasAtaque ?? []).map(a =>
+    (a.principal === true)
+      ? { ...a, exitos: Number(a.exitos ?? 0) + nivelInc }
+      : { ...a }
+  );
+}
+
+/**
  * Resuelve el daño de UN objetivo del encuentro:
  *   1) Calcula el daño base del ataque para ESE defensor, repartiendo sus
  *      éxitos de defensa entre las armas (ver Calculo.calcularDanoAtaque).
@@ -1702,7 +1801,7 @@ function _aplicarValorAlConflicto(enc, diferencia)
  *                            danoEnergia, danoMelee, danoLigero, tieneArea,
  *                            penetracionFinal).
  */
-function _resolverDanoDeObjetivo(enc, objetivo, def, armasAtaque)
+async function _resolverDanoDeObjetivo(enc, objetivo, def, armasAtaque)
 {
   const exitosDefensa = _totalExitosDefensa(def);
   // 1) Daño base (comparte mecanismo puro).
@@ -1743,10 +1842,66 @@ function _resolverDanoDeObjetivo(enc, objetivo, def, armasAtaque)
     // resuelve por miembro (división ENTERA) y las bajas se aplican/escriben.
     _resolverDanoEnjambre(enc, actorObj, resultado, armasAtaque);
   }
-  else
+    else
   {
     // [HUECO-DANO-OTROS] Otros tipos: se verá en requerimientos siguientes.
     _log(enc, t("Ad6.Log.objetivoNoSoportado", { nombre: actorObj.name, tipo: actorObj.type }));
+  }
+
+  // 4) ESTADOS al IMPACTAR: si el ataque TOCÓ (hubo daño base, ya garantizado
+  //    por el return de arriba) y alguna arma inflige corrosivo/incendio, se
+  //    aplican al DEFENSOR. Regla "impacta": basta con haber tocado.
+  await _aplicarEstadosAlImpactar(enc, actorObj, armasAtaque);
+}
+
+/**
+ * Aplica al DEFENSOR los estados que infligen las armas que han impactado.
+ *
+ * REGLA "impacta": basta con que el ataque haya TOCADO. Se invoca SOLO desde
+ * _resolverDanoDeObjetivo, y allí esta llamada queda DESPUÉS del return que
+ * descarta los ataques sin daño base (resultado.total.length === 0). Así, si
+ * se llega aquí, es que hubo impacto.
+ *
+ * En FUEGO CONCENTRADO basta con que CUALQUIER arma del ataque tenga la
+ * propiedad (coherente con energía/melee/ligero/área).
+ *
+ * - CORROSIVA  -> aplica (o refresca) el estado Corroído.
+ * - INCENDIARIA -> aplica (o sube nivel) el estado Incendiado.
+ *
+ * El servicio de estados comprueba internamente si este cliente puede escribir
+ * el documento del defensor (dueño o GM). Nunca lanza: si algo falla, se deja
+ * constancia en consola sin romper la resolución del encuentro.
+ *
+ * @param {object} enc         Encuentro (para el log).
+ * @param {Actor}  defensor    Actor defensor.
+ * @param {Array}  armasAtaque Datos de armas (con .corrosiva / .incendiaria).
+ */
+async function _aplicarEstadosAlImpactar(enc, defensor, armasAtaque)
+{
+  if (!defensor) return;
+  const armas = armasAtaque ?? [];
+
+  const tocaCorrosivo  = armas.some(a => a?.corrosiva === true);
+  const tocaIncendiado = armas.some(a => a?.incendiaria === true);
+  if (!tocaCorrosivo && !tocaIncendiado) return;
+
+  try
+  {
+    if (tocaCorrosivo)
+    {
+      const ok = await Estado.aplicarCorrosivo(defensor);
+      if (ok) _logNivel(enc, "aplicar", t("Ad6.Log.aplicarCorrosivo", { defensor: defensor.name }));
+    }
+
+    if (tocaIncendiado)
+    {
+      const nivel = await Estado.aplicarIncendiado(defensor);
+      if (nivel > 0) _logNivel(enc, "aplicar", t("Ad6.Log.aplicarIncendiado", { defensor: defensor.name, nivel }));
+    }
+  }
+  catch (e)
+  {
+    console.error("[AD6][Estados] Error aplicando estado al impactar:", e);
   }
 }
 
@@ -1791,8 +1946,29 @@ function _resolverDanoEnjambre(enc, enjambre, resultado, armasAtaque)
   const tipoDano = _tipoDanoAtaque(armasAtaque, resultado.total);
   const atributos = _atributosAtaque(armasAtaque, tipoDano, fuegoConcentrado);
 
-  // Orden ALEATORIO de imputación entre los miembros de la formación.
+    // Orden ALEATORIO de imputación entre los miembros de la formación.
   const orden = CalculoEnjambre.ordenAleatorio(formacion.length);
+
+  // CORROÍDO: si el ENJAMBRE defensor está corroído, se hala la ARMADURA
+  // PRINCIPAL de cada miembro (la que entra en el cálculo puro). Se hace sobre
+  // la COPIA "formacion" (clonada arriba), nunca sobre el documento.
+  if (Estado.estaCorroido(enjambre))
+  {
+    for (const miembro of formacion)
+    {
+      const arm = miembro?.armaduraPrincipal;
+      if (!arm) continue;
+      const antes = Number(arm.restante) || 0;
+      if (antes <= 0) continue;
+      arm.restante = Math.floor(antes / 2);
+      arm.valor = Math.floor((Number(arm.valor) || 0) / 2);
+      _logSangrado(enc, t("Ad6.Log.corrosivoArmadura", {
+         base:   antes
+        ,escala: Calculo.normalizarEscala(arm.tipo) ?? ""
+        ,final:  arm.restante
+      }), null, 1);
+    }
+  }
 
   // Cálculo PURO: qué le pasa a cada miembro (no muta nada).
   const calc = CalculoEnjambre.resolverFormacion(resultado.total, formacion, orden, atributos);
@@ -1887,6 +2063,19 @@ function _resolverDanoPersona(enc, actor, resultado, armasAtaque)
   const atributos = _atributosAtaque(armasAtaque, tipoDano, fuegoConcentrado);
 
   const proteccion = _armaduraPersona(actor);
+
+  // CORROÍDO: si el actor defensor está corroído, su armadura combinada
+  // (item + especie) se hala SOLO en la copia (Opción 2). _armaduraPersona ya
+  // devuelve una COPIA, así que es seguro mutarla.
+  _aplicarCorrosivoAProteccion(enc, proteccion, actor);
+
+  // BONO: si el defensor lleva un EQUIPO de BLOQUEO y el ataque es melee, su
+  // armadura sube +1 (del tipo que sea su armadura). _armaduraPersona ya
+  // devuelve una COPIA, así que es seguro mutarla.
+  if (_bonoBloqueoVsMelee(proteccion, atributos, actor))
+  {
+    _logSangrado(enc, t("Ad6.Log.bonoBloqueo", { bonos: 1 }), null, 1);
+  }
 
   // Daño que PASA (empieza siendo el daño base COMPLETO, como lista de pares).
   let danoQuePasa = resultado.total;
@@ -2105,9 +2294,23 @@ function _resolverDanoVehiculo(enc, vehiculo, resultado, armasAtaque)
   // Daño que PASA (empieza siendo el daño base COMPLETO, como lista de pares).
   let danoQuePasa = resultado.total;
 
-  if (armaduraItem)
+    if (armaduraItem)
   {
-    const proteccion = armaduraItem.system.armadura;
+        // CLON: armaduraItem.system.armadura es el documento VIVO del item; hay que
+    // copiarlo para no modificar el vehículo al aplicar el bono (u otras sumas).
+    const proteccion = foundry.utils.deepClone(armaduraItem.system.armadura);
+
+    // CORROÍDO: si el VEHÍCULO defensor está corroído, su Blindaje se hala SOLO
+    // en esta copia (Opción 2: el documento nunca se toca).
+    _aplicarCorrosivoAProteccion(enc, proteccion, vehiculo);
+
+    // BONO: si el defensor lleva un EQUIPO de BLOQUEO y el ataque es melee, su
+    // armadura sube +1 (del tipo que sea su armadura).
+    if (_bonoBloqueoVsMelee(proteccion, atributos, vehiculo))
+    {
+      _logSangrado(enc, t("Ad6.Log.bonoBloqueo", { bonos: 1 }), null, 1);
+    }
+
     const armaduraCalc = Calculo.calcularArmaduraEfectiva(proteccion, atributos);
 
     _logSangrado(enc, t("Ad6.Log.vehiculoArmadura", {
@@ -2399,6 +2602,62 @@ function _atributosAtaque(armasAtaque, tipoDano, fuegoConcentrado)
     // La penetración solo se ofrece si coincide el tipo (lo valida el cálculo).
     ,penetracionFinal: Number(a.penetracionFinal ?? 0) || 0
   };
+}
+
+/**
+ * ¿El defensor lleva un EQUIPO equipado ("siendoUsado") con la característica
+ * de BLOQUEO activa (system.bloque === true)?
+ *
+ * Se busca entre sus items de tipo "equipo" (NO armadura). Basta con que lleve
+ * UNO en esas condiciones. "siendoUsado" es el campo que marca que el equipo
+ * está en uso (ver Ad6_Equipo; no confundir con armadura.equipada).
+ *
+ * @param {Actor} defensor
+ * @returns {boolean}
+ */
+function _defensorTieneEquipoBloqueo(defensor)
+{
+  const items = defensor?.items;
+  if (!items || typeof items.some !== "function") return false;
+
+  return items.some(i =>
+        i?.type === "equipo"
+     && i?.system?.siendoUsado === true
+     && i?.system?.bloqueo === true
+  );
+}
+
+/**
+ * Aplica el BONO DE ARMADURA +1 por "equipo de bloqueo vs ataque melee".
+ *
+ * REGLA: si el defensor lleva un EQUIPO de BLOQUEO equipado (siendoUsado) y el
+ * atacante emplea un arma de daño MELEE (danoMelee === true), la armadura del
+ * defensor se incrementa en 1, del TIPO QUE SEA EL PORTADOR (su "Blindaje").
+ * Por eso NO se toca el .tipo de la protección, solo su valor.
+ *
+ * Trabaja sobre una COPIA de la protección (objeto plano con .tipo/.restante/
+ * .valor), NUNCA sobre el documento del item: así no se modifica el actor. La
+ * copia la prepara el llamador (para persona ya es una copia; para vehículo hay
+ * que clonarla antes).
+ *
+ * @param {object}  proteccion  protección plana (con .restante).
+ * @param {object}  atributos   atributos del ataque (con .danoMelee).
+ * @param {Actor}   defensor    actor defensor (para su equipo de bloqueo).
+ * @returns {boolean}           true si el bono se aplicó (para poder loguearlo).
+ */
+function _bonoBloqueoVsMelee(proteccion, atributos, defensor)
+{
+  if (!proteccion) return false;
+
+  // Condición 1: el arma del atacante es MELEE.
+  if (atributos?.danoMelee !== true) return false;
+  // Condición 2: el defensor lleva un EQUIPO de BLOQUEO equipado.
+  if (!_defensorTieneEquipoBloqueo(defensor)) return false;
+
+  // +1 del tipo que sea (no se cambia el .tipo).
+  proteccion.restante = (Number(proteccion.restante) || 0) + 1;
+  proteccion.valor    = (Number(proteccion.valor) || 0) + 1;
+  return true;
 }
 
 /**

@@ -6,6 +6,7 @@ import { NSLOTS_TIRADA } from '../../model/funciones.mjs'
 import * as ServicioAsistencia from '../chat/ad6_servicioAsistencia.mjs'
 import * as ServicioCombate from '../combate/ad6_servicioCombate.mjs'
 import * as ServicioUpgrade from '../upgrade/ad6_servicioUpgrade.mjs'
+import * as Estado from '../combate/ad6_servicioEstados.mjs'
 
 
 /* este clase es en la que pongo todas las funciones comunes para que las hereden todas las hojas
@@ -61,6 +62,10 @@ export class Ad6_HojaActor extends HandlebarsApplicationMixin(ActorSheetV2)
             ,fuegoConcentrado: this._onFuegoConcentrado
             ,prestarDefensa: this._onPrestarDefensa
             ,borrarUpgrade: this._onBorrarUpgrade
+            // ESTADOS (Corroído / Incendiado): botones del parcial de Vitales.
+            ,estadoSubir: this._onEstadoSubir
+            ,estadoBajar: this._onEstadoBajar
+            ,estadoQuitar: this._onEstadoQuitar
 
     }
   };
@@ -158,6 +163,45 @@ export class Ad6_HojaActor extends HandlebarsApplicationMixin(ActorSheetV2)
     this.render();
   }
 
+  // -------------------------------------------------------------------------
+  // ESTADOS (Corroído / Incendiado): acciones de los botones de Vitales
+  // -------------------------------------------------------------------------
+  // Toda la lógica vive en el servicio (ad6_servicioEstados.mjs). Aquí sólo se
+  // resuelve el tipo y se delega; tras la operación se re-renderiza la hoja para
+  // reflejar el nuevo estado.
+  //
+  // SUBIR: solo tiene sentido para INCENDIADO (sube un nivel, tope 3).
+  static async _onEstadoSubir(event, target)
+  {
+    const tipo = target.dataset.tipo;
+    if (tipo === "incendiado")
+    {
+      if (Estado.nivelIncendio(this.actor) <= 0) await Estado.aplicarIncendiado(this.actor);
+      else                                       await Estado.subirIncendiado(this.actor);
+      this.render();
+    }
+  }
+
+  // BAJAR: solo tiene sentido para INCENDIADO (baja un nivel; a 0 lo apaga).
+  static async _onEstadoBajar(event, target)
+  {
+    const tipo = target.dataset.tipo;
+    if (tipo === "incendiado")
+    {
+      await Estado.bajarIncendiado(this.actor);
+      this.render();
+    }
+  }
+
+  // QUITAR: corrosivo -> lo elimina; incendiado -> lo apaga por completo.
+  static async _onEstadoQuitar(event, target)
+  {
+    const tipo = target.dataset.tipo;
+    if (tipo === "corrosivo")       await Estado.quitarCorrosivo(this.actor);
+    else if (tipo === "incendiado") await Estado.apagarIncendiado(this.actor);
+    this.render();
+  }
+
   // Gestiona el DROP de un item de tipo "upgrade" sobre la hoja: crea una copia
   // del upgrade en el actor y lo EQUIPA automáticamente (aplica bonos, imágenes,
   // designación e inyecta sus listas, según el tipo de actor). Devuelve true si
@@ -241,6 +285,10 @@ export class Ad6_HojaActor extends HandlebarsApplicationMixin(ActorSheetV2)
     // Mejoras (upgrades) del actor, para el menú emergente de Vitales. Aplica a
     // vehiculo, principal y teniente.
     context.upgrades = ServicioUpgrade.upgradesDelActor(actor);
+
+    // ESTADOS de combate (Corroído / Incendiado) del actor, listos para pintar
+    // los iconos de la sección de Vitales. Ver _estadosParaPlantilla().
+    context.estados = Ad6_HojaActor._estadosParaPlantilla(actor);
 
     context.tabs = this._prepareTabs("primary");
 
@@ -530,6 +578,48 @@ await item.update({[campo]: valor});
         });
         fp.browse();
     }
+
+  // -------------------------------------------------------------------------
+  // DATOS PARA LA PLANTILLA DE ESTADOS (Corroído / Incendiado)
+  // -------------------------------------------------------------------------
+  // Devuelve un objeto { corrosivo, incendiado } listo para el parcial
+  // parcialIconosEstados.hbs. Se lee SIEMPRE del servicio (fuente única) y NUNCA
+  // se reconstruye la lógica aquí:
+  //   - corrosivo : null | { ronda }  (datos del efecto activo).
+  //   - incendiado: { activo, nivel } (nivel 0 si no está incendiado).
+  // Cada entrada lleva además su DEFINICIÓN (icono, color) desde el catálogo
+  // Ad6.Estados (config), para que la plantilla no la busque.
+  // Es estático para poder invocarlo desde cualquier hijo y desde el contexto.
+  static _estadosParaPlantilla(actor)
+  {
+    const defCorrosivo  = Ad6?.Estados?.corrosivo  ?? {};
+    const defIncendiado = Ad6?.Estados?.incendiado ?? {};
+
+    // Corrosivo: el servicio devuelve los datos del efecto o null.
+    const datosCorrosivo = Estado.estadoCorrosivo(actor);
+
+    // Incendiado: el servicio devuelve el nivel (0 si no procede).
+    const nivelIncendio = Number(Estado.nivelIncendio(actor) ?? 0);
+
+    return {
+       corrosivo: datosCorrosivo
+        ? {
+             activo: true
+            // El servicio guarda la ronda de CADUCIDAD como "expiraRonda".
+            ,ronda: datosCorrosivo.expiraRonda ?? 0
+            ,icono: defCorrosivo.icono ?? "fa-solid fa-droplet"
+            ,color: defCorrosivo.color ?? "#7dbf3a"
+          }
+        : { activo: false, ronda: 0, icono: defCorrosivo.icono ?? "fa-solid fa-droplet", color: defCorrosivo.color ?? "#7dbf3a" }
+
+      ,incendiado: {
+           activo: nivelIncendio > 0
+          ,nivel: nivelIncendio
+          ,icono: defIncendiado.icono ?? "fa-solid fa-fire"
+          ,color: defIncendiado.color ?? "#e8611a"
+        }
+    };
+  }
 
 
 

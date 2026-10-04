@@ -68,9 +68,23 @@
             ,"sociales": "Social"
             ,"tacticos": "Tactical"
             ,"tecnicos": "Technical"
-        }
-         ,"Etiquetas":  
-         {
+          }
+           ,"Estados":
+           {
+              "titulo":           "Conditions"
+             ,"corrosivoNombre":  "Corroded"
+             ,"corrosivoAyuda":   "Armor halved until the following round."
+             ,"incendiadoNombre": "Burning ({nivel})"
+             ,"incendiadoAyuda":  "+{nivel} success(es) to incoming attacks (max. 3). Extinguished manually."
+             ,"corrosivoCorto":   "Corroded"
+             ,"incendiadoCorto":  "Burn {nivel}"
+             ,"subir":            "Increase level"
+             ,"bajar":            "Decrease level"
+             ,"quitar":           "Remove condition"
+             ,"apagar":           "Put out fire"
+           }
+           ,"Etiquetas":  
+           {
              "rnk": "Rnk"
             ,"personal": "¿Personal?"
             ,"valor": "Value"
@@ -477,6 +491,11 @@
         ,"Log":
         {
              "resolucionTitulo": "— Combat Resolution —"
+            ,"aplicarCorrosivo": "APPLIED: target {defensor} is CORRODED (armor halved until the following round)."
+            ,"aplicarIncendiado": "APPLIED: target {defensor} is BURNING (level {nivel})."
+            ,"corrosivoArmadura": "Corroded: armor {base}{escala} → {final}{escala} (halved)."
+            ,"incendiadoExitos": "Burning (level {nivel}): +{nivel} success(es) to the main weapon."
+            ,"corrosivoCaducado": "The Corroded condition on {nombre} has expired."
             ,"conflictoCabecera": "— Confrontation: {atacante} vs {defensor} —"
             ,"conflictoDatos": "Conflict successes: {exitosConflicto} | Defense: {exitosDefensor} | Conflict armor: {armadura} → effective defense: {defensaEfectiva}."
             ,"conflictoGanaDefensor": "Defender {defensor} wins: apply {diferencia} point(s) to conflict {atacante} (conflict armor already deducted)."
@@ -557,6 +576,7 @@
             ,"personaArmadura": "Armor: {base}{escala}{bonos}{penetracion} → {final}{escala}."
             ,"personaArmaduraBonos": " +{bonos} resistances"
             ,"personaArmaduraPen": " − {penetracion} penetration"
+            ,"bonoBloqueo": "Bonus from blocking equipment (defense against melee attack): +{bonos} armor."
             ,"personaArmaduraExtra": "[warning] {nombre} armor's is in different scale ({detalle}) doesn't match the main calculation."
             ,"sinDanoArmaduraAbsorbio": "✔ No damage: armor soaked all damage from attack."
             ,"sinValorHeridas": "[warning] {nombre} desn't have a valid \"wound value\"; wounds can't be allocated."

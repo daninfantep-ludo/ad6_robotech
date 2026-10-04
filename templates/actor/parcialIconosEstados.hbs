@@ -1,0 +1,46 @@
+{{!--
+    ESTADOS de combate (Corroído / Incendiado) — iconos en la sección de Vitales.
+    ---------------------------------------------------------------------------
+    Consume "estados" del contexto de la hoja (ver Ad6_HojaActor._estadosParaPlantilla):
+      estados.corrosivo : { activo, ronda, icono, color }
+      estados.incendiado: { activo, nivel, icono, color }
+
+    Se muestra una fila de iconos SOLO si hay algún estado activo (si no, no pinta
+    nada). Cada icono lleva su tooltip localizado:
+      - Corroído : "Estado corrosivo hasta la ronda N" (nombre + ayuda).
+      - Incendiado: nombre con el NIVEL (n) + ayuda.
+    Cada icono es un botón con menú contextual para SUBIR/BAJAR/QUITAR, usando las
+    acciones registradas en la hoja (estadoSubir/estadoBajar/estadoQuitar).
+    El menú reutiliza el patrón .menu-context / .menu-toggle del sistema.
+--}}
+{{#if (or estados.corrosivo.activo estados.incendiado.activo)}}
+<div class="ad6-estados-vitales flx cnt-horizontal vam mrg-t5">
+
+    {{!-- CORROÍDO: icono estático (no tiene nivel) + botón de quitar. --}}
+    {{#if estados.corrosivo.activo}}
+    <span class="ad6-estado-chip ad6-estado-corrosivo"
+          title="{{localize 'Ad6.Estados.corrosivoNombre'}} — {{localize 'Ad6.Estados.corrosivoAyuda'}} (ronda {{estados.corrosivo.ronda}})">
+        <i class="{{estados.corrosivo.icono}}" style="color: {{estados.corrosivo.color}};"></i>
+        <span class="ad6-estado-texto">{{localize "Ad6.Estados.corrosivoCorto"}}</span>
+        <button type="button" class="ad6-estado-btn" data-action="estadoQuitar" data-tipo="corrosivo"
+                title="{{localize 'Ad6.Estados.quitar'}}"><i class="fas fa-xmark"></i></button>
+    </span>
+    {{/if}}
+
+    {{!-- INCENDIADO: icono con NIVEL + botones subir/bajar/quitar. --}}
+    {{#if estados.incendiado.activo}}
+    <span class="ad6-estado-chip ad6-estado-incendiado"
+          title="{{localize 'Ad6.Estados.incendiadoNombre'}} — {{localize 'Ad6.Estados.incendiadoAyuda'}}">
+        <i class="{{estados.incendiado.icono}}" style="color: {{estados.incendiado.color}};"></i>
+        <span class="ad6-estado-texto">{{localize "Ad6.Estados.incendiadoCorto" nivel=estados.incendiado.nivel}}</span>
+        <button type="button" class="ad6-estado-btn" data-action="estadoBajar" data-tipo="incendiado"
+                title="{{localize 'Ad6.Estados.bajar'}}"><i class="fas fa-angle-down"></i></button>
+        <button type="button" class="ad6-estado-btn" data-action="estadoSubir" data-tipo="incendiado"
+                title="{{localize 'Ad6.Estados.subir'}}"><i class="fas fa-angle-up"></i></button>
+        <button type="button" class="ad6-estado-btn" data-action="estadoQuitar" data-tipo="incendiado"
+                title="{{localize 'Ad6.Estados.apagar'}}"><i class="fas fa-xmark"></i></button>
+    </span>
+    {{/if}}
+
+</div>
+{{/if}}

@@ -1,3 +1,14 @@
+// ---------------------------------------------------------------------------
+// INTERRUPTOR MAESTRO del servicio de ESTADOS de combate (Corroído / Incendiado).
+//   true  -> el servicio funciona con normalidad.
+//   false -> el servicio queda NEUTRALIZADO en caliente: no se aplican estados
+//            al impactar, no se consumen (ni mitad de armadura ni éxitos extra)
+//            y no se pintan iconos. Útil como red de seguridad si algo falla en
+//            partida. Para desactivarlo NO hay que tocar más código: basta
+//            cambiar esta constante.
+// ---------------------------------------------------------------------------
+export const ACTIVAR_ESTADOS = true;
+
 export const Ad6 = {};
 /*
 ad6.ranges = {
@@ -492,6 +503,30 @@ Ad6.Escalas =
     ,M : "Ad6.Escalas.M"
     ,N : "Ad6.Escalas.N"
 }
+
+// Catálogo de ESTADOS de combate del sistema. Cada entrada define:
+//   id      -> id del statusEffect (se registra en CONFIG.statusEffects) y el
+//              "status" del efecto activo.
+//   icono   -> clase FontAwesome del icono.
+//   color   -> color de realce (para la hoja y el badge del token).
+//   impacto -> "impacta" (basta tocar) | "traspasa" (debe atravesar armadura).
+//              Por ahora corrosivo e incendiado usan "impacta".
+Ad6.Estados = {
+   corrosivo: {
+       id:      "ad6-corrosivo"
+      ,icono:   "fa-solid fa-droplet"
+      ,color:   "#7dbf3a"
+      ,impacto: "impacta"
+      ,img:     "systems/ad6_robotech/img/estados/corrosivo.svg"
+   }
+  ,incendiado: {
+       id:      "ad6-incendiado"
+      ,icono:   "fa-solid fa-fire"
+      ,color:   "#e8611a"
+      ,impacto: "impacta"
+      ,img:     "systems/ad6_robotech/img/estados/incendiado.svg"
+   }
+};
 /*
 ad6.fatigues = {
      none: ""

@@ -588,21 +588,7 @@ input[type="number"].con-flechas::-webkit-outer-spin-button {
   vertical-align:middle;
 }
 
-/* Carpetas de directorio (sidebar Y compendios): imagen de fondo.
-   - El selector correcto es la ETIQUETA <li> con las clases .directory-item.folder
-     (antes estaba ".li.directory-item.folder", que busca una CLASE "li" y no aplica).
-   - OJO con la RUTA del url(): en un CSS, las rutas relativas se resuelven respecto
-     al PROPIO ARCHIVO CSS (no a la raíz del servidor). Este CSS está en
-     systems/ad6_robotech/css/, así que "../img/..." apunta a
-     systems/ad6_robotech/img/... (igual que hace ad6_chat.css con los dados).
-   - background-image necesita url(...).
-   - no-repeat + cover para que la imagen llene la fila sin repetirse en mosaico. */
-li.directory-item.folder {
-  background-image: url("../img/fondoActores.png");
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: cover;
-}
+
 
 /* En las carpetas, el nombre va sobre la imagen: le damos sombra para que se
    lea bien sobre cualquier zona clara/oscura de la foto. */

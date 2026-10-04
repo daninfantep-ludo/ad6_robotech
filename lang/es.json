@@ -68,9 +68,23 @@
             ,"sociales": "Sociales"
             ,"tacticos": "Tácticos"
             ,"tecnicos": "Técnicos"
-        }
-         ,"Etiquetas":  
-         {
+  }
+   ,"Estados":
+   {
+              "titulo":           "Estados"
+             ,"corrosivoNombre":  "Corroído"
+             ,"corrosivoAyuda":   "Armadura a la mitad hasta el asalto siguiente."
+             ,"incendiadoNombre": "Incendiado ({nivel})"
+             ,"incendiadoAyuda":  "+{nivel} éxito(s) a los ataques recibidos (máx. 3). Se apaga manualmente."
+             ,"corrosivoCorto":   "Corroído"
+             ,"incendiadoCorto":  "Incend. {nivel}"
+             ,"subir":            "Subir nivel"
+             ,"bajar":            "Bajar nivel"
+             ,"quitar":           "Quitar estado"
+             ,"apagar":           "Apagar incendio"
+   }
+   ,"Etiquetas":  
+   {
              "rnk": "Rng"
             ,"personal": "¿Personal?"
             ,"valor": "Valor"
@@ -476,6 +490,11 @@
         ,"Log":
         {
              "resolucionTitulo": "— Resolución del intercambio de éxitos —"
+            ,"aplicarCorrosivo": "APLICADO: el objetivo {defensor} queda CORROÍDO (armadura a la mitad hasta el asalto siguiente)."
+            ,"aplicarIncendiado": "APLICADO: el objetivo {defensor} queda INCENDIADO (nivel {nivel})."
+            ,"corrosivoArmadura": "Corroído: armadura {base}{escala} → {final}{escala} (a la mitad)."
+            ,"incendiadoExitos": "Incendiado (nivel {nivel}): +{nivel} éxito(s) al arma principal."
+            ,"corrosivoCaducado": "El estado Corroído de {nombre} ha caducado."
             ,"conflictoCabecera": "— Enfrentamiento: {atacante} vs {defensor} —"
             ,"conflictoDatos": "Éxitos del conflicto: {exitosConflicto} | Defensa: {exitosDefensor} | Armadura del conflicto: {armadura} → defensa efectiva: {defensaEfectiva}."
             ,"conflictoGanaDefensor": "El defensor {defensor} se impone: aplicar {diferencia} punto(s) al conflicto {atacante} (ya descontada la armadura del conflicto)."
@@ -556,6 +575,7 @@
             ,"personaArmadura": "Armadura: {base}{escala}{bonos}{penetracion} → {final}{escala}."
             ,"personaArmaduraBonos": " +{bonos} por resistencias"
             ,"personaArmaduraPen": " − {penetracion} penetración"
+            ,"bonoBloqueo": "Bono por equipo de bloqueo (defensa contra ataque melee): +{bonos} a la armadura."
             ,"personaArmaduraExtra": "[aviso] {nombre} tiene armadura en otra escala ({detalle}) que no se combina en el cálculo principal."
             ,"sinDanoArmaduraAbsorbio": "✔ Sin daño: la armadura absorbió todo el ataque."
             ,"sinValorHeridas": "[aviso] {nombre} no tiene un \"valor de heridas\" válido; no se pueden marcar heridas."

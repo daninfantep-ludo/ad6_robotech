@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Gota de ácido corrosivo, color verde del catálogo (#7dbf3a) -->
+  <path fill="#7dbf3a" d="M256 32C174 144 96 224 96 320a160 160 0 0 0 320 0c0-96-78-176-160-288z"/>
+  <path fill="#ffffff" fill-opacity="0.35" d="M256 120c-52 72-96 128-96 200a96 96 0 0 0 40 78c-12-24-16-48-16-72 0-60 40-116 72-166-8-14-8-20 0-40z"/>
+</svg>

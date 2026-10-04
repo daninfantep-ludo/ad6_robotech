@@ -1,7 +1,7 @@
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 const { ActorSheetV2 } = foundry.applications.sheets;
 
-import {Ad6} from './config.mjs'
+import {Ad6, ACTIVAR_ESTADOS} from './config.mjs'
 
 import {Ad6_ActorConflicto, Ad6_ActorPrincipal, Ad6_ActorTeniente, Ad6_ActorEnjambre, Ad6_ActorVehiculo} from '../model/actores.mjs' 
 import {Ad6_Habilidad, Ad6_Talento, Ad6_Equipo, Ad6_Armadura, Ad6_Hardware, Ad6_SuitEquipo, Ad6_PerfilVelocidad, Ad6_Localizacion, Ad6_Upgrade} from '../model/items.mjs' 
@@ -21,6 +21,8 @@ import * as TrackerFases from "./combate/ad6_trackerFases.mjs";
 import * as ReglasTurno from "./combate/ad6_reglasTurno.mjs";
 import * as VisualConflicto from "./combate/ad6_appVisualConflicto.mjs";
 import * as RepresentacionEnjambre from "./token/ad6_representacionEnjambre.mjs";
+import * as ServicioEstados from "./combate/ad6_servicioEstados.mjs";
+import * as EstadosToken from "./token/ad6_estadosToken.mjs";
 
 
 class Ad6_App extends ApplicationV2 {
@@ -166,6 +168,14 @@ Hooks.on("renderChatLog", (app, html) => {
       CONFIG.Item.dataModels.hardware = Ad6_Hardware;
       CONFIG.Item.dataModels.upgrade = Ad6_Upgrade;
 
+      // ----------------------------------------------------------------------
+      // REGISTRO de los ESTADOS del sistema (Corroído / Incendiado) como STATUS
+      // EFFECTS de Foundry, a partir del catálogo Ad6.Estados (fuente única).
+      // Así aparecen en el icono del token, en su HUD y en la lista de efectos.
+      // Se registran SOLO si el interruptor maestro está activo.
+      // ----------------------------------------------------------------------
+      if (ACTIVAR_ESTADOS) _registrarEstadosSistema();
+
 
 
       // Registro de las hojas para cada clase
@@ -236,7 +246,8 @@ Hooks.on("renderChatLog", (app, html) => {
         ,"appCombate": "systems/ad6_robotech/templates/combate/appCombate.hbs"
         ,"parcialArmaAtaque": "systems/ad6_robotech/templates/combate/parcialArmaAtaque.hbs"
         ,"parcialEmergenteUpgrades": "systems/ad6_robotech/templates/actor/parcialEmergenteUpgrades.hbs"
-        
+                ,"parcialIconosEstados": "systems/ad6_robotech/templates/actor/parcialIconosEstados.hbs"
+
         
     });
       // por qué no necesito registrar los templates de los dialog?
@@ -518,6 +529,15 @@ Hooks.on("renderChatLog", (app, html) => {
    // aleatoria centrada en la huella del token.
    RepresentacionEnjambre.inicializarRepresentacionEnjambre();
 
+   // Arrancamos el servicio de ESTADOS: mantiene Corroído/Incendiado (aplica,
+   // caduca al cambiar de asalto, etc.). El cálculo del combate y la interfaz
+   // lo consultan; aquí sólo registramos sus hooks.
+   ServicioEstados.inicializarServicioEstados();
+
+   // Presentación de los ESTADOS en el token (badge de nivel + sincronización
+   // con la hoja: aplicar un estado en el token se refleja en la hoja y al revés).
+   EstadosToken.inicializarEstadosToken();
+
 });
 
 // --------------------------------------------------------------------------
@@ -639,3 +659,68 @@ Hooks.on("preCreateToken", (tokenDoc, data, options, userId) =>
 
   tokenDoc.updateSource({ actorLink: true });
 });
+
+// --------------------------------------------------------------------------
+// REGISTRO de los ESTADOS del sistema en CONFIG.statusEffects
+// --------------------------------------------------------------------------
+// Convierte el catálogo Ad6.Estados (Corroído / Incendiado) en entradas de
+// CONFIG.statusEffects, para que Foundry los trate como estados de token:
+// aparecen sobre el actor (su ICONO en el token) y en la lista de efectos.
+//
+// FORMATO v12+/v14: CONFIG.statusEffects es un ARRAY de objetos { id, name, img }.
+//   - El IDENTIFICADOR de la entrada es "id". Foundry empareja el "statuses" de
+//     cada ActiveEffect con el "id" de la entrada para decidir qué icono pintar.
+//   - Por eso el efecto DEBE llevar "statuses" con EXACTAMENTE el mismo valor que
+//     el "id" de la entrada (lo garantizamos desde el servicio de estados).
+//   - "name" es una CLAVE i18n (Foundry la localiza); "img" es la RUTA del icono
+//     (nuestros SVG propios en img/estados/). IMPORTANTE: "img" debe existir
+//     SIEMPRE; si faltara, Foundry intentaría pintar el icono con una textura
+//     indefinida y fallaría ("undefined is not a valid property name").
+//
+// Se escriben solo si no existen ya (idempotente por "id"). Si por compatibilidad
+// con alguna versión antigua CONFIG.statusEffects fuera un OBJETO, se escribe
+// también en formato objeto (clave -> { name, img }).
+function _registrarEstadosSistema()
+{
+  const catalogo = CONFIG.Ad6?.Estados ?? {};
+  const statuses = CONFIG.statusEffects;
+
+  for (const clave of Object.keys(catalogo))
+  {
+    const def = catalogo[clave];
+    if (!def?.id) continue;
+
+    // Nombre localizado: para el incendio quitamos el sufijo "(nivel)" del
+    // nombre de la lista de estados (el nivel se ve en el badge del token).
+    const nombre = (def.id === "ad6-incendiado")
+      ? game.i18n.localize("Ad6.Estados.incendiadoNombre").replace(/\s*\(\{nivel\}\)\s*/g, "").trim()
+      : game.i18n.localize("Ad6.Estados.corrosivoNombre");
+
+    // "img" SIEMPRE definida (nunca undefined/null): si el catálogo no la
+    // trajera, caemos al icono SVG por defecto de Foundry.
+    const img = def.img ?? "icons/svg/aura.svg";
+
+    // --- Caso ARRAY (v12+): entrada { id, name, img } ---
+    if (Array.isArray(statuses))
+    {
+      const existente = statuses.find(s => (s?.id === def.id));
+      if (existente)
+      {
+        // Reparamos una entrada a medias (p.ej. sin img) sin duplicarla.
+        existente.name = nombre;
+        existente.img = img;
+      }
+      else
+      {
+        statuses.push({ id: def.id, name: nombre, img });
+      }
+      continue;
+    }
+
+    // --- Caso OBJETO (legacy): clave -> { name, img } ---
+    if (statuses && typeof statuses === "object")
+    {
+      statuses[def.id] = { name: nombre, img };
+    }
+  }
+}

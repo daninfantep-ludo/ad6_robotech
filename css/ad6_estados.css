@@ -1,0 +1,88 @@
+/* ===========================================================================
+ * ESTADOS de combate (Corroído / Incendiado)
+ * ---------------------------------------------------------------------------
+ * - Badge de nivel del incendio sobre el icono de estado del token.
+ * - Fila de "chips" de estado en la HOJA (sección de Vitales).
+ * =========================================================================== */
+
+/* ---------------------------------------------------------------------------
+ * BADGE de NIVEL sobre el icono de estado del token.
+ * --------------------------------------------------------------------------- */
+.ad6-badge-nivel {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 14px;
+  height: 14px;
+  padding: 0 3px;
+  border-radius: 7px;
+  color: #fff;
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 14px;
+  text-align: center;
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* ===========================================================================
+ * ESTADOS en la HOJA (sección de Vitales)
+ * ---------------------------------------------------------------------------
+ * Fila de "chips" con el icono del estado, su nombre corto y los botones para
+ * subir/bajar/quitar. Se pinta solo si hay algún estado activo (lo decide el
+ * parcial parcialIconosEstados.hbs).
+ * =========================================================================== */
+
+.ad6-estados-vitales {
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-left: 5px;
+}
+
+.ad6-estado-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 4px;
+  border: 1px solid rgba(0, 0, 0, 0.35);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.08);
+  line-height: 1.2;
+}
+
+.ad6-estado-chip .ad6-estado-texto {
+  font-size: 0.85em;
+  white-space: nowrap;
+}
+
+.ad6-estado-chip > i {
+  font-size: 0.95em;
+}
+
+/* Botones pequeños (subir/bajar/quitar) dentro del chip. */
+.ad6-estado-btn {
+  width: 16px;
+  height: 16px;
+  min-height: 0;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.7em;
+  opacity: 0.7;
+  color: inherit;
+}
+
+.ad6-estado-btn:hover {
+  opacity: 1;
+}
+
+.ad6-estado-btn i {
+  margin: 0;
+}
+
