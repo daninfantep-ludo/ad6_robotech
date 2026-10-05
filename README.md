@@ -31,6 +31,10 @@ General Features (not in a particular order)
  <li>29.- Fix bug: the clone adding is bounded to triumvirate career not tiresian species</li>
  <li>30.- When a triumvirate pilots a mecha, it structure is x3, when off or replaced /3</li>
  <li>31.- Fix bug: Replacing pilots kept concat pilot name with vehicle name</li>
+ <li>32.- Implements automatic +1 armor when attacked with melee weeapon and the defender has equipped a parry tagged weapon</li>
+ <li>33.- Implements incenidiary: a active effect that shows a flame in the token and in the visuals in the sheet. It adds +1 success per level cap 3 when a on fire unit is attacked. Control by active effects in foundry and in the character/lieutenant/swarm/vehicle sheet</li>
+ <li>34.- Same with corrosive weapon tag. It last 1 round</li>
+ <li>35.- Implements new weapon tag x2 damage to swarms, due to the shark's missiles (that are incenidary too)</li>
 </ul>
 Note: Not implemented special damage to on-foot triumvirates. On-foot Triumvirate swarms should't be a thing (narrative) I believe... nor triumvirate mecha swarms
 
