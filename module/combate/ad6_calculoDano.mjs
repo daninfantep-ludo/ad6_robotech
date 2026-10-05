@@ -274,6 +274,10 @@ export function formatearDano(dano)
  *   1) Reparte los éxitos de defensa entre las armas (anulando primero las más
  *      dañinas).
  *   2) Calcula el daño potencial de cada arma (daño por éxito * éxitos netos).
+ *   2b) x2 A ENJAMBRES: si el OBJETIVO es un enjambre y el arma trae el flag
+ *      "dobleSwarm", se DUPLICA el daño potencial de ESA arma (solo el suyo,
+ *      nunca el de las demás). Se hace DESPUÉS del reparto de defensa (que ya
+ *      rebajó los éxitos netos) y ANTES de sumar.
  *   3) Suma los daños de todas las armas en un resultado compuesto.
  *
  * Recibe SOLO valores/objetos planos: no conoce el encuentro ni los documentos.
@@ -281,20 +285,29 @@ export function formatearDano(dano)
  * @param {Array<{
  *    danoTexto:string,        // daño del arma tal cual ("1M","3xL","M",...)
  *    exitos:number,           // éxitos de ataque asignados a esa arma
- *    nombre?:string           // (opcional) para el detalle
+ *    nombre?:string,          // (opcional) para el detalle
+ *    dobleSwarm?:boolean      // (opcional) el arma hace x2 daño a enjambres
  * }>} armas
  * @param {number} exitosDefensa  éxitos de defensa a repartir.
+ * @param {object} [opciones]     { doblaDanoEnjambre:boolean } -> true cuando el
+ *                                OBJETIVO del ataque es un enjambre; activa el
+ *                                x2 de las armas con "dobleSwarm".
  * @returns {{
  *   armas: Array<{ nombre:string, dano:object, exitos:number, exitosNetos:number,
- *                  potencial:object }>,
+ *                  potencial:object, doblada:boolean }>,
  *   total: Array<{cantidad:number, tipo:string}>,
  *   totalTexto: string,
  *   detalle: string[]
  * }}
  */
-export function calcularDanoAtaque(armas, exitosDefensa)
+export function calcularDanoAtaque(armas, exitosDefensa, opciones = {})
 {
   const detalle = [];
+
+  // ¿Se debe duplicar el daño de las armas con "dobleSwarm"? SOLO cuando el
+  // objetivo es un enjambre (lo decide el llamador). El flag es POR ARMA, así
+  // que dentro del bucle solo se duplican las armas que lo traigan.
+  const doblaDanoEnjambre = opciones.doblaDanoEnjambre === true;
 
   // Normalizamos cada arma al par { dano:{cantidad,tipo}, exitos }.
   const preparadas = (armas ?? []).map((a, i) => ({
@@ -302,6 +315,7 @@ export function calcularDanoAtaque(armas, exitosDefensa)
     ,danoTexto: a.danoTexto ?? ""
     ,dano: parseDano(a.danoTexto)
     ,exitos: Number(a.exitos) || 0
+    ,dobleSwarm: a.dobleSwarm === true
   }));
 
   // 1) Reparto de la defensa (sobre copias; no muta la entrada).
@@ -310,14 +324,25 @@ export function calcularDanoAtaque(armas, exitosDefensa)
     ,exitosDefensa
   );
 
-  // 2) + 3) Potencial por arma y suma.
+  // 2) + 2b) + 3) Potencial por arma (con x2 si procede) y suma.
   const armasRes = [];
   const listaDanos = [];
   for (let i = 0; i < preparadas.length; i++)
   {
     const p = preparadas[i];
     const r = repartidas[i];
-    const potencial = p.dano ? danoPotencial(p.dano, r.exitosNetos) : null;
+
+    // Daño potencial base (daño por éxito * éxitos NETOS, ya descontada la defensa).
+    let potencial = p.dano ? danoPotencial(p.dano, r.exitosNetos) : null;
+
+    // x2 A ENJAMBRES: SOLO la contribución de ESTA arma y SOLO si el objetivo es
+    // enjambre y el arma lo indica. La defensa YA se consumió (éxitosNetos), así
+    // que aquí solo se duplica el daño de las armas marcadas.
+    const doblada = doblaDanoEnjambre && p.dobleSwarm === true && !!potencial;
+    if (doblada)
+    {
+      potencial = { cantidad: (Number(potencial.cantidad) || 0) * 2, tipo: potencial.tipo };
+    }
 
     if (p.dano)
     {
@@ -340,6 +365,7 @@ export function calcularDanoAtaque(armas, exitosDefensa)
       ,exitos: r.exitos
       ,exitosNetos: r.exitosNetos
       ,potencial: potencial ?? { cantidad: 0, tipo: null }
+      ,doblada
     });
   }
 

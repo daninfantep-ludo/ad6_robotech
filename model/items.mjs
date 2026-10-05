@@ -106,6 +106,8 @@ export class Ad6_Equipo extends Ad6_Item{
         ,danoEnergia: new fields.BooleanField()
         ,danoMelee: new fields.BooleanField()
         // estos campos son para indicar si hacen ese tipo de daño, para las resistencias.
+        ,dobleSwarm: new fields.BooleanField()
+        // este campo para armas que hacen doble de daño a swarms
         }
     }
     get descriptores()

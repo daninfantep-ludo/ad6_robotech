@@ -3,6 +3,8 @@
                 <span class="flex-0-1-auto">{{localize "Ad6.Etiquetas.vitales"}}</span>
         {{!-- Menús contextuales agrupados: Mejoras (upgrades) + configuración. --}}
         <div class="cnt-horizontal mrg-la">
+            <span class="flex-0-1-auto"> {{!-- ESTADOS de combate (Corroído / Incendiado) del actor. --}}
+                        {{> parcialIconosEstados estados = estados}}</span>
             <div class="menu-context menu-contenido">
                 {{> parcialEmergenteUpgrades upgrades = upgrades}}
             </div>
@@ -92,6 +94,5 @@
             </div>
         </div>
     </div> 
-    {{!-- ESTADOS de combate (Corroído / Incendiado) del actor. --}}
-    {{> parcialIconosEstados estados = estados}}
+
 </section>   

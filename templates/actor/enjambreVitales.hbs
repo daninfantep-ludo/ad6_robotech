@@ -2,6 +2,10 @@
      
     <header class="div-panel-titulo cnt-horizontal">
         <span class="flex-0-1-auto">{{localize "Ad6.Etiquetas.vitales"}}</span>
+        <div class="cnt-horizontal mrg-la">
+        <span class="flex-0-1-auto"> {{!-- ESTADOS de combate (Corroído / Incendiado) del actor. --}}
+                        {{> parcialIconosEstados estados = estados}}</span>
+                        </div>
     </header>
     <div class="cnt-horizontal">
         {{> parcialRetrato}}
@@ -41,6 +45,5 @@
 
         </div>
     </div> 
-    {{!-- ESTADOS de combate (Corroído / Incendiado) del actor. --}}
-    {{> parcialIconosEstados estados = estados}}
+
 </section>   

@@ -1475,8 +1475,12 @@ async function _evaluarResolucion(enc)
     // ESTADOS: propiedades del arma que APLICAN estados al impactar. Se leen
     // del clon "datos" (system del arma). En fuego concentrado basta con que
     // CUALQUIER arma las tenga (lo decide la aplicación del estado, más abajo).
-    ,corrosiva:       a?.datos?.system?.corrosiva === true
+            ,corrosiva:       a?.datos?.system?.corrosiva === true
     ,incendiaria:     a?.datos?.system?.incendiaria === true
+    // x2 DAÑO A ENJAMBRES: propiedad del arma que DUPLICA el daño de ESA arma
+    // cuando el OBJETIVO es un enjambre. Se aplica DESPUÉS del reparto de defensa
+    // y ANTES de cualquier armadura (ver _resolverDanoDeObjetivo).
+    ,dobleSwarm:      a?.datos?.system?.dobleSwarm === true
     // ¿Es el arma PRINCIPAL del atacante? (la suya propia, no prestada). La usa
     // el estado INCENDIADO para sumar sus +n éxitos SOLO al arma principal.
     ,principal:       a.principal === true
@@ -1781,10 +1785,12 @@ function _armasConBonusIncendio(armasAtaque, nivelInc, enc, defensor)
 }
 
 /**
- * Resuelve el daño de UN objetivo del encuentro:
- *   1) Calcula el daño base del ataque para ESE defensor, repartiendo sus
- *      éxitos de defensa entre las armas (ver Calculo.calcularDanoAtaque).
- *   2) Resuelve el actor objetivo (actor del mundo).
+  * Resuelve el daño de UN objetivo del encuentro:
+ *   1) Resuelve el actor objetivo (actor del mundo). Se hace ANTES del cálculo
+ *      porque su TIPO decide si se duplica el daño de las armas "dobleSwarm".
+ *   2) Calcula el daño base del ataque para ESE defensor, repartiendo sus
+ *      éxitos de defensa entre las armas (ver Calculo.calcularDanoAtaque) y
+ *      aplicando el x2 a enjambres si el objetivo es un enjambre.
  *   3) Según el TIPO de objetivo:
  *        - vehículo -> armadura + estructura, y decide aplicar o informar.
  *        - otro     -> [HUECO-DANO-OTROS] (se verá más adelante).
@@ -1803,9 +1809,19 @@ function _armasConBonusIncendio(armasAtaque, nivelInc, enc, defensor)
  */
 async function _resolverDanoDeObjetivo(enc, objetivo, def, armasAtaque)
 {
+  // 2) Actor objetivo. Se resuelve PRIMERO (antes del cálculo) porque el TIPO de
+  //    objetivo decide si se duplica el daño de las armas "dobleSwarm" (x2 a
+  //    enjambres), parámetro que necesita el cálculo puro.
+  const actorObj = _normalizarActorDelMundo(fromUuidSync(objetivo.actorUuid));
+
   const exitosDefensa = _totalExitosDefensa(def);
-  // 1) Daño base (comparte mecanismo puro).
-  const resultado = Calculo.calcularDanoAtaque(armasAtaque, exitosDefensa);
+  // 1) Daño base (comparte mecanismo puro). El x2 a enjambres se resuelve DENTRO
+  //    del cálculo: reparte la defensa (rebaja éxitos), calcula el potencial por
+  //    arma y, si el objetivo es enjambre + el arma trae "dobleSwarm", duplica la
+  //    contribución de ESA arma antes de sumar. Todo ANTES de cualquier armadura.
+  const resultado = Calculo.calcularDanoAtaque(armasAtaque, exitosDefensa, {
+     doblaDanoEnjambre: (actorObj?.type === "enjambre")
+  });
 
   _log(enc, t("Ad6.Log.danoCabecera", { atacante: enc.atacanteNombre, defensor: def.nombre }));
   _logSangrado(enc, t("Ad6.Log.defensaAplicada", { exitos: exitosDefensa }), null, 1);
@@ -1818,9 +1834,7 @@ async function _resolverDanoDeObjetivo(enc, objetivo, def, armasAtaque)
     return;
   }
 
-  // 2) Actor objetivo.
-  const actorObj = _normalizarActorDelMundo(fromUuidSync(objetivo.actorUuid));
-  if (!actorObj)
+      if (!actorObj)
   {
     _logSangrado(enc, t("Ad6.Log.objetivoNoResuelto"), null, 1);
     return;
