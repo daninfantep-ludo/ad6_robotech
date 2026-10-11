@@ -12,8 +12,19 @@
  *   encuentro. Así:
  *     - Ningún cliente escribe documentos ajenos => sin problemas de permisos.
  *     - Funciona igual para jugadores y para el GM.
- *   Los avisos no tienen contenido visible y se ocultan del log con el hook
+  *   Los avisos no tienen contenido visible y se ocultan del log con el hook
  *   renderChatMessageHTML (clase .ad6-asistencia-aviso, reutilizada).
+ *
+ * PROBLEMA DE LOS ENCUENTROS "COLGADOS" (y cómo se resuelve):
+ *   Como el estado vive SOLO en memoria por cliente, si un cliente recarga la
+ *   página (F5), se reconecta o sufre un corte de conexión, PIERDE su copia de
+ *   game.ad6_encuentros. A partir de ahí no llega ningún aviso nuevo (los demás
+ *   clientes no reenvían nada) y sus ventanas de ataque/defensa no se
+ *   reconstruyen: el encuentro queda "colgado" para ese cliente.
+ *   La solución es la REHIDRATACIÓN (ver rehidratarEncuentros): los avisos de
+ *   combate SIGUEN en el HISTORIAL DE CHAT con su flag-snapshot, así que al
+ *   arrancar (ready) recorremos ese historial y repoblamos el estado con el
+ *   ÚLTIMO snapshot de cada encuentroId, reabriendo las ventanas que toquen.
  *
  * IMPORTANTE (alcance de esta fase):
  *   Se gestionan: selección de objetivos, reparto de éxitos de ataque y
@@ -2870,6 +2881,26 @@ function _entradaLog(texto, datos, nivel, sangria)
 async function _difundir(encuentroId)
 {
   const enc = encuentros()[encuentroId] ?? null;
+  await _emitirAviso(encuentroId, enc ? foundry.utils.deepClone(enc) : null);
+}
+
+/**
+ * Emite un aviso de CIERRE (snapshot null) de un encuentro, SIN necesidad de
+ * que exista en el estado local. Lo usa la poda de la rehidratación para
+ * sincronizar el cierre del encuentro en todos los clientes.
+ */
+async function _difundirCierre(encuentroId)
+{
+  if (!encuentroId) return;
+  await _emitirAviso(encuentroId, null);
+}
+
+/**
+ * Emite un mensaje-aviso de combate con el snapshot indicado (o null = cierre).
+ * Punto ÚNICO de creación del mensaje, para no duplicar el formato del flag.
+ */
+async function _emitirAviso(encuentroId, snapshot)
+{
   await ChatMessage.create({
      content: ""
     ,speaker: { alias: "Combate" }
@@ -2878,7 +2909,7 @@ async function _difundir(encuentroId)
       [ID_FLAG]: {
         [AVISO_COMBATE]: {
            encuentroId: encuentroId
-          ,snapshot: enc ? foundry.utils.deepClone(enc) : null
+          ,snapshot: snapshot ?? null
         }
       }
     }
@@ -2917,24 +2948,91 @@ function esMensajeAviso(mensaje)
 }
 
 /**
+ * ¿Sigue el actor indicado PRESENTE en el combate activo (game.combat)?
+ *
+ * "Presente" = tiene un Combatant de PRESENCIA (NO de fase) en el combate
+ * activo. Es la MISMA regla que usa objetivosDelCombate() para "quién está en
+ * la liza", aplicada aquí a un único actor.
+ *
+ * @param {string} actorUuid  uuid del actor ("Actor.<id>").
+ * @returns {boolean}
+ */
+function _actorEnCombate(actorUuid)
+{
+  const combat = game.combat;
+  if (!combat || !actorUuid) return false;
+
+  const actor = _normalizarActorDelMundo(fromUuidSync(actorUuid));
+  if (!actor) return false;
+
+  for (const c of combat.combatants)
+  {
+    // Los Combatants de FASE (tiradas fijadas) no cuentan como presencia.
+    if (esCombatantDeFase(c)) continue;
+    if (c.defeated === true) continue;
+    const a = _normalizarActorDelMundo(c.actor);
+    if (a && a.uuid === actor.uuid) return true;
+  }
+  return false;
+}
+
+/**
+ * ¿Sigue VIVO (tiene sentido jugable) un encuentro?
+ *
+ * Se usa para DECIDIR SI REHIDRATAR un encuentro a partir del historial de
+ * chat. Un encuentro histórico puede haber quedado "abierto"/"resuelto" en el
+ * log si su aviso de cierre nunca llegó (corte de conexión, etc.), pero ya no
+ * tener sentido. Criterios (TODOS deben cumplirse):
+ *   1) Hay un combate ACTIVO (game.combat). Sin liza, no hay ataque/defensa.
+ *   2) El ATACANTE sigue PRESENTE en el combate activo.
+ *   3) Al menos UN OBJETIVO sigue PRESENTE en el combate activo.
+ *
+ * Si falta cualquiera, el encuentro está MUERTO y debe cerrarse/podarse.
+ *
+ * @param {object} enc  Snapshot del encuentro.
+ * @returns {boolean}
+ */
+function _encuentroTieneSentido(enc)
+{
+  if (!enc) return false;
+  // 1) Debe haber un combate activo.
+  if (!game.combat) return false;
+  // 2) El atacante debe seguir en la liza.
+  if (!_actorEnCombate(enc.atacanteUuid)) return false;
+  // 3) Al menos un objetivo debe seguir en la liza.
+  const algunObjetivo = (enc.objetivos ?? []).some(o => _actorEnCombate(o.actorUuid));
+  return algunObjetivo;
+}
+
+/**
  * REHIDRATA el estado de los encuentros a partir del HISTORIAL DE CHAT.
  *
  * Por qué: el estado vive en game.ad6_encuentros (memoria por cliente). Al
  * recargar la página (F5), reconectar o sufrir un problema de conexión, ese
  * estado se pierde y no llega ningún aviso nuevo, así que las ventanas no se
  * reconstruyen. Pero los avisos de combate SIGUEN en el log de chat con su
- * flag-snapshot. Aquí los recorremos de NUEVO a VIEJO y nos quedamos con el
- * ÚLTIMO snapshot de cada encuentroId, repoblando el estado y reabriendo las
- * ventanas que correspondan a este cliente.
+ * flag-snapshot. Aquí los recorremos y nos quedamos con el ÚLTIMO snapshot de
+ * cada encuentroId, repoblando el estado y reabriendo las ventanas que
+ * correspondan a este cliente.
+ *
+ * FILTRADO POR "SENTIDO JUGABLE": un snapshot del historial puede estar en
+ * estado "abierto"/"resuelto" y, aun así, ya NO tener sentido (no hay combate
+ * activo, o sus participantes se fueron de la liza). Esos se DESCARTAN y se
+ * emite su CIERRE para que todos los clientes los limpien.
  *
  * Reglas:
- *   - Solo se rehidratan encuentros VIVOS (estado != "cerrado" y snapshot no
- *     nulo). Un aviso con snapshot=null significa "cerrado/limpiado".
+ *   - Aviso con snapshot=null, o estado "cerrado" -> limpia y cierra.
+ *   - Estado != "cerrado" pero sin sentido jugable -> poda + difunde cierre.
+ *   - Estado != "cerrado" y con sentido         -> reconstruye + abre ventanas.
  *   - El último aviso de un encuentroId MANDA (puede ser un cierre).
  */
 export function rehidratarEncuentros()
 {
   if (!game.messages) return;
+
+  // BARRIDO LOCAL PREVIO: partimos de cero para no arrastrar estado zombi de
+  // una sesión anterior de la misma página (antes de repoblar desde el log).
+  _limpiarEstadoLocal();
 
   // Ordenamos cronológicamente (más antiguo -> más reciente) para que el
   // ÚLTIMO aviso de cada encuentroId sea el que manda.
@@ -2952,9 +3050,11 @@ export function rehidratarEncuentros()
   }
 
   let reconstruidos = 0;
+  const idsACerrar = [];
+
   for (const [encuentroId, snapshot] of ultimoPorId.entries())
   {
-    // Aviso de cierre: o snapshot nulo, o encuentro marcado como "cerrado".
+    // (a) Aviso de cierre ya emitido: o snapshot nulo, o estado "cerrado".
     if (!snapshot || snapshot.estado === "cerrado")
     {
       delete encuentros()[encuentroId];
@@ -2962,7 +3062,17 @@ export function rehidratarEncuentros()
       continue;
     }
 
-    // Reconstruimos el estado local con el snapshot más reciente.
+    // (b) Snapshot aún "vivo" en el log, pero ¿sigue teniendo sentido jugable?
+    if (!_encuentroTieneSentido(snapshot))
+    {
+      // Encuentro MUERTO: lo podamos y pedimos su cierre (difundido por el GM).
+      delete encuentros()[encuentroId];
+      Ad6_AppCombate.cerrarEncuentro(encuentroId);
+      idsACerrar.push(encuentroId);
+      continue;
+    }
+
+    // (c) Reconstruimos el estado local con el snapshot más reciente.
     encuentros()[encuentroId] = foundry.utils.deepClone(snapshot);
     reconstruidos++;
   }
@@ -2970,9 +3080,36 @@ export function rehidratarEncuentros()
   // Revisamos ventanas de todos los encuentros vivos reconstruidos.
   _revisarTodos();
 
+  // FASE 3: difundimos el CIERRE de los encuentros podados para que el resto de
+  // clientes también los limpien y no reaparezcan en un futuro F5. Solo difunde
+  // el GM, para no emitir cierres duplicados desde varios clientes a la vez.
+  if (idsACerrar.length > 0 && game.user?.isGM)
+  {
+    for (const id of idsACerrar) _difundirCierre(id);
+  }
+
   if (reconstruidos > 0)
   {
     console.log(`[AD6][Combate] Rehidratados ${reconstruidos} encuentro(s) desde el historial de chat.`);
+  }
+  if (idsACerrar.length > 0)
+  {
+    console.log(`[AD6][Combate] Descartados ${idsACerrar.length} encuentro(s) sin sentido jugable (sin combate/participantes).`);
+  }
+}
+
+/**
+ * Vacía el estado LOCAL de encuentros y cierra las ventanas conocidas, SIN
+ * difundir nada. Se usa al arrancar (antes de rehidratar) para no arrastrar
+ * estado zombi de una sesión anterior de la misma página.
+ */
+function _limpiarEstadoLocal()
+{
+  const store = encuentros();
+  for (const id of Object.keys(store))
+  {
+    Ad6_AppCombate.cerrarEncuentro(id);
+    delete store[id];
   }
 }
 
@@ -3045,9 +3182,21 @@ export function inicializarServicioCombate()
     _cerrarTodos();
   });
 
-  // Al borrar el combate, idem.
+    // Al borrar el combate, idem.
   Hooks.on("deleteCombat", () => {
     _cerrarTodos();
+  });
+
+  // RED DE SEGURIDAD: al CREAR o ACTUALIZAR el combate, cerramos los encuentros
+  // que ya NO tengan sentido jugable (sin combate activo, o sin sus participantes
+  // en la liza). Cubre el caso de "borro/sustituyo el combate" sin depender solo
+  // de deleteCombat, y el de un combate que cambia de combatientes. Solo actúa el
+  // GM para no reescribir el cierre desde varios clientes.
+  Hooks.on("createCombat", () => {
+    if (game.user?.isGM) _podarEncuentrosSinSentido();
+  });
+  Hooks.on("updateCombat", () => {
+    if (game.user?.isGM) _podarEncuentrosSinSentido();
   });
 
   // Conexión/desconexión de usuarios: la visibilidad de las ventanas de
@@ -3086,6 +3235,31 @@ function _cerrarTodos()
     store[id].estado = "cerrado";
     Ad6_AppCombate.cerrarEncuentro(id);
     delete store[id];
+  }
+}
+
+/**
+ * Poda los encuentros VIVOS que ya no tienen sentido jugable: aquellos cuyo
+ * atacante u objetivos han desaparecido de la liza (o cuando ya no hay combate
+ * activo). Cierra sus ventanas localmente y DIFUNDE su cierre para que el resto
+ * de clientes se limpien igual.
+ *
+ * La usa el hook de combate (createCombat/updateCombat) como red de seguridad.
+ * Solo debe invocarla el GM (evita difundir cierres duplicados).
+ */
+function _podarEncuentrosSinSentido()
+{
+  const store = encuentros();
+  for (const id of Object.keys(store))
+  {
+    const enc = store[id];
+    if (!enc) continue;
+    if (_encuentroTieneSentido(enc)) continue;
+
+    // Sin sentido -> cerramos localmente y difundimos el cierre.
+    Ad6_AppCombate.cerrarEncuentro(id);
+    delete store[id];
+    _difundirCierre(id);
   }
 }
 

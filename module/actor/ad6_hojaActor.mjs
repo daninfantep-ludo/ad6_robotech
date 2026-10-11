@@ -106,9 +106,10 @@ export class Ad6_HojaActor extends HandlebarsApplicationMixin(ActorSheetV2)
     {
       const tipo = target.dataset.tipo;
       let feature = { name: game.i18n.localize("Ad6.Mensajes.nuevoItem") ,type: tipo };
+      console.log(feature)
       // se le pasa el tipo para saber de qué actor hay que borrar
       const res = await Func.ObtenerActorOriginal(this.actor,tipo);
-      
+      console.log(res);
       //this.actor.createEmbeddedDocuments("Item",[feature]);
       await res.actor.createEmbeddedDocuments("Item",[feature]);
       if(res.esPiloto)

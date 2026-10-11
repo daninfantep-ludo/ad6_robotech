@@ -48,6 +48,12 @@ export async function ObtenerActorOriginal(actor,tipo)
     {
         resultado = await foundry.utils.fromUuid("Actor." + actor.system.nombrePiloto);
         piloto = true;
+        // caso particular... qué pasa si el vehículo es una nave no tripulada? cagamos
+        if(resultado===null)
+        {
+           resultado= await actor;
+           piloto = false; 
+        }
     }
     return { actor: resultado, esPiloto: piloto};
 

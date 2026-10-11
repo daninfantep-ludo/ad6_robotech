@@ -156,7 +156,7 @@ export class Ad6_Hardware extends Ad6_Item{
         const commonData = super.defineSchema();
         return {
         ...commonData
-        ,marcado: new fields.BooleanField()
+        ,marcado: new fields.BooleanField({initial: true})
         }
     }
 }
@@ -166,7 +166,7 @@ export class Ad6_Localizacion extends Ad6_Item{
         const commonData = super.defineSchema();
         return {
         ...commonData
-        ,marcado: new fields.BooleanField()
+        ,marcado: new fields.BooleanField({initial: true})
         }
     }
 }
@@ -267,6 +267,7 @@ export class Ad6_Upgrade extends Ad6_Item{
         ,suitEquipos: new fields.ArrayField(new fields.ObjectField()) // cada uno: item.toObject() de tipo suitEquipo
         ,talentos: new fields.ArrayField(new fields.ObjectField())    // cada uno: item.toObject() de tipo talento
         ,elementos: new fields.ArrayField(new fields.ObjectField())   // cada uno: item.toObject() de tipo elemento
+        ,localizaciones: new fields.ArrayField(new fields.ObjectField()) // cada uno: item.toObject() de tipo localizacion
         }
     }
 }

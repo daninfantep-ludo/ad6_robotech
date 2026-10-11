@@ -28,13 +28,13 @@
 // ---------------------------------------------------------------------------
 
 // Qué campos de lista del upgrade se APLICAN a cada TIPO DE ACTOR.
-//   - vehiculo : armaduras + equipos + suitEquipos
+//   - vehiculo : armaduras + equipos + suitEquipos + localizaciones
 //   - principal: equipos + suitEquipos + talentos + elementos
 //   - teniente : equipos + suitEquipos
 // Los bonos numéricos, las imágenes y la designación SOLO se aplican en
 // vehículo (se controla aparte, con esVehiculo()).
 const LISTAS_POR_ACTOR = {
-   vehiculo:  ["armaduras", "equipos", "suitEquipos"]
+   vehiculo:  ["armaduras", "equipos", "suitEquipos","localizaciones"]
   ,principal: ["equipos", "suitEquipos", "talentos", "elementos"]
   ,teniente:  ["equipos", "suitEquipos"]
 };

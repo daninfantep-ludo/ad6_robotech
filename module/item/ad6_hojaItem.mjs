@@ -64,6 +64,7 @@ export class Ad6_HojaItem extends HandlebarsApplicationMixin(ItemSheetV2)   {
           ,upgradeBorrarSuitEquipo: Ad6_HojaItem._onUpgradeBorrarSuitEquipo
           ,upgradeBorrarTalento: Ad6_HojaItem._onUpgradeBorrarTalento
           ,upgradeBorrarElemento: Ad6_HojaItem._onUpgradeBorrarElemento
+          ,upgradeBorrarLocalizacion: Ad6_HojaItem._onUpgradeBorrarLocalizacion
         },
         // Permitir arrastrar items reales (armadura/equipo/suitEquipo) SOBRE la
         // hoja de un upgrade para añadirlos a sus listas de inyección.
@@ -106,7 +107,7 @@ export class Ad6_HojaItem extends HandlebarsApplicationMixin(ItemSheetV2)   {
             ,"competencia": "hojaGenerico"
             ,"hardware": "hojaHardware"
             ,"localizacion": "hojaLocalizacion"
-                        ,"perfilVelocidad": "hojaPerfilVelocidad"
+            ,"perfilVelocidad": "hojaPerfilVelocidad"
             ,"hardware":"hojaLocalizacion"
             ,"upgrade": "hojaUpgrade"
         };
@@ -226,6 +227,11 @@ export class Ad6_HojaItem extends HandlebarsApplicationMixin(ItemSheetV2)   {
     this._quitarDeLista("elementos", Number(target.dataset.index));
   }
 
+    static async _onUpgradeBorrarLocalizacion(event, target)
+  {
+    this._quitarDeLista("localizaciones", Number(target.dataset.index));
+  }
+
   // -------------------------------------------------------------------------
   // ITEM "upgrade": AÑADIR cosas a las listas ARRASTRANDO items reales
   // -------------------------------------------------------------------------
@@ -258,6 +264,7 @@ export class Ad6_HojaItem extends HandlebarsApplicationMixin(ItemSheetV2)   {
       ,suitEquipo: "suitEquipos"
       ,talento: "talentos"
       ,elemento: "elementos"
+      ,localizacion: "localizaciones"
     };
         const campo = campoPorTipo[item.type];
     // Tipo no soportado (p.ej. otro upgrade): no hacemos nada con el drop.

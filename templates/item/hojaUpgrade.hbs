@@ -225,6 +225,20 @@
         </div>
     </div>
 
+    {{!-- === LOCALIZACIONES A INYECTAR (solo lectura) ===
+         Sólo se inyectan en actores de tipo "principal" (ver servicio de
+         upgrades). En vehículo/teniente se ignoran al equipar. --}}
+    <div class="form-group grupo-campos fd-column">
+        <header class="chk-ct" style="height:20px;">
+            <div class="w-375 tx-pq tx-cnt" >{{localize "Ad6.Pestanas.localizaciones"}}</div>
+        </header>
+        <div class="fd-column" ID="UPGRADE_LOCALIZACIONES">
+            {{#each system.localizaciones as |loc idx|}}
+                {{> parcialUpgradeLecturaLocalizacion loc=loc idx=idx }}
+            {{/each}}
+        </div>
+    </div>    
+
     <div class="form-group grupo-descripcion">
         <prose-mirror target="system.description" name="system.descripcion" value="{{system.descripcion}}" toggled="true">
         {{{descripcionRica}}} {{!--the enriched text--}}

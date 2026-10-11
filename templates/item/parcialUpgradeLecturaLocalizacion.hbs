@@ -1,0 +1,19 @@
+{{!--
+    Fila de LOCALIZACION en SOLO LECTURA para la hoja de un UPGRADE.
+    Replica los mismos campos/aspecto que tabLocalizacion, pero SIN
+    edición. Sólo conserva el botón de quitar de la lista.
+
+    Parámetros:
+      * loc  -> la COPIA del item (objeto plano): loc.name...
+      * idx  -> índice en la lista (para el botón quitar).
+--}}
+<div class="chk-ct">
+    {{!-- Nombre --}}
+    <div class="w-375 mrg mrg-r10">{{loc.name}}</div>
+
+    {{!-- Botón quitar de la lista del upgrade --}}
+    <div class="fila-ext mrg-la">
+        <button type="button" class="boton-ico" data-action="upgradeBorrarLocalizacion" data-index="{{idx}}" title="{{localize "Ad6.Upgrade.quitar"}}"><i class="fas fa-trash"></i></button>
+    </div>
+</div>
+

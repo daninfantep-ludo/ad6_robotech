@@ -31,8 +31,12 @@ const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 export class Ad6_AppVisualConflicto extends HandlebarsApplicationMixin(ApplicationV2)
 {
   static DEFAULT_OPTIONS = {
-     // Sin id de instancia único: es SINGLETON por cliente (ver abrirORefrescar).
-     tag: "div"
+     // ID FIJO = SINGLETON a nivel de Foundry: aunque se construyeran dos
+     // instancias por error (p. ej. una race de hooks), Foundry las identificará
+     // por el mismo id y reutilizará/reemplazará la existente en vez de pintar
+     // dos ventanas. Refuerza el guardado por "_instancia" (ver abrirORefrescar).
+     id: "ad6-visual-conflicto"
+    ,tag: "div"
     ,classes: ["ad6", "conflictos"]
     ,window: {
        // Valor SOLO de relleno: ApplicationV2 NO procesa el prefijo "i18n:" en
@@ -81,15 +85,29 @@ export class Ad6_AppVisualConflicto extends HandlebarsApplicationMixin(Applicati
   /**
    * Abre la ventana si no existe; si ya existe, la refresca (para reflejar el
    * estado actual del combate y de sus conflictos).
+   *
+   * ANTI-DUPLICADOS: si ya hay una instancia registrada (aunque su `rendered`
+   * todavía sea false porque el render es ASÍNCRONO y no ha terminado), NO
+   * creamos otra: refrescamos la que hay. Sin esta comprobación, varios hooks
+   * seguidos (createCombatant + updateCombatant + ready…) crearían una ventana
+   * nueva cada uno antes de que el primer render terminase -> DUPLICADOS.
    */
   static abrirORefrescar()
   {
-    if (Ad6_AppVisualConflicto._instancia && Ad6_AppVisualConflicto._instancia.rendered)
+    const actual = Ad6_AppVisualConflicto._instancia;
+    if (actual)
     {
-      Ad6_AppVisualConflicto._instancia.render({ force: true });
-      return Ad6_AppVisualConflicto._instancia;
+      // Ya renderizada -> refrescamos forzando el contexto.
+      // Aún renderizando (rendered false) -> NO lanzamos otro render (evita
+      // carreras); cuando termine el que está en curso ya mostrará el estado.
+      if (actual.rendered) actual.render({ force: true });
+      return actual;
     }
+
     const nueva = new Ad6_AppVisualConflicto();
+    // Registramos la instancia ANTES de renderizar: así, si cualquier hook
+    // dispara mientras el render está en curso, encontrará "_instancia" y no
+    // creará una segunda.
     Ad6_AppVisualConflicto._instancia = nueva;
     nueva.render(true);
     return nueva;
@@ -99,14 +117,22 @@ export class Ad6_AppVisualConflicto extends HandlebarsApplicationMixin(Applicati
   static cerrar()
   {
     const inst = Ad6_AppVisualConflicto._instancia;
-    if (inst && inst.rendered) inst.close();
+    // Cerramos aunque no esté "rendered" todavía (render en curso): close() es
+    // idempotente y evita dejar una ventana a medio abrir huérfana.
+    if (inst) inst.close();
     Ad6_AppVisualConflicto._instancia = null;
   }
 
-  /** @override — al cerrarse, desregistramos la instancia. */
+  /** @override — al cerrarse, desregistramos la instancia (solo si es la nuestra). */
   async close(options)
   {
-    Ad6_AppVisualConflicto._instancia = null;
+    // Solo desregistramos si ESTA instancia es la registrada. Así, si por una
+    // carrera hubiera quedado otra instancia activa, no la "olvidamos" al
+    // cerrarse esta.
+    if (Ad6_AppVisualConflicto._instancia === this)
+    {
+      Ad6_AppVisualConflicto._instancia = null;
+    }
     return super.close(options);
   }
 

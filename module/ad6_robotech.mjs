@@ -200,13 +200,10 @@ Hooks.on("renderChatLog", (app, html) => {
         ,"hojaArmadura" : "systems/ad6_robotech/templates/item/hojaArmadura.hbs"
         ,"hojaGenerico": "systems/ad6_robotech/templates/item/hojaGenerico.hbs"
         ,"hojaHardware": "systems/ad6_robotech/templates/item/hojaHardware.hbs"        
-                ,"hojaLocalizacion": "systems/ad6_robotech/templates/item/hojaLocalizacion.hbs"
+        ,"hojaLocalizacion": "systems/ad6_robotech/templates/item/hojaLocalizacion.hbs"
         ,"hojaPerfilVelocidad": "systems/ad6_robotech/templates/item/hojaPerfilVelocidad.hbs"
         ,"hojaUpgrade": "systems/ad6_robotech/templates/item/hojaUpgrade.hbs"                                
-        // Parciales SOLO LECTURA de la hoja de UPGRADE: muestran las listas de
-        // armaduras / equipos / suities con el mismo aspecto que tabEquipo.hbs,
-        // pero sin edición ni botones (el upgrade sólo se CONSTRUYE por drag&drop).
-                ,"parcialUpgradeLecturaArmadura": "systems/ad6_robotech/templates/item/parcialUpgradeLecturaArmadura.hbs"
+        ,"parcialUpgradeLecturaArmadura": "systems/ad6_robotech/templates/item/parcialUpgradeLecturaArmadura.hbs"
         ,"parcialUpgradeLecturaEquipo": "systems/ad6_robotech/templates/item/parcialUpgradeLecturaEquipo.hbs"
         ,"parcialUpgradeLecturaHardwares": "systems/ad6_robotech/templates/item/parcialUpgradeLecturaHardwares.hbs"
         ,"parcialUpgradeLecturaTalento": "systems/ad6_robotech/templates/item/parcialUpgradeLecturaTalento.hbs"
@@ -241,12 +238,13 @@ Hooks.on("renderChatLog", (app, html) => {
         ,"parcialHardwares": "systems/ad6_robotech/templates/actor/parcialHardwares.hbs"
         ,"parcialEquipo": "systems/ad6_robotech/templates/item/parcialEquipo.hbs"
         ,"parcialSistemas": "systems/ad6_robotech/templates/actor/parcialSistemas.hbs"
-                ,"parcialTenienteHabilidades": "systems/ad6_robotech/templates/actor/parcialTenienteHabilidades.hbs"
+        ,"parcialTenienteHabilidades": "systems/ad6_robotech/templates/actor/parcialTenienteHabilidades.hbs"
         ,"vehiculoHabilidadesTripulacion": "systems/ad6_robotech/templates/actor/vehiculoHabilidadesTripulacion.hbs"
         ,"appCombate": "systems/ad6_robotech/templates/combate/appCombate.hbs"
         ,"parcialArmaAtaque": "systems/ad6_robotech/templates/combate/parcialArmaAtaque.hbs"
         ,"parcialEmergenteUpgrades": "systems/ad6_robotech/templates/actor/parcialEmergenteUpgrades.hbs"
-                ,"parcialIconosEstados": "systems/ad6_robotech/templates/actor/parcialIconosEstados.hbs"
+        ,"parcialIconosEstados": "systems/ad6_robotech/templates/actor/parcialIconosEstados.hbs"
+        ,"parcialUpgradeLecturaLocalizacion":"systems/ad6_robotech/templates/item/parcialUpgradeLecturaLocalizacion.hbs"
 
         
     });
