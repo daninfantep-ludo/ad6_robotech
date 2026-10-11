@@ -35,6 +35,9 @@ General Features (not in a particular order)
  <li>33.- Implements incenidiary: a active effect that shows a flame in the token and in the visuals in the sheet. It adds +1 success per level cap 3 when a on fire unit is attacked. Control by active effects in foundry and in the character/lieutenant/swarm/vehicle sheet</li>
  <li>34.- Same with corrosive weapon tag. It last 1 round</li>
  <li>35.- Implements new weapon tag x2 damage to swarms, due to the shark's missiles (that are incenidary too)</li>
+ <li>36.- Fix bugs regarding not closing encounters when not in combat and multiple conflict window when GM</li>
+ <li>37.- Now de upgrade item allow locations, to make easier write vessels</li>
+ <li>37.- Now de vessels can add talents when unmanned to reflect veteran crewes as per Void and Fire</li> 
 </ul>
 Note: Not implemented special damage to on-foot triumvirates. On-foot Triumvirate swarms should't be a thing (narrative) I believe... nor triumvirate mecha swarms
 
